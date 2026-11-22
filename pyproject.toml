@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "slopdam"
+version = "0.2.0.dev0"
+description = "Logger formatter and linter that strips AI-generated patterns (em dashes, emoji, separators, markdown) from log output"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+authors = [{ name = "The slopdam Authors" }]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: Korean",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Logging",
+]
+requires-python = ">=3.9"
+keywords = ["logging", "formatter", "linter", "korean", "ai", "slop"]
+
+[project.urls]
+Homepage = "https://github.com/slopdam/slopdam"
+Repository = "https://github.com/slopdam/slopdam"
+Issues = "https://github.com/slopdam/slopdam/issues"
+Changelog = "https://github.com/slopdam/slopdam/blob/main/CHANGELOG.md"
+
+[project.scripts]
+slopdam = "slopdam.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/slopdam"]

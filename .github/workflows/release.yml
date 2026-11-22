@@ -1,0 +1,40 @@
+name: release
+
+# Push a tag like v0.2.0 to publish to PyPI.
+# Uses PyPI Trusted Publishing: no API token is stored in the repository.
+# One-time setup: add a pending publisher on pypi.org (owner slopdam, repo slopdam,
+# workflow release.yml, environment pypi). See https://docs.pypi.org/trusted-publishers/
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
