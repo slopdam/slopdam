@@ -1,9 +1,9 @@
 # slopdam
 
-[English](README.md) | [한국어](README.ko.md)
+[English](https://github.com/slopdam/slopdam/blob/main/README.md) | [한국어](https://github.com/slopdam/slopdam/blob/main/README.ko.md)
 
 [![ci](https://github.com/slopdam/slopdam/actions/workflows/ci.yml/badge.svg)](https://github.com/slopdam/slopdam/actions/workflows/ci.yml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/slopdam/slopdam/blob/main/LICENSE)
 
 **A dam for AI slop in your logs.** slopdam removes the traces AI coding tools leave in log messages and console output: em dashes and look-alike lines (including the Korean `ㅡ`), decorative emoji, separator lines, markdown bold, curly quotes and invisible characters.
 
@@ -27,10 +27,10 @@ slopdam uses deterministic rules (regular expressions and character tables). It 
 
 ## Install
 
-slopdam needs Python 3.9 or later and has no runtime dependencies. Until the first PyPI release, install it from GitHub:
+slopdam needs Python 3.9 or later and has no runtime dependencies.
 
 ```bash
-pip install git+https://github.com/slopdam/slopdam
+pip install slopdam
 ```
 
 ## Clean log output
@@ -107,12 +107,12 @@ tail -f app.log | slopdam clean
 
 ## Rules
 
-Every rule has an ID such as `dash.run` or `emoji.pictograph`, and can be turned off by ID or by group (`--disable emoji`). Profiles decide what a trace becomes, and levels decide how far slopdam goes: `basic` (default), `strong` (also removes filler words) and `strict` (also reports any non-ASCII symbol). See [docs/RULES.md](docs/RULES.md) for the full catalog.
+Every rule has an ID such as `dash.run` or `emoji.pictograph`, and can be turned off by ID or by group (`--disable emoji`). Profiles decide what a trace becomes, and levels decide how far slopdam goes: `basic` (default), `strong` (also removes filler words) and `strict` (also reports any non-ASCII symbol). See [docs/RULES.md](https://github.com/slopdam/slopdam/blob/main/docs/RULES.md) for the full catalog.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md); every commit needs a DCO sign-off (`git commit -s`). Report security issues privately as described in [SECURITY.md](SECURITY.md). Project decisions follow [GOVERNANCE.md](GOVERNANCE.md), and the community follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. Please read [CONTRIBUTING.md](https://github.com/slopdam/slopdam/blob/main/CONTRIBUTING.md); every commit needs a DCO sign-off (`git commit -s`). Report security issues privately as described in [SECURITY.md](https://github.com/slopdam/slopdam/blob/main/SECURITY.md). Project decisions follow [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md), and the community follows the [Code of Conduct](https://github.com/slopdam/slopdam/blob/main/CODE_OF_CONDUCT.md).
 
 ## License
 
-[MIT](LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](https://github.com/slopdam/slopdam/blob/main/LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](https://github.com/slopdam/slopdam/blob/main/THIRD_PARTY_NOTICES.md).

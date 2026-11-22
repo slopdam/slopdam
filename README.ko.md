@@ -27,10 +27,10 @@ slopdam은 결정적 규칙(정규식과 문자표)으로 동작합니다. AI가
 
 ## 설치
 
-Python 3.9 이상에서 동작하고, 실행에 필요한 의존성은 없습니다. PyPI 첫 배포 전까지는 GitHub에서 설치합니다.
+Python 3.9 이상에서 동작하고, 실행에 필요한 의존성은 없습니다.
 
 ```bash
-pip install git+https://github.com/slopdam/slopdam
+pip install slopdam
 ```
 
 ## 로그 출력 정리

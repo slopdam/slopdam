@@ -2,7 +2,7 @@
 
 External components that slopdam includes or uses, and their licenses. The policy for adding new ones is in [CONTRIBUTING.md](CONTRIBUTING.md#dependencies-and-data).
 
-## Current state (0.2.0.dev0)
+## Current state (0.2.0)
 
 - **Runtime dependencies: none.** slopdam uses only the Python standard library.
 - **Bundled third-party code or data: none.**

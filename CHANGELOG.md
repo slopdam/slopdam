@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased] (0.2.0.dev0)
+## [0.2.0] - 2026-11-23
 
 ### Added
 - `reader` (default) and `dev` profiles, and `basic`, `strong` and `strict` levels.
