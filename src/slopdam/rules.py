@@ -8,7 +8,7 @@ Detection is shared by every profile; only the action differs:
 
 An action is a replacement string, a callable ``(match, ctx) -> str``, or ``None``
 (report only, used by the linter). A rule whose ``actions`` has no entry for a
-profile is inactive in that profile. See docs/DESIGN.md for the full spec.
+profile is inactive in that profile. See docs/RULES.md for the rule list.
 """
 from __future__ import annotations
 
@@ -68,7 +68,7 @@ _PROTECT = re.compile(
     r"|(?<![\w/])(?P<path>(?:~|\.{1,2})?/[^\s\"'`,;)]+)"
 )
 
-# --- dash family (docs/DESIGN.md section 4) -------------------------------------
+# --- dash family -------------------------------------------------------------
 HYPHENS = "‐‑−﹣－"
 DASHES = "‒–—―⸺⸻﹘︱︲⹀"
 EU = "ㅡￚᅳ"  # ㅡ, halfwidth ㅡ, conjoining jungseong ㅡ (NFKC target of ㅡ)
@@ -131,7 +131,7 @@ def _r(id: str, level: str, pattern: str, actions: Dict[str, Action], descriptio
     return Rule(id, level, re.compile(pattern, flags), actions, description, ascii)
 
 
-# Order matters; see docs/DESIGN.md section 3.
+# Order matters: later rules assume earlier ones already ran.
 RULES: tuple = (
     _r("space.invisible", "basic", "[​‌⁠﻿­]", _both(""), "zero-width or invisible character"),
     _r("space.nbsp", "basic", "[  　]", _both(" "), "non-breaking or ideographic space"),

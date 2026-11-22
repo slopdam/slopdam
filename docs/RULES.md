@@ -1,58 +1,61 @@
-# 규칙 카탈로그 (v0.2)
+# Rule catalog
 
-실행 순서대로 나열했습니다. 설계 근거는 [DESIGN.md](DESIGN.md).
-`reader` 가 기본 프로필입니다. "-" 는 해당 프로필에서 규칙이 꺼져 있다는 뜻, "보고" 는 린터에서만 알리고 고치지 않는다는 뜻입니다.
+[English](RULES.md) | [한국어](RULES.ko.md)
 
-| id | 레벨 | 탐지 | `reader` (기본) | `dev` |
+Rules run in the order listed. `reader` is the default profile. "off" means the rule does not run in that profile; "report" means the linter reports it but nothing is changed.
+
+| ID | Level | Matches | `reader` (default) | `dev` |
 |---|---|---|---|---|
-| `space.invisible` | basic | ZWSP, ZWNJ, WJ, BOM, 소프트 하이픈 | 삭제 | 삭제 |
-| `space.nbsp` | basic | NBSP, 202F, 전각 공백 | 공백 | 공백 |
-| `width.fullwidth` | basic | `，：；（）！？［］｛｝` | 반각 | 반각 |
+| `space.invisible` | basic | Zero-width space, ZWNJ, word joiner, BOM, soft hyphen | Removed | Removed |
+| `space.nbsp` | basic | No-break space, narrow no-break space, ideographic space | Space | Space |
+| `width.fullwidth` | basic | `，：；（）！？［］｛｝` | Halfwidth | Halfwidth |
 | `quote.double` / `quote.single` | basic | `“ ” „` / `‘ ’ ‚` | `"` / `'` | `"` / `'` |
 | `punct.ellipsis` | basic | `…` `⋯` | `...` | `...` |
-| `punct.arrow` | basic | `→ ⇒ ➜ ➡ ⟶` / `← ⇐ ⬅` / `↔ ⇔` | `->` / `<-` / `<->` | 동일 |
-| `punct.bullet` | basic | 줄 앞 `• ◦ ▪ ● ▶ ►` | `- ` | `- ` |
-| `emoji.status` | basic | 메시지 맨 앞 ✅ ❌ ⚠️ 등 | - (pictograph가 삭제) | `[OK]` `[FAIL]` `[WARN]`, 로그 레벨과 겹치면 생략 |
-| `emoji.pictograph` | basic | 이모지, 그림 기호, ZWJ, VS16, 키캡, 국기 | 삭제 | 삭제 |
-| `md.heading` | basic | 줄 앞 `#`~`######` + 공백 | 삭제 | 삭제 |
-| `md.fence` | basic | ` ``` ` 줄 | 줄 삭제 | 줄 삭제 |
-| `md.hr` | basic | 줄 전체 `---` `***` `___` | 줄 삭제 | 줄 삭제 |
-| `md.emphasis` | basic | `**x**` (밑줄 `__x__` 는 `__name__` 같은 파이썬 이름과 겹쳐 제외) | `x` | `x` |
-| (보호 구역) | - | `` `x` `` | 내용이 깨끗하면 백틱 제거 | 유지 |
+| `punct.arrow` | basic | `→ ⇒ ➜ ➡ ⟶` / `← ⇐ ⬅` / `↔ ⇔` | `->` / `<-` / `<->` | Same |
+| `punct.bullet` | basic | `• ◦ ▪ ● ▶ ►` at the start of a line | `- ` | `- ` |
+| `emoji.status` | basic | ✅ ❌ ⚠️ and similar at the start of a message | off (`emoji.pictograph` removes it) | `[OK]` `[FAIL]` `[WARN]`, omitted when the log level already says it |
+| `emoji.pictograph` | basic | Emoji and pictographs, ZWJ sequences, variation selectors, keycaps, flags | Removed | Removed |
+| `md.heading` | basic | `#` to `######` and a space at the start of a line | Removed | Removed |
+| `md.fence` | basic | A line with a code fence | Line removed | Line removed |
+| `md.hr` | basic | A line made only of `---`, `***` or `___` | Line removed | Line removed |
+| `md.emphasis` | basic | `**x**` (`__x__` is not matched because it collides with Python names such as `__name__`) | `x` | `x` |
+| (protected) | | `` `x` `` | Backticks dropped when the code inside is clean | Kept |
 | `dash.hyphen` | basic | `‐ ‑ − ﹣ －` | `-` | `-` |
 | `dash.wave` | basic | `〜 ～` | `~` | `~` |
-| `dash.run` | basic | **`ㅡ` `ￚ` `ᅳ`**, `‒ – — ― ⸺ ⸻ ﹘ ︱ ︲ ⹀`, `─ ━ ┄~┋ ╌~╏ ═ ⎯ ⏤ ➖` | 아래 판정표 | 아래 판정표 |
-| `dash.cjk-run` | basic | `一 ー ｰ` 3개 이상 연속 | 삭제 | 삭제 |
-| `dash.ascii-run` | basic | `= - * # ~ _ +` 5개 이상 연속 | 삭제 | 삭제 |
-| `tone.exclaim` | basic | 한글 바로 뒤 `!` | `.` | - |
-| `tone.filler` | strong | `성공적으로` `완벽하게` `무사히` `드디어` | 삭제 | 보고 |
-| `tone.chatty` | basic | `Let's` `Here's` `해볼게요` `살펴보겠습니다` 등 | 보고 | 보고 |
-| `symbol.non-ascii` | strict | 글자/숫자/공백/ASCII 외 기호 | 보고 | 보고 |
+| `dash.run` | basic | **`ㅡ` `ￚ` `ᅳ`**, `‒ – — ― ⸺ ⸻ ﹘ ︱ ︲ ⹀`, `─ ━ ┄`-`┋` `╌`-`╏` `═ ⎯ ⏤ ➖` | See the table below | See the table below |
+| `dash.cjk-run` | basic | Three or more `一 ー ｰ` in a row | Removed | Removed |
+| `dash.ascii-run` | basic | Five or more of the same `= - * # ~ _ +` | Removed | Removed |
+| `tone.exclaim` | basic | `!` right after Hangul | `.` | off |
+| `tone.filler` | strong | Korean filler words such as `성공적으로` | Removed | report |
+| `tone.chatty` | basic | Chatty phrases such as `Let's` and `Here's` | report | report |
+| `symbol.non-ascii` | strict | Any symbol that is not a letter, digit, space or ASCII | report | report |
 
-## `dash.run` 판정표
+## How `dash.run` decides
 
-| 상황 | 예 | `reader` | `dev` |
+A run of dash-like characters is judged by what is next to it.
+
+| Context | Example | `reader` | `dev` |
 |---|---|---|---|
-| 2개 이상 연속 | `ㅡㅡ`, `──`, `——` | 삭제 | 삭제 |
-| 숫자 사이 | `3ㅡ5`, `2024–2025` | `~` | `-` |
-| 줄 맨 앞 + 공백 | `ㅡ 항목` | `- ` | `- ` |
-| 글자 사이 (공백 유무 무관) | `완료 ㅡ 다음`, `완료—다음` | `: ` (`--dash-inline` 으로 변경) | ` - ` |
-| 그 외 (줄 끝, 문장부호 옆) | `완료 ㅡ`, `완료 ㅡ, 다음` | 삭제 | 삭제 |
+| Two or more in a row | `ㅡㅡ`, `──`, `——` | Removed | Removed |
+| Between digits | `3ㅡ5`, `2024–2025` | `~` | `-` |
+| Start of a line, followed by a space | `ㅡ item` | `- ` | `- ` |
+| Between words, with or without spaces | `done ㅡ next`, `done—next` | `: ` (change with `--dash-inline`) | ` - ` |
+| Anything else (end of line, next to punctuation) | `done ㅡ`, `done ㅡ, next` | Removed | Removed |
 
-조합형 `ᅳ`(U+1173)는 초성 바로 뒤에 오면 음절의 일부이므로 건드리지 않습니다.
+A conjoining `ᅳ` (U+1173) right after a leading consonant is part of a syllable and is left alone. In Python string literals, placeholders such as `%s`, `{0}` and f-string expressions count as words.
 
-## 보호 구역 (어떤 규칙도 적용하지 않음)
+## Protected spans
 
-URL, 백틱 안 코드, `key=value` 의 값, `/` `./` `~/` 로 시작하는 경로.
+No rule touches URLs, inline code in backticks, the value in `key=value`, or paths that start with `/`, `./`, `../` or `~/`.
 
-## 후처리
+## After the rules
 
-연속 공백을 하나로 합치고, 앞뒤 공백과 빈 줄을 제거합니다. 결과가 빈 문자열이면 `PlainFilter` 가 레코드를 버립니다.
+Repeated spaces collapse to one, and leading and trailing spaces and empty lines are removed. If the result is empty, `PlainFilter` drops the log record.
 
-## 새 규칙 추가 체크리스트
+## Checklist for a new rule
 
-1. 탐지 예시 (반드시 걸려야 하는 입력)
-2. 오탐 방지 예시 (날짜 `2026-11-21`, `--dry-run`, `一般`, `ㅋㅋ` 등)
-3. `reader` / `dev` 각각의 기대 결과
-4. 레벨과 그 이유
-5. 멱등성 테스트에 입력 추가
+1. Inputs that must be caught.
+2. Inputs that must not be caught (dates such as `2026-11-21`, `--dry-run`, `一般`, `ㅋㅋ`).
+3. Expected output for `reader` and `dev`.
+4. The level, and why.
+5. An idempotency case.

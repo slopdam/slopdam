@@ -1,49 +1,45 @@
-# 운영 방식 (Governance)
+# Governance
 
-## 1. 역할
+[English](GOVERNANCE.md) | [한국어](GOVERNANCE.ko.md)
 
-| 역할 | 권한 | 되는 방법 |
+## Roles
+
+| Role | Can | How to become one |
 |---|---|---|
-| 기여자 | 이슈, PR, 리뷰 | 누구나 |
-| 커미터 | PR 승인과 병합, 이슈 분류 | 의미 있는 PR 5개 이상 병합 후 메인테이너 추천 |
-| 메인테이너 | 릴리스, 로드맵, 보안 대응, 역할 부여 | 커미터 중 메인테이너 합의로 선정 |
+| Contributor | Open issues and pull requests, review | Anyone |
+| Committer | Approve and merge pull requests, triage issues | Nominated by a maintainer after five or more substantial merged pull requests |
+| Maintainer | Release, set the roadmap, handle security reports, grant roles | Chosen from committers by agreement of the maintainers |
 
-초기에는 창시자 1인이 메인테이너입니다. 메인테이너가 3명이 되면 아래 합의 규칙을 적용합니다.
+The founder is the only maintainer for now. The decision rules below apply in full once there are three maintainers.
 
-## 2. 의사 결정
+## Decisions
 
-- 일반 PR: 커미터 1명 승인으로 병합
-- **출력 변경 PR (`[output-change]`)**: 메인테이너 1명을 포함해 2명 승인
-- 라이선스, 거버넌스, 프로필/레벨 체계 변경: 메인테이너 전원 합의, 공개 토론(Discussion) 7일 이상
-- 합의가 안 되면 메인테이너 다수결, 동수면 창시자가 결정
+- Regular pull requests: one committer approval.
+- **Output changes** (`[output-change]`): two approvals, at least one from a maintainer.
+- Changes to the license, this document, or the profile and level system: agreement of all maintainers, after a public discussion of at least 7 days.
+- If maintainers cannot agree, a majority vote decides; on a tie, the founder decides.
 
-## 3. 로드맵
+## Versioning and output stability
 
-[docs/PLAN.md](docs/PLAN.md) 가 공식 로드맵입니다. 분기마다 갱신합니다.
+slopdam changes the format of people's logs, so a change in output is a compatibility change. We follow [Semantic Versioning](https://semver.org/) and treat **the output for existing input** as part of the public API.
 
-## 4. 버전과 출력 안정성 정책
-
-이 도구는 사용자의 **로그 형식을 바꾸는 도구**라서, 출력 변화가 곧 하위 호환성 문제입니다.
-
-[Semantic Versioning](https://semver.org/) 을 따르되, "API"에 **기존 입력에 대한 출력**을 포함합니다.
-
-| 변경 | 0.x 단계 | 1.0 이후 |
+| Change | While 0.x | From 1.0 |
 |---|---|---|
-| 버그 수정 (명백한 오탐 수정 포함) | 패치 | 패치 |
-| 새 규칙 추가 (기본 꺼짐 또는 `strict` 전용) | 패치 | 마이너 |
-| 새 규칙 추가 (`basic` 에서 기본 켜짐) | 마이너 | **메이저**, 또는 다음 메이저까지 기본 꺼짐으로 제공 |
-| 기존 규칙의 결과 변경 | 마이너 | 메이저 |
-| Unicode 데이터 버전 갱신 | 마이너 | 마이너 (CHANGELOG에 새로 잡히는 문자 명시) |
-| 기본 프로필, 레벨 변경 | 마이너 | 메이저 |
+| Bug fix, including clear false positives | Patch | Patch |
+| New rule, off by default or `strict` only | Patch | Minor |
+| New rule, on by default in `basic` | Minor | **Major**, or ship it off by default until the next major |
+| Different output from an existing rule | Minor | Major |
+| Unicode data update | Minor | Minor, listing newly matched characters in the changelog |
+| Different default profile or level | Minor | Major |
 
-출력을 고정하고 싶은 사용자를 위해 1.0부터 `ruleset = "1.0"` 처럼 **규칙 세트 버전을 고정**하는 옵션을 제공합니다.
+From 1.0, users who need fixed output will be able to pin a rule set version (for example `ruleset = "1.0"`).
 
-## 5. 릴리스
+## Releases
 
-- 태그 `vX.Y.Z` 를 푸시하면 GitHub Actions가 PyPI Trusted Publishing으로 배포합니다.
-- 릴리스 노트는 [CHANGELOG.md](CHANGELOG.md) 에서 가져옵니다.
+- Pushing a tag `vX.Y.Z` publishes to PyPI through GitHub Actions with Trusted Publishing.
+- Release notes come from [CHANGELOG.md](CHANGELOG.md).
 
-## 6. 이름과 상표
+## Name and trademark
 
-- 프로젝트 이름과 로고는 메인테이너가 관리합니다.
-- 포크와 재배포는 MIT 라이선스에 따라 자유롭습니다. 다만 공식 배포판으로 오해할 수 있도록 같은 이름으로 패키지를 배포하는 것은 삼가 주세요.
+- The maintainers manage the project name and logo.
+- Forks and redistribution are free under the MIT license. Please do not publish packages under the same name in a way that could be mistaken for the official release.

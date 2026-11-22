@@ -7,3 +7,8 @@ build/
 dist/
 *.egg-info/
 .DS_Store
+
+# Local agent harness (Claude Code): rules, checks, internal notes. Not published.
+CLAUDE.md
+CLAUDE.local.md
+.claude/

@@ -1,18 +1,18 @@
-name: 새 규칙 제안
-description: 걸러야 할 AI 흔적 패턴을 제안해요
+name: Rule request
+description: Suggest a trace slopdam should catch
 labels: [rule-request]
 body:
   - type: textarea
     id: examples
     attributes:
-      label: 걸러야 할 예시 (실제 AI 출력이면 더 좋아요)
+      label: Text that should be caught (real AI output is best)
     validations:
       required: true
   - type: textarea
     id: preserve
     attributes:
-      label: 걸리면 안 되는 비슷한 예시
+      label: Similar text that must not be caught
   - type: textarea
     id: expected
     attributes:
-      label: 기대 결과 (reader / dev)
+      label: Expected output (reader and dev)

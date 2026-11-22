@@ -1,26 +1,27 @@
-# 보안 정책
+# Security Policy
 
-## 지원 버전
+[English](SECURITY.md) | [한국어](SECURITY.ko.md)
 
-| 버전 | 보안 수정 |
+## Supported versions
+
+| Version | Security fixes |
 |---|---|
-| 최신 마이너 (0.x 최신) | 지원 |
-| 그 이전 | 지원하지 않음 |
+| Latest minor release (0.x) | Yes |
+| Older releases | No |
 
-## 신고 방법
+## Reporting a vulnerability
 
-공개 이슈로 올리지 말고 GitHub 저장소의 **Security > Report a vulnerability** (비공개 취약점 신고)를 사용해 주세요.
-접수 확인 3영업일 이내, 초기 분석 결과 14일 이내 회신을 목표로 합니다.
+Please do not open a public issue. Use **Security > Report a vulnerability** on the [repository page](https://github.com/slopdam/slopdam/security/advisories/new) to report privately. We aim to acknowledge a report within 3 business days and to share a first assessment within 14 days.
 
-## 이 프로젝트에서 특히 중요한 위협
+## Threats that matter for this project
 
-이 도구는 **로그 핫패스**에서 **신뢰할 수 없는 입력**(사용자 입력이 섞인 로그 메시지)을 정규식으로 처리합니다.
+slopdam runs regular expressions over untrusted input (log messages that may contain user data) on the hot path of a service.
 
-| 위협 | 설명 | 대응 |
+| Threat | What can happen | Mitigation |
 |---|---|---|
-| **ReDoS** | 악의적인 입력 문자열로 정규식이 지수 시간 동안 돌아 서비스가 멈춤 | 중첩 수량자 금지(CONTRIBUTING 3장), 퍼징 테스트, 메시지 길이 상한 옵션(`max_length`, v0.2) |
-| 로그 위조 | 정리 과정에서 줄바꿈이나 제어 문자가 새로 생겨 가짜 로그 줄이 만들어짐 | 치환 결과에 줄바꿈을 만들지 않는 규칙만 허용, 테스트로 보장 |
-| 정보 손실 | 정리 때문에 사고 분석에 필요한 내용이 사라짐 | 트레이스백 불변, `dev` 프로필의 정보 보존 원칙, 원본 레코드 불변(포맷터) |
-| 공급망 | 의존성이나 데이터 파일 변조 | 필수 의존성 0개, 데이터 파일은 생성 스크립트와 해시를 함께 커밋, PyPI Trusted Publishing |
+| ReDoS | A crafted message makes a pattern run in exponential time and stalls the service | No nested quantifiers (see CONTRIBUTING), fuzz tests, an optional message length limit |
+| Log forging | Cleaning introduces a newline or control character and creates a fake log line | Replacements never produce newlines; covered by tests |
+| Information loss | Cleaning removes something needed to investigate an incident | Tracebacks are never changed, the `dev` profile preserves status, the formatter never modifies the original record |
+| Supply chain | A dependency or data file is tampered with | No runtime dependencies; data files are committed with the script that generates them; releases use PyPI Trusted Publishing |
 
-ReDoS, 로그 위조, 정리 후 정보가 의도치 않게 사라지는 문제는 모두 보안 이슈로 받습니다.
+We treat ReDoS, log forging and unintended loss of information as security issues.

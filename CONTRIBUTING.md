@@ -1,50 +1,65 @@
-# 기여 가이드
+# Contributing
 
-## 1. 시작하기
+[English](CONTRIBUTING.md) | [한국어](CONTRIBUTING.ko.md)
+
+Thank you for helping. This guide covers setup, the sign-off every commit needs, and what a rule change has to include.
+
+## Getting started
 
 ```bash
-pip install -e .
-pip install pytest
+pip install -e . pytest
 python -m pytest
 ```
 
-## 2. DCO 서명 (필수)
+## Sign your commits (DCO)
 
-이 프로젝트는 CLA 대신 [Developer Certificate of Origin 1.1](https://developercertificate.org/) 을 사용합니다.
-모든 커밋에 `Signed-off-by` 줄이 있어야 하며, `-s` 옵션으로 자동 추가됩니다.
+slopdam uses the [Developer Certificate of Origin 1.1](https://developercertificate.org/) instead of a CLA. Every commit needs a `Signed-off-by` line, which `git commit -s` adds for you.
 
 ```bash
-git commit -s -m "dash: 반각 ㅡ(U+FFDA) 탐지 추가"
+git commit -s -m "dash: detect halfwidth eu (U+FFDA)"
 ```
 
-서명은 "이 기여를 MIT 라이선스로 제출할 권리가 나에게 있다"는 확인입니다. AI 도구로 작성한 코드도 같습니다 ([docs/LICENSING.md](docs/LICENSING.md) 5장).
+By signing off you confirm that you have the right to submit the change under the MIT license. The same applies to code written with AI tools: you are responsible for what you submit.
 
-## 3. 새 규칙 추가
+## Adding or changing a rule
 
-규칙 PR에는 다음이 모두 있어야 합니다. ([docs/RULES.md](docs/RULES.md) 체크리스트)
+A rule pull request needs all of the following (see the checklist in [docs/RULES.md](docs/RULES.md)):
 
-1. **탐지 예**: 반드시 걸려야 하는 입력
-2. **오탐 방지 예**: 걸리면 안 되는 입력 (날짜, CLI 옵션, 한자, 가나, `ㅋㅋ` 등)
-3. **`reader` / `dev` 기대 결과**
-4. **레벨** (`basic` / `strong` / `strict`) 과 그 이유
-5. **멱등성 테스트**에 입력 추가
-6. 정규식은 **ReDoS 안전**해야 합니다. 중첩 수량자(`(a+)+`), 겹치는 선택지 반복(`(a|a)*`)을 쓰지 않습니다 ([SECURITY.md](SECURITY.md))
-7. 다른 프로젝트에서 가져온 목록이면 출처와 라이선스 ([docs/LICENSING.md](docs/LICENSING.md) 4장)
+1. **Inputs that must be caught.**
+2. **Inputs that must not be caught**, such as dates, command line flags, CJK text or `ㅋㅋ`.
+3. **Expected output for both profiles**, `reader` and `dev`.
+4. **A level** (`basic`, `strong` or `strict`) and why.
+5. **An idempotency case**: running the cleaner twice must give the same result.
+6. **A ReDoS-safe pattern.** No nested quantifiers such as `(a+)+` and no overlapping alternatives inside a repetition such as `(a|a)*`. See [SECURITY.md](SECURITY.md).
+7. **Provenance** for any list taken from another project, with a license on the allowlist below. Ideas from other tools are welcome; copied lists are not.
 
-## 4. 출력이 바뀌는 변경
+## Changes to output
 
-이 도구의 출력은 사용자의 로그 형식 그 자체입니다. 기존 규칙의 결과가 바뀌는 PR은 다음을 지킵니다.
+slopdam's output is the user's log format, so a change in output is a compatibility change.
 
-- PR 제목에 `[output-change]` 를 붙입니다.
-- [CHANGELOG.md](CHANGELOG.md) 의 "출력 변경" 절에 before/after 예시를 적습니다.
-- 버전 정책은 [GOVERNANCE.md](GOVERNANCE.md) 4장을 따릅니다.
+- Add `[output-change]` to the pull request title.
+- Add a before and after example under "Output changes" in [CHANGELOG.md](CHANGELOG.md).
+- Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## 5. 커밋과 PR
+## Dependencies and data
 
-- 커밋 제목은 `<규칙군 또는 영역>: <요약>` 형식 (예: `emoji: 국기 지역 표시자 처리`, `cli: json 출력 추가`)
-- 하나의 PR에는 하나의 주제만 담습니다.
-- **이 저장소 자체도 도구의 린터를 통과해야 합니다.** `src/` 의 로그 문자열과 커밋 메시지에 `—`, 장식 이모지, 구분선을 쓰지 않습니다 (`slopdam check src/`). 규칙 정의와 테스트, 문서의 예시 문자는 예외입니다.
+slopdam has no runtime dependencies, and we want to keep it that way.
 
-## 6. 행동 강령
+| Kind | Allowed licenses (SPDX) |
+|---|---|
+| Optional runtime dependency | `MIT`, `BSD-2-Clause`, `BSD-3-Clause`, `Apache-2.0`, `ISC`, `PSF-2.0`, `CNRI-Python` |
+| Bundled data | `Unicode-3.0`, `MIT`, `CC0-1.0` |
+| Not accepted | `GPL-*`, `AGPL-*`, `LGPL-*`, `SSPL-*`, or no stated license |
 
-모든 참여자는 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) 를 따릅니다.
+A pull request that adds a dependency or data file also updates [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+## Commits and pull requests
+
+- Commit subjects follow `<rule group or area>: <summary>`, for example `emoji: handle flag sequences` or `cli: add json output`.
+- One topic per pull request.
+- The repository has to pass its own linter: no em dashes, decorative emoji or separator lines in log strings under `src/` or in commit messages (`slopdam check src/`). Rule definitions, tests and examples in the docs are the exception.
+- Documentation is written in English first. If you change a document that has a Korean version (`*.ko.md`), update it in the same pull request or say in the description that it needs a translation.
+
+## Code of Conduct
+
+Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).

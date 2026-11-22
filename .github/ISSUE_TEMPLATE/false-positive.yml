@@ -1,32 +1,32 @@
-name: 잘못 바뀜 (오탐)
-description: 바뀌면 안 되는 문자열이 바뀌었어요
+name: Wrong change (false positive)
+description: slopdam changed text it should have left alone
 labels: [false-positive]
 body:
   - type: input
     id: input
     attributes:
-      label: 입력 문자열
+      label: Input
     validations:
       required: true
   - type: input
     id: output
     attributes:
-      label: 실제 결과
+      label: Actual output
     validations:
       required: true
   - type: input
     id: expected
     attributes:
-      label: 기대한 결과
+      label: Expected output
     validations:
       required: true
   - type: dropdown
     id: profile
     attributes:
-      label: 프로필
-      options: [reader (기본), dev]
+      label: Profile
+      options: [reader (default), dev]
   - type: input
     id: version
     attributes:
-      label: slopdam 버전
+      label: slopdam version
       placeholder: python -c "import slopdam; print(slopdam.__version__)"

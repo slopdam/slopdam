@@ -1,98 +1,93 @@
 # slopdam
 
-AI로 생성한 코드의 로그와 출력에 남는 흔적을 걷어내는 **로거 포맷터 + 린터**입니다. 대상은 `ㅡ` `—` `───` 대시류, `✅🚀` 이모지, `=====` 구분선, `**굵게**` 마크다운, `“둥근 따옴표”` 등입니다.
+[English](README.md) | [한국어](README.ko.md)
 
-누가 읽는지에 따라 두 가지로 정리합니다.
+[![ci](https://github.com/slopdam/slopdam/actions/workflows/ci.yml/badge.svg)](https://github.com/slopdam/slopdam/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**A dam for AI slop in your logs.** slopdam removes the traces AI coding tools leave in log messages and console output: em dashes and look-alike lines (including the Korean `ㅡ`), decorative emoji, separator lines, markdown bold, curly quotes and invisible characters.
+
+It works in two places:
+
+- **When logs are written**: a `logging` formatter and filter clean every message on its way out, with no change to your code.
+- **Before code is committed**: a linter reports traces in log calls, and a fixer rewrites the string literals in Python files.
+
+The same trace becomes different text depending on who reads it:
 
 ```
-입력  : ✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉
-
-reader: 저장 완료: 2024~2025년 데이터 3건 처리했습니다.          ← 일반 사용자용 (기본)
-dev   : [OK] 저장 완료 - 2024-2025년 데이터 3건 처리했습니다!    ← 개발자용
+input : ✅ **Saved** — 3 rows processed 🎉
+reader: Saved: 3 rows processed
+dev   : [OK] Saved - 3 rows processed
 ```
 
-> 초안 v0.2. 기획 [docs/PLAN.md](docs/PLAN.md) · 상세 설계 [docs/DESIGN.md](docs/DESIGN.md) · 리서치 [docs/RESEARCH.md](docs/RESEARCH.md) · 규칙 [docs/RULES.md](docs/RULES.md)
+- `reader` (default): plain text for people, such as CLI messages, alerts and reports.
+- `dev`: grep-friendly text for log files and collectors. Status emoji become `[OK]`, `[FAIL]` and `[WARN]` instead of disappearing.
 
-## 프로필
+slopdam uses deterministic rules (regular expressions and character tables). It does not try to guess whether a model wrote the text: the same input always gives the same output, and every change can be traced to a rule ID.
 
-| 프로필 | 누구를 위한 출력인가 | 쓰는 곳 |
-|---|---|---|
-| `reader` (기본) | 일반 사용자가 편하게 읽는 담백한 한국어 | CLI 메시지, 알림, 리포트, 화면 오류 문구 |
-| `dev` | 개발자가 보고 검색하기 편한, 정보 손실 없는 형태 | 로그 파일, 로그 수집기, DEBUG 로그 |
+## Install
 
-레벨은 `basic`(기본), `strong`(상투 표현 `성공적으로` 등도 삭제), `strict`(비ASCII 기호를 린터에서 경고) 세 가지입니다.
+slopdam needs Python 3.9 or later and has no runtime dependencies. Until the first PyPI release, install it from GitHub:
 
-## 1. 런타임 포맷터
+```bash
+pip install git+https://github.com/slopdam/slopdam
+```
+
+## Clean log output
 
 ```python
 import logging
-from slopdam import PlainFormatter, PlainFilter
+from slopdam import PlainFilter, PlainFormatter
 
-console = logging.StreamHandler()                            # 사람이 보는 화면
-console.setFormatter(PlainFormatter("%(message)s"))          # reader (기본)
-console.addFilter(PlainFilter())                             # 구분선만 찍는 로그는 버림
+console = logging.StreamHandler()                    # read by people
+console.setFormatter(PlainFormatter("%(message)s"))  # reader profile
+console.addFilter(PlainFilter())                     # drop lines that were only separators
 
-file = logging.FileHandler("app.log")                        # 개발자, 수집기
+file = logging.FileHandler("app.log")                # read by tools
 file.setFormatter(PlainFormatter("%(asctime)s %(levelname)s %(message)s", profile="dev"))
 
 logging.basicConfig(level=logging.INFO, handlers=[console, file])
-logging.info("✅ 처리 %s건 ㅡ 완료!", 3)
-# 화면  : 처리 3건: 완료.
-# 파일  : 2026-11-21 ... INFO [OK] 처리 3건 - 완료!
+logging.info("✅ Synced %s rows — done", 3)
+# console: Synced 3 rows: done
+# app.log: 2026-11-23 ... INFO [OK] Synced 3 rows - done
 ```
 
-- 원본 로그 레코드는 바뀌지 않으므로 핸들러마다 다른 프로필을 쓸 수 있습니다.
-- 예외 트레이스백, URL, 백틱 안 코드, `key=value` 의 값, 파일 경로는 건드리지 않습니다.
+- The original log record is never modified, so each handler can use its own profile.
+- Tracebacks, URLs, inline code, `key=value` values and file paths are left untouched.
 
-## 2. 정적 린터
+## Lint and fix source code
 
 ```bash
-slopdam check src/                         # 로그/print 호출 라인 검사, 걸리면 exit 1
-slopdam --profile dev check src/
-slopdam check --all --format json src/
-slopdam --disable emoji check src/         # 규칙 그룹 단위로 끄기
+slopdam check src/                # report traces in log and print calls; exit 1 if any
+slopdam --profile dev check src/  # suggestions in the dev style
+slopdam fix --diff src/           # preview fixes to Python string literals
+slopdam fix src/                  # apply them
 ```
 
 ```
-src/app.py:12:17: dash.run 'ㅡ' -> ': '
-src/app.py:15:14: emoji.pictograph '✅' -> ''
+src/sync.py:8:18: emoji.pictograph '✅' -> ''
+src/sync.py:8:25: dash.run 'ㅡ' -> ': '
 ```
 
-줄 끝에 `# slopdam: ignore` 를 붙이면 그 줄을 건너뜁니다. `# slopdam: ignore[emoji]` 처럼 규칙을 지정할 수도 있습니다.
+Python files are read through the syntax tree, so slopdam knows exactly where each string starts and ends. `slopdam fix` changes only the literal text: quotes, prefixes, escape sequences, f-string expressions and placeholders such as `%s` stay as they are, and nothing is written unless the result compiles. Other languages are checked line by line.
 
-### 자동 수정 (Python)
+To skip a line, add `# slopdam: ignore`, or `# slopdam: ignore[emoji]` to skip one rule group.
 
-문법 트리로 로그/print 호출의 문자열 인자만 찾아 고칩니다. 따옴표, `f`/`r` 접두어, 이스케이프, f-string의 `{...}`, `%s` 같은 서식 자리는 그대로 두고, 결과가 컴파일되지 않으면 쓰지 않습니다.
+## Configuration
 
-```bash
-slopdam fix --diff src/          # 미리 보기 (바뀔 내용이 있으면 exit 1)
-slopdam fix src/                 # 고치기
-slopdam fix --scope strings src/ # 독스트링을 뺀 모든 문자열
-```
-
-```diff
--logger.info("✅ 저장 완료 ㅡ %s건 처리!", n)
-+logger.info("저장 완료: %s건 처리.", n)
-```
-
-### 설정 파일
-
-저장소의 `slopdam.toml` 또는 `pyproject.toml` 의 `[tool.slopdam]` 을 읽습니다. 명령줄 옵션이 우선하고, 설정 오류는 exit 2입니다.
+slopdam reads `slopdam.toml`, or the `[tool.slopdam]` table in `pyproject.toml`. Command line options take precedence.
 
 ```toml
 profile = "dev"
 level = "basic"
 disable = ["emoji.status"]
 
-[dash]
-inline = "colon"
-
 [lint]
 scope = "log-calls"   # log-calls | strings | all
 exclude = ["tests/**"]
 ```
 
-pre-commit:
+## pre-commit and CI
 
 ```yaml
 repos:
@@ -102,19 +97,22 @@ repos:
       - id: slopdam
 ```
 
-## 3. 파이프
+Exit codes: `0` clean, `1` traces found (or `fix --diff` has changes), `2` usage or configuration error.
+
+## Pipe
 
 ```bash
 tail -f app.log | slopdam clean
 ```
 
-## 라이선스와 기여
+## Rules
 
-[MIT](LICENSE). 기여 방법은 [CONTRIBUTING.md](CONTRIBUTING.md) (DCO 서명), 보안 신고는 [SECURITY.md](SECURITY.md), 운영 방식은 [GOVERNANCE.md](GOVERNANCE.md).
+Every rule has an ID such as `dash.run` or `emoji.pictograph`, and can be turned off by ID or by group (`--disable emoji`). Profiles decide what a trace becomes, and levels decide how far slopdam goes: `basic` (default), `strong` (also removes filler words) and `strict` (also reports any non-ASCII symbol). See [docs/RULES.md](docs/RULES.md) for the full catalog.
 
-## 개발
+## Contributing
 
-```bash
-pip install -e .
-python -m pytest
-```
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md); every commit needs a DCO sign-off (`git commit -s`). Report security issues privately as described in [SECURITY.md](SECURITY.md). Project decisions follow [GOVERNANCE.md](GOVERNANCE.md), and the community follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+[MIT](LICENSE). Third-party components are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

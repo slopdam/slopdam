@@ -1,15 +1,15 @@
-# 행동 강령
+# Code of Conduct
 
-이 프로젝트는 [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) 을 행동 강령으로 채택합니다.
-공식 사이트에서 제공하는 한국어 번역본을 함께 안내합니다. (번역본과 원문이 다르면 원문이 우선, 공개 전 번역본 주소 확인)
+[English](CODE_OF_CONDUCT.md) | [한국어](CODE_OF_CONDUCT.ko.md)
 
-## 요약
+slopdam adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) as its code of conduct.
 
-- 서로 존중하고, 다른 의견과 경험을 환영합니다.
-- 괴롭힘, 차별적 언행, 개인 정보 공개, 성적인 언행은 허용하지 않습니다.
-- 메인테이너는 강령을 어긴 댓글, 커밋, 이슈를 수정하거나 삭제하고, 참여를 제한할 수 있습니다.
+## In short
 
-## 신고
+- Be respectful, and welcome different views and experiences.
+- Harassment, discriminatory language, publishing others' private information and sexualized language or behavior are not acceptable.
+- Maintainers may edit or remove comments, commits and issues that break these rules, and may restrict participation.
 
-메인테이너의 GitHub 프로필에 있는 연락처로 보내 주세요.
-신고자의 신원은 보호하며, 메인테이너 본인이 관련된 경우 해당 메인테이너는 처리에서 빠집니다.
+## Reporting
+
+Contact a maintainer through the contact details on their GitHub profile. Reports are handled confidentially. If a maintainer is involved in a report, that maintainer does not take part in handling it.
