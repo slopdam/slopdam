@@ -73,6 +73,20 @@ file.Error("❌ 업로드 실패", "err", err)               // "msg":"업로드
 
 `NewHandler`는 어떤 `slog.Handler`든 감싸서 모든 레코드의 메시지를 정리합니다. 속성(attribute)은 구조화된 데이터라 그대로 두고, 구분선뿐인 레코드는 버리되 오류가 담겨 있으면 남깁니다. 표준 라이브러리의 `slogtest` 핸들러 검사를 통과합니다.
 
+### go vet
+
+```bash
+go install github.com/slopdam/slopdam/go/vet/cmd/slopdamvet@latest
+slopdamvet ./...                          # 또는: go vet -vettool=$(which slopdamvet) ./...
+```
+
+```
+sync.go:12:14: slopdam emoji.pictograph: "✅" should be ""
+sync.go:12:33: slopdam dash.run: "ㅡ" should be ": "
+```
+
+`slopdamvet -fix ./...`는 제안한 수정을 적용합니다. `log.Printf("✅ %d건 동기화 ㅡ 완료", n)`은 `log.Printf("%d건 동기화: 완료", n)`이 됩니다. `log`, `slog`, `fmt`와 이름에 `log`가 들어간 받는 쪽(`s.logger.Warn`) 호출의 문자열 인자를 검사하고, `"a" + b` 같은 이어 붙이기도 포함합니다. 문자열 안의 글자만 고치며 따옴표, 이스케이프, `%v`, `%d` 같은 서식 동사는 그대로 둡니다. 옵션: `-profile dev`, `-level`, `-disable emoji,dash.run`, `-dash-inline`, `-receivers`. 분석기는 별도 모듈(`go/vet`, Go 1.26 이상)이라 패키지 본체는 `golang.org/x/tools`에 의존하지 않습니다.
+
 ## Python과 같은 결과를 내는 방법
 
 규칙을 손으로 다시 쓰지 않습니다. `go generate`가 저장소의 [spec/rules.json](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)을 `spec_data.go`로 복사하고, 그 안의 패턴은 패키지를 불러올 때 Python 정규식 문법에서 변환됩니다(유니코드 `\w`, `\s`, `\b`와 Python의 `^`, `$`). 문맥에 따라 바꾸는 동작 네 가지만 Go로 작성했습니다. PR마다 Python, JavaScript, Go에 같은 적합성 사례를 실행합니다. 무작위 입력 20,000개에서 Go와 Python의 결과가 같았습니다.
@@ -81,7 +95,7 @@ file.Error("❌ 업로드 실패", "err", err)               // "msg":"업로드
 
 ## 로드맵
 
-slopdam 0.6 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 이 패키지와 `log/slog` 핸들러에 이어 `go vet` 분석기를 만듭니다.
+slopdam 0.6 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 이 패키지, `log/slog` 핸들러, `go vet` 분석기로 이루어집니다.
 
 ## 기여
 

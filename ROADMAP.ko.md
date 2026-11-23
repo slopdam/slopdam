@@ -68,7 +68,7 @@ slopdam/ (이 저장소)
 
 - [x] 모든 적합성 사례를 통과하는 Go 모듈 ([go/](go/README.ko.md))
 - [x] `log/slog` 핸들러 (`slopdam.NewHandler`)
-- [ ] 자동 수정을 제안하는 `go vet` 분석기
+- [x] 자동 수정을 제안하는 `go vet` 분석기 (`slopdamvet`)
 - [ ] Logback 변환기와 Log4j2 재작성 정책을 갖춘 Java 라이브러리
 
 ### 0.7: Rust와 편집기

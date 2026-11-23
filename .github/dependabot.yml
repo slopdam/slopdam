@@ -16,3 +16,7 @@ updates:
     directory: /go
     schedule:
       interval: monthly
+  - package-ecosystem: gomod
+    directory: /go/vet
+    schedule:
+      interval: monthly
