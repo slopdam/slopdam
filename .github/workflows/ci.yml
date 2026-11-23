@@ -111,3 +111,24 @@ jobs:
           node -e "require('@slopdam/core/pino').slopdamPino(); require('@slopdam/core/winston').slopdamWinston()"
           node --input-type=module -e "import {slopdamPino} from '@slopdam/core/pino'; import {slopdamWinston} from '@slopdam/core/winston'; slopdamPino(); slopdamWinston()"
           node --input-type=module -e "import slopdam from '@slopdam/core/eslint'; if (!slopdam.rules['no-slop']) process.exit(1)"
+
+  go:
+    # The Go module: spec_data.go is current, and every conformance case passes.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.22", "stable"]
+    defaults:
+      run:
+        working-directory: go
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: go/go.sum
+      - run: go generate ./... && git diff --exit-code -- spec_data.go
+      - run: go vet ./...
+      - run: test -z "$(gofmt -l .)"
+      - run: go test ./...

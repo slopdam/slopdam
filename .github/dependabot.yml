@@ -12,3 +12,7 @@ updates:
     directory: /js
     schedule:
       interval: monthly
+  - package-ecosystem: gomod
+    directory: /go
+    schedule:
+      interval: monthly

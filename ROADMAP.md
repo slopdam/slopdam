@@ -11,7 +11,7 @@ Every implementation keeps the same four ideas:
 1. **One engine, two profiles.** Detection is shared; `reader` writes plain text for people, `dev` writes text that is easy to grep and parse.
 2. **Two places to stop slop.** At runtime, a formatter for the language's loggers cleans what is printed. Before merge, a linter finds traces in source code and fixes what it safely can.
 3. **Deterministic and conservative.** The same input and settings always give the same output, cleaning twice changes nothing, and dates, flags, URLs, paths, code and CJK text are left alone. No model, no network.
-4. **No runtime dependencies** in the core package of each language.
+4. **No runtime dependencies** in the core package of each language, except where the standard library cannot run the spec: Go uses regexp2, because its `regexp` has no lookbehind or back references.
 
 ## How other languages stay consistent
 
@@ -20,7 +20,7 @@ slopdam/ (this repository)
   ├── spec/    rule catalog + conformance cases
   ├── src/     Python    slopdam            reference implementation, CLI, pre-commit, GitHub Action
   ├── js/      JS/TS     @slopdam/core      0.5
-  ├── go/      Go        slopdam            planned
+  ├── go/      Go        slopdam            0.6
   ├── java/    JVM       slopdam            planned
   └── rust/    Rust      slopdam (crate)    planned
 ```
@@ -66,7 +66,9 @@ slopdam/ (this repository)
 
 ### 0.6: Go and the JVM
 
-- [ ] Go module with an `slog.Handler` and a `go vet` analyzer
+- [x] Go module ([go/](go/README.md)) passing every conformance case
+- [ ] `log/slog` handler
+- [ ] `go vet` analyzer with suggested fixes
 - [ ] Java library with a Logback converter and a Log4j2 rewrite policy
 
 ### 0.7: Rust and editors
