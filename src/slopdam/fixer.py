@@ -14,7 +14,7 @@ import tokenize
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 
-from .rules import Finding, Sanitizer
+from .rules import _MAX_PASSES, Finding, Sanitizer
 
 LOG_METHODS = {"debug", "info", "warning", "warn", "error", "exception", "critical", "fatal", "log"}
 IGNORE = re.compile(r"slopdam:\s*ignore(?:\[([\w.,\s-]+)\])?")
@@ -232,6 +232,13 @@ def fix_source(source: str, sanitizer: Sanitizer, scope: str = "log-calls") -> T
         body = token[body_start:len(token) - len(quote)]
         masked, pieces, where = _mask(body, "f" in prefix.lower())
         text, applied = _rewrite(masked, sanitizer, ignored, quote, "r" in prefix.lower())
+        # Repeat until stable, as clean() does: removing one trace can expose another
+        # (the dash in "‒•" leaves a bullet at the start of the string).
+        for _ in range(_MAX_PASSES - 1):
+            again, _ = _rewrite(text, sanitizer, ignored, quote, "r" in prefix.lower())
+            if again == text:
+                break
+            text = again
         new_body = _unmask(text, pieces)
         if new_body is None:
             continue  # a rule swallowed a placeholder: leave this literal alone

@@ -82,6 +82,16 @@ tester.run("no-slop", rule, {
       errors: [{ messageId: "report", data: { rule: "tone.chatty", text: "Let's" } }],
     },
     {
+      code: 'console.log("‒• 항목")',                     // a fix that exposes another trace is done in one pass
+      output: 'console.log("- 항목")',
+      errors: [{ messageId: "fixable", data: { rule: "dash.run", text: "‒", fix: "" } }],
+    },
+    {
+      code: 'console.log("```python %s", x)',            // the message shows the source, not a placeholder
+      output: null,
+      errors: [{ messageId: "fixable", data: { rule: "md.fence", text: "```python %s", fix: "" } }],
+    },
+    {
       code: 'console.log("\\u2014 ✅ done")',                // escapes stay as they are
       output: 'console.log("\\u2014 done")',
       errors: 1,

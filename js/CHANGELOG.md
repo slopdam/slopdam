@@ -2,6 +2,12 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [Unreleased]
+
+### Fixed
+- `slopdam/no-slop` applies its fix until the string stops changing, so one `eslint --fix` pass is enough when removing a trace exposes another (`"‒• 항목"` becomes `"- 항목"`).
+- Messages show the source text; they used to show an internal placeholder where a `%s` or `${...}` was inside the reported span.
+
 ## [0.2.0] - 2026-11-24
 
 ### Added
