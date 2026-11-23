@@ -45,6 +45,7 @@ console.addFilter(PlainFilter())                     # 구분선만 찍는 로�
 
 file = logging.FileHandler("app.log")                # 도구가 읽는 파일
 file.setFormatter(PlainFormatter("%(asctime)s %(levelname)s %(message)s", profile="dev"))
+file.addFilter(PlainFilter(profile="dev"))
 
 logging.basicConfig(level=logging.INFO, handlers=[console, file])
 logging.info("✅ 처리 %s건 ㅡ 완료!", 3)

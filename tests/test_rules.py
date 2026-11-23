@@ -223,6 +223,24 @@ def test_filter_drops_separator_only_records():
     assert stream.getvalue() == "완료\n"
 
 
+def test_filters_on_two_handlers_do_not_leak_into_each_other():
+    # The README setup: reader for people, dev for the file, a PlainFilter on each.
+    reader_out, dev_out = io.StringIO(), io.StringIO()
+    reader_h, dev_h = logging.StreamHandler(reader_out), logging.StreamHandler(dev_out)
+    reader_h.setFormatter(PlainFormatter("%(message)s"))
+    reader_h.addFilter(PlainFilter())
+    dev_h.setFormatter(PlainFormatter("%(levelname)s %(message)s", profile="dev"))
+    dev_h.addFilter(PlainFilter(profile="dev"))
+    log = _logger(reader_h)
+    log.addHandler(dev_h)
+
+    log.info("✅ **Saved** %s rows — done!", 3)
+    log.info("==========")
+    log.error("❌ 업로드 실패 ㅡ 재시도")
+    assert reader_out.getvalue().splitlines() == ["Saved 3 rows: done!", "업로드 실패: 재시도"]
+    assert dev_out.getvalue().splitlines() == ["INFO [OK] Saved 3 rows - done!", "ERROR 업로드 실패 - 재시도"]
+
+
 def test_cli_check(tmp_path, capsys):
     (tmp_path / "app.py").write_text(
         'import logging\n'
