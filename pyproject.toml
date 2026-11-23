@@ -47,7 +47,7 @@ slopdam = "slopdam.cli:main"
 
 [tool.hatch.build.targets.sdist]
 # README images and recordings are served from GitHub; keep them out of the source package.
-exclude = ["docs/assets"]
+exclude = ["docs/assets", "js"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/slopdam"]

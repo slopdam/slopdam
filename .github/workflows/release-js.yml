@@ -1,0 +1,32 @@
+name: release-js
+
+# Push a tag like js-v0.1.0 to publish @slopdam/core (the js/ folder) to npm.
+# Python releases use v* tags and release.yml; the two never trigger each other.
+# Uses npm trusted publishing (OIDC), so no npm token is stored in the repository.
+# One-time setup on npmjs.com: create the slopdam organization, then add a trusted
+# publisher for @slopdam/core (repository slopdam/slopdam, workflow release-js.yml).
+
+on:
+  push:
+    tags: ["js-v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+      - name: Tag matches package.json
+        run: test "js-v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public

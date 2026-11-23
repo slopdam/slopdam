@@ -27,7 +27,14 @@
       "[OK]": "✅✔☑🟢🆗",
       "[FAIL]": "❌✖🔴⛔🚫❎",
       "[WARN]": "⚠🟡🚨"
-    }
+    },
+    "hangul_choseong": "ᄀ-ᅟꥠ-ꥼ"
+  },
+  "dash_word_before": ")]}%",
+  "dash_word_after": "([{",
+  "tidy": {
+    "multi_space": "(?<=\\S)[ \\t]{2,}",
+    "max_passes": 8
   },
   "status_redundant_at": {
     "[FAIL]": "ERROR",

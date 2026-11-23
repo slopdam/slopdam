@@ -1,0 +1,57 @@
+{
+  "name": "@slopdam/core",
+  "version": "0.1.0",
+  "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages. JavaScript port of slopdam, conformance-tested against its spec.",
+  "license": "MIT",
+  "author": "The slopdam Authors",
+  "homepage": "https://github.com/slopdam/slopdam/tree/main/js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slopdam/slopdam.git",
+    "directory": "js"
+  },
+  "bugs": "https://github.com/slopdam/slopdam/issues",
+  "keywords": [
+    "logging",
+    "linter",
+    "formatter",
+    "korean",
+    "ai",
+    "slop",
+    "llm",
+    "em-dash",
+    "emoji"
+  ],
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/cjs/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  }
+}

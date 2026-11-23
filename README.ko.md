@@ -38,7 +38,7 @@ dev   : [OK] 저장 완료 - 2024-2025년 데이터 3건 처리했습니다!
 - 한국어를 압니다. 한글 `ㅡ`의 세 가지 코드 포인트, 한글 뒤의 `!`를 처리하고, `reader`에서는 숫자 범위를 한국어 표기대로 `~`로 쓰며, 한글, 한자, 가나 본문은 건드리지 않습니다.
 - 보수적으로 동작합니다. URL, 인라인 코드, `key=value`의 값, 파일 경로는 보호하고, 날짜, 명령줄 옵션, `__name__`을 흔적으로 착각하지 않습니다. 규칙은 결정적이고, 두 번 정리해도 바뀌지 않는지 속성 기반 테스트로 확인합니다.
 - CI에 바로 붙습니다. pre-commit 훅, PR에 주석을 다는 GitHub Action, 코드 스캐닝용 SARIF, JSON 출력, 편집기용 표준 입력 검사를 지원합니다. 모든 결과에는 규칙 ID가 있어 끄거나 줄 단위로 무시할 수 있습니다.
-- 다른 언어로 넓힐 준비가 되어 있습니다. 동작은 언어 중립 [명세](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)와 적합성 사례로 적혀 있고, JavaScript, Go, Java, Rust 구현이 이를 함께 씁니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)).
+- 다른 언어로 넓힐 준비가 되어 있습니다. 동작은 언어 중립 [명세](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)와 적합성 사례로 적혀 있습니다. JavaScript, TypeScript 패키지 [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.ko.md)는 이미 모든 사례를 통과하고, Go, Java, Rust가 뒤따릅니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)).
 - 실행 의존성이 없습니다. Python 3.9~3.13, 타입 정보 포함.
 
 ## 화면
@@ -162,7 +162,7 @@ tail -f app.log | slopdam clean
 slopdam은 어느 언어에서나 같은 방식으로 동작하도록 만들고 있습니다.
 
 - **지금 가능한 것:** `slopdam check`는 JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP, Swift의 로그와 print 호출을 줄 단위로 검사하고, pre-commit 훅과 GitHub Action도 같은 파일을 다룹니다. `slopdam clean`은 파이프로 어떤 프로그램의 출력이든 정리합니다: `node server.js 2>&1 | slopdam clean --profile dev`
-- **언어별 패키지:** 동작은 Python과 별개로 [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)에 정의되어 있습니다. 규칙 목록과, 모든 구현이 통과해야 하는 적합성 사례입니다. JavaScript, Go, Java, Rust 패키지는 [로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)에 계획되어 있습니다.
+- **언어별 패키지:** 동작은 Python과 별개로 [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)에 정의되어 있습니다. 규칙 목록과, 모든 구현이 통과해야 하는 적합성 사례입니다. JavaScript, TypeScript 패키지 [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.ko.md)는 `js/`에 있고 모든 사례를 통과합니다. Go, Java, Rust는 [로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)에 계획되어 있습니다.
 
 ## 규칙
 

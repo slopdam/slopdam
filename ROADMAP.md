@@ -16,16 +16,18 @@ Every implementation keeps the same four ideas:
 ## How other languages stay consistent
 
 ```
-spec/                      rule catalog + conformance cases (this repository)
-  ├── Python   slopdam            reference implementation, CLI, pre-commit, GitHub Action
-  ├── JS/TS    @slopdam/core      planned
-  ├── Go       slopdam-go         planned
-  ├── JVM      slopdam-java       planned
-  └── Rust     slopdam (crate)    planned
+slopdam/ (this repository)
+  ├── spec/    rule catalog + conformance cases
+  ├── src/     Python    slopdam            reference implementation, CLI, pre-commit, GitHub Action
+  ├── js/      JS/TS     @slopdam/core      0.5
+  ├── go/      Go        slopdam            planned
+  ├── java/    JVM       slopdam            planned
+  └── rust/    Rust      slopdam (crate)    planned
 ```
 
 - [spec/](spec/README.md) defines the behavior without reference to Python. A port is correct when it passes every case in `spec/conformance.json`, and its CI runs those cases.
-- Each port lives in its own repository under the slopdam organization, so it uses its ecosystem's own build, test and release tools. It pins the spec version it implements.
+- Every port lives in this repository, in its own folder with its ecosystem's own build, test and release tools. It reads `spec/` directly, so a rule change and its effect on every language are reviewed and tested in one pull request.
+- Each package is released on its own tags (`v0.x` for Python, `js-v0.x` for JavaScript).
 - New rules land in the spec first, with conformance cases. Ports follow by passing the new cases.
 - Until a native package exists, any language can use the CLI: `slopdam check` for source code, `slopdam clean` in a pipe for output, plus the pre-commit hook and GitHub Action.
 
@@ -35,7 +37,7 @@ spec/                      rule catalog + conformance cases (this repository)
 |---|---|---|---|
 | Python | `slopdam` (PyPI) | `logging`; structlog and loguru next | `slopdam check` and `fix`, pre-commit, GitHub Action |
 | JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston, `console` wrapper | ESLint plugin |
-| Go | `github.com/slopdam/slopdam-go` | `slog.Handler`, zap core | `go vet` analyzer |
+| Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` analyzer |
 | Java, Kotlin | Maven Central | Logback converter, Log4j2 rewrite policy | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` layer, `log` | CLI |
 | Any | CLI | `slopdam clean` in a pipe | CLI, pre-commit, GitHub Action |
@@ -57,7 +59,8 @@ spec/                      rule catalog + conformance cases (this repository)
 
 ### 0.5: JavaScript and TypeScript
 
-- [ ] `@slopdam/core` passing every conformance case, in Node.js and browsers
+- [x] `@slopdam/core` in [js/](js/README.md) passing every conformance case (Node.js 20+, ESM and CommonJS)
+- [ ] First npm release (`js-v0.1.0`)
 - [ ] pino and winston formatters
 - [ ] `eslint-plugin-slopdam`: string arguments of log calls, with autofix
 
@@ -86,5 +89,5 @@ spec/                      rule catalog + conformance cases (this repository)
 ## How to help
 
 - Report a trace slopdam misses, or a change it should not have made, with the issue templates. Each confirmed case becomes a conformance case.
-- Start a port: open an issue to claim a language, then implement the spec until `conformance.json` passes. Maintainers will create the repository under the organization.
+- Start a port: open an issue to claim a language, then implement the spec in a new folder until `conformance.json` passes.
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) first; every commit needs a DCO sign-off.
