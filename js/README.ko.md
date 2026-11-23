@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logo.png" alt="slopdam logo: tangled lines held back by a dam, straight lines flowing out" width="140">
+</p>
+
 <h1 align="center">JavaScript용 slopdam</h1>
 
 <p align="center"><i><a href="https://github.com/slopdam/slopdam">slopdam</a>의 JavaScript, TypeScript 구현: 긴 대시, 이모지, 구분선, 마크다운이 로그에 남지 않게 합니다.</i></p>

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logo.png" alt="slopdam logo: tangled lines held back by a dam, straight lines flowing out" width="140">
+</p>
+
 <h1 align="center">slopdam for JavaScript</h1>
 
 <p align="center"><i>The JavaScript and TypeScript port of <a href="https://github.com/slopdam/slopdam">slopdam</a>: em dashes, emoji, separator lines and markdown stay out of your logs.</i></p>

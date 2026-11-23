@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logo.png" alt="slopdam logo: tangled lines held back by a dam, straight lines flowing out" width="140">
+</p>
+
 <h1 align="center">slopdam</h1>
 
 <p align="center"><i>A dam for AI slop: em dashes, emoji, separator lines and markdown stay out of your logs.</i></p>
