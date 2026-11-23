@@ -50,6 +50,39 @@ console.log(dev.findings("log.info('🚀 Started — ok')"));
 
 `require("@slopdam/core")` works the same way in CommonJS.
 
+### pino
+
+```js
+import pino from "pino";
+import { slopdamPino } from "@slopdam/core/pino";
+
+const log = pino({ ...slopdamPino({ profile: "dev" }) });
+log.info("✅ **Saved** %d rows — done!", 3);   // msg: "[OK] Saved 3 rows - done!"
+log.error(err, "❌ Upload failed");            // msg: "Upload failed", err untouched
+```
+
+The message of every call is cleaned before pino writes it. Objects and errors are left as they are, and a call that only printed a separator line is dropped. The profile applies to the whole logger; to send `reader` text to one place and `dev` text to another, use two loggers. If you already pass `hooks.logMethod`, give it to `slopdamPino({ hooks })` so both run.
+
+### winston
+
+```js
+import winston from "winston";
+import { slopdamWinston } from "@slopdam/core/winston";
+
+const { combine, printf, json } = winston.format;
+winston.createLogger({
+  transports: [
+    new winston.transports.Console({ format: combine(slopdamWinston(), printf((i) => i.message)) }),
+    new winston.transports.File({ filename: "app.log", format: combine(slopdamWinston({ profile: "dev" }), json()) }),
+  ],
+});
+// console: "Saved 3 rows: done!"   app.log: {"message":"[OK] Saved 3 rows - done!", ...}
+```
+
+winston gives every transport its own copy of the entry, so each one can use its own profile. Put `slopdamWinston()` after `format.splat()` and before `colorize()`, `printf()`, `simple()` or `json()`. Stack traces are kept as they are.
+
+Neither integration imports pino or winston, so `@slopdam/core` still has no runtime dependencies.
+
 ### Options
 
 | Option | Values | Default |
@@ -69,7 +102,7 @@ The rules are not rewritten by hand. The build reads the repository's [spec/](ht
 
 ## Roadmap
 
-Part of slopdam milestone 0.5 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): this core package first, then pino and winston formatters and `eslint-plugin-slopdam`.
+Part of slopdam milestone 0.5 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): the core package and the pino and winston integrations, then `eslint-plugin-slopdam`.
 
 ## Contributing
 

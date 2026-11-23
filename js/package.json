@@ -1,7 +1,7 @@
 {
   "name": "@slopdam/core",
   "version": "0.1.0",
-  "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages. JavaScript port of slopdam, conformance-tested against its spec.",
+  "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages, with pino and winston integrations. JavaScript port of slopdam, conformance-tested against its spec.",
   "license": "MIT",
   "author": "The slopdam Authors",
   "homepage": "https://github.com/slopdam/slopdam/tree/main/js#readme",
@@ -20,7 +20,9 @@
     "slop",
     "llm",
     "em-dash",
-    "emoji"
+    "emoji",
+    "pino",
+    "winston"
   ],
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -35,6 +37,26 @@
       "require": {
         "types": "./dist/cjs/index.d.ts",
         "default": "./dist/cjs/index.js"
+      }
+    },
+    "./pino": {
+      "import": {
+        "types": "./dist/esm/pino.d.ts",
+        "default": "./dist/esm/pino.js"
+      },
+      "require": {
+        "types": "./dist/cjs/pino.d.ts",
+        "default": "./dist/cjs/pino.js"
+      }
+    },
+    "./winston": {
+      "import": {
+        "types": "./dist/esm/winston.d.ts",
+        "default": "./dist/esm/winston.js"
+      },
+      "require": {
+        "types": "./dist/cjs/winston.d.ts",
+        "default": "./dist/cjs/winston.js"
       }
     },
     "./package.json": "./package.json"
@@ -52,6 +74,8 @@
     "prepublishOnly": "npm test"
   },
   "devDependencies": {
-    "typescript": "~6.0.3"
+    "pino": "^10.4.0",
+    "typescript": "~6.0.3",
+    "winston": "^3.19.0"
   }
 }

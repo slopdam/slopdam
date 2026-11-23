@@ -61,7 +61,7 @@ slopdam/ (this repository)
 
 - [x] `@slopdam/core` in [js/](js/README.md) passing every conformance case (Node.js 20+, ESM and CommonJS)
 - [ ] First npm release (`js-v0.1.0`)
-- [ ] pino and winston formatters
+- [x] pino and winston integrations (`@slopdam/core/pino`, `@slopdam/core/winston`)
 - [ ] `eslint-plugin-slopdam`: string arguments of log calls, with autofix
 
 ### 0.6: Go and the JVM
