@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
-## [Unreleased]
+## [0.1.0] - 2026-11-24
 
 ### Added
 - `@slopdam/core/pino`: `slopdamPino()` returns pino options whose `hooks.logMethod` cleans each message. pino levels map to slopdam's, so `dev` drops a status tag the level already says.

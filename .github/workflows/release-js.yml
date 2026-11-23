@@ -3,8 +3,12 @@ name: release-js
 # Push a tag like js-v0.1.0 to publish @slopdam/core (the js/ folder) to npm.
 # Python releases use v* tags and release.yml; the two never trigger each other.
 # Uses npm trusted publishing (OIDC), so no npm token is stored in the repository.
-# One-time setup on npmjs.com: create the slopdam organization, then add a trusted
-# publisher for @slopdam/core (repository slopdam/slopdam, workflow release-js.yml).
+# npm can only attach a trusted publisher to a package that already exists, so the very
+# first version (0.1.0) is published once by a maintainer from their own machine. After
+# that, on npmjs.com: @slopdam/core > Settings > Trusted publishing > GitHub Actions,
+# organization slopdam, repository slopdam, workflow release-js.yml. npm drops a new
+# configuration that has not published within 2 days, so add it when the next version is due.
+# A version that is already on npm is skipped, so tagging a hand-published version is safe.
 
 on:
   push:
@@ -27,6 +31,16 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Tag matches package.json
         run: test "js-v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
-      - run: npm ci
-      - run: npm test
-      - run: npm publish --provenance --access public
+      - name: Skip if this version is already on npm
+        id: published
+        run: |
+          if npm view "@slopdam/core@$(node -p "require('./package.json').version")" version >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::@slopdam/core $(node -p "require('./package.json').version") is already on npm; nothing to publish."
+          fi
+      - if: steps.published.outputs.already != 'true'
+        run: npm ci
+      - if: steps.published.outputs.already != 'true'
+        run: npm test
+      - if: steps.published.outputs.already != 'true'
+        run: npm publish --provenance --access public
