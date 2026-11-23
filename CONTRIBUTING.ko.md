@@ -7,7 +7,7 @@
 ## 시작하기
 
 ```bash
-pip install -e . pytest
+pip install -e ".[test]"
 python -m pytest
 ```
 

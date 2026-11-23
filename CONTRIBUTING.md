@@ -7,7 +7,7 @@ Thank you for helping. This guide covers setup, the sign-off every commit needs,
 ## Getting started
 
 ```bash
-pip install -e . pytest
+pip install -e ".[test]"
 python -m pytest
 ```
 

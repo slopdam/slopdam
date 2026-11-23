@@ -55,6 +55,20 @@ logging.info("✅ Synced %s rows — done", 3)
 - The original log record is never modified, so each handler can use its own profile.
 - Tracebacks, URLs, inline code, `key=value` values and file paths are left untouched.
 
+structlog and loguru work the same way. Neither library is required by slopdam.
+
+```python
+from slopdam.integrations.structlog import SlopdamProcessor
+structlog.configure(processors=[structlog.processors.add_log_level,
+                                SlopdamProcessor(profile="dev"),
+                                structlog.processors.JSONRenderer()])
+
+from slopdam.integrations.loguru import SlopdamPatcher
+logger = logger.patch(SlopdamPatcher(profile="dev"))
+```
+
+The structlog processor cleans the event message only; pass `keys=["note"]` to clean other fields too.
+
 ## Lint and fix source code
 
 ```bash
@@ -62,6 +76,8 @@ slopdam check src/                # report traces in log and print calls; exit 1
 slopdam --profile dev check src/  # suggestions in the dev style
 slopdam fix --diff src/           # preview fixes to Python string literals
 slopdam fix src/                  # apply them
+git diff | slopdam check -        # check text from stdin
+cat app.py | slopdam check --stdin-filename app.py -   # stdin, checked like that file
 ```
 
 ```

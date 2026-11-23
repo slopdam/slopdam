@@ -269,6 +269,21 @@ def test_cli_check_sarif(tmp_path, capsys):
     assert result["locations"][0]["physicalLocation"]["region"] == {"startLine": 1, "startColumn": 14}
 
 
+def test_cli_check_stdin_plain_text(monkeypatch, capsys):
+    monkeypatch.setattr("sys.stdin", io.StringIO("배포 완료 ㅡ 3건\n문제 없음\n"))
+    assert main(["check", "-"]) == 1  # plain text: every line is checked
+    out = capsys.readouterr().out
+    assert out.startswith("<stdin>:1:") and "dash.run" in out
+
+
+def test_cli_check_stdin_as_python(monkeypatch, capsys):
+    src = '# ✅ comment\nx = "— not a log"\nlog.info("✅ done")\n'
+    monkeypatch.setattr("sys.stdin", io.StringIO(src))
+    assert main(["check", "--stdin-filename", "app.py", "--format", "json", "-"]) == 1
+    [hit] = json.loads(capsys.readouterr().out)
+    assert hit["path"] == "app.py" and hit["line"] == 3 and hit["rule"] == "emoji.pictograph"
+
+
 def test_cli_check_clean_tree(tmp_path):
     (tmp_path / "ok.py").write_text(
         'logger.info("saved %d rows", n)\n'

@@ -51,10 +51,10 @@ spec/                      rule catalog + conformance cases (this repository)
 
 ### 0.4: Python integrations and rule quality
 
-- [ ] structlog and loguru adapters
+- [x] structlog and loguru adapters
 - [ ] Emoji ranges generated from Unicode `emoji-data.txt` instead of a hand-written table
-- [ ] Property-based tests (idempotency, protected spans) and a benchmark in CI
-- [ ] `slopdam check -` to lint text from stdin, for editors and other tools
+- [x] Property-based tests (idempotency, protected spans) and a benchmark in CI
+- [x] `slopdam check -` to lint text from stdin, for editors and other tools
 
 ### 0.5: JavaScript and TypeScript
 

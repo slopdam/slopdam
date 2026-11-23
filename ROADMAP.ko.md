@@ -51,10 +51,10 @@ spec/                      규칙 목록 + 적합성 사례 (이 저장소)
 
 ### 0.4: Python 연동과 규칙 품질
 
-- [ ] structlog, loguru 어댑터
+- [x] structlog, loguru 어댑터
 - [ ] 직접 쓴 표 대신 유니코드 `emoji-data.txt`에서 생성한 이모지 범위
-- [ ] 속성 기반 테스트(멱등성, 보호 구역)와 CI 벤치마크
-- [ ] 편집기와 다른 도구를 위한 `slopdam check -` (표준 입력 검사)
+- [x] 속성 기반 테스트(멱등성, 보호 구역)와 CI 벤치마크
+- [x] 편집기와 다른 도구를 위한 `slopdam check -` (표준 입력 검사)
 
 ### 0.5: JavaScript와 TypeScript
 

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: MIT
 """Command line entry point.
 
-    slopdam check [PATH ...]   report rule hits, exit 1 if any
+    slopdam check [PATH ...]   report rule hits, exit 1 if any (- reads stdin)
     slopdam fix [PATH ...]     rewrite string literals in Python files (--diff to preview)
     slopdam clean              read stdin, write cleaned text to stdout
 
@@ -91,24 +91,31 @@ def _line_hits(text: str, sanitizer: Sanitizer, scope: str):
                 yield lineno, f.start + 1, f.rule_id, f.text, f.fix
 
 
+def _hits(path: str, text: str, sanitizer: Sanitizer, scope: str) -> list:
+    if scope in ("log-calls", "strings") and path.endswith(".py"):
+        # Python: exact string literals from the syntax tree, the same targets fix rewrites.
+        try:
+            _, edits = fix_source(text, sanitizer, scope=scope)
+            return sorted((e.line, e.col, e.rule_id, e.before, e.after) for e in edits)
+        except SyntaxError:
+            return list(_line_hits(text, sanitizer, "log-calls"))
+    return list(_line_hits(text, sanitizer, "all" if scope == "all" else "log-calls"))
+
+
 def check(args: argparse.Namespace) -> int:
     cfg = _resolve(args)
     sanitizer = _sanitizer(cfg)
     results = []
-    for path in iter_files(args.paths, cfg):
-        text = _read(path)
-        if text is None:
-            continue
-        if cfg.scope in ("log-calls", "strings") and path.endswith(".py"):
-            # Python: exact string literals from the syntax tree, the same targets fix rewrites.
-            try:
-                _, edits = fix_source(text, sanitizer, scope=cfg.scope)
-                hits = sorted((e.line, e.col, e.rule_id, e.before, e.after) for e in edits)
-            except SyntaxError:
-                hits = list(_line_hits(text, sanitizer, "log-calls"))
-        else:
-            hits = list(_line_hits(text, sanitizer, "all" if cfg.scope == "all" else "log-calls"))
-        results += [(path, *h) for h in hits]
+    if args.paths == ["-"]:
+        # Without a file name stdin is plain text, so every line counts.
+        name = args.stdin_filename or "<stdin>"
+        scope = cfg.scope if args.stdin_filename else "all"
+        results += [(name, *h) for h in _hits(name, sys.stdin.read(), sanitizer, scope)]
+    else:
+        for path in iter_files(args.paths, cfg):
+            text = _read(path)
+            if text is not None:
+                results += [(path, *h) for h in _hits(path, text, sanitizer, cfg.scope)]
 
     if args.format == "json":
         json.dump([{"path": p, "line": n, "col": c, "rule": r, "text": t, "fix": x} for p, n, c, r, t, x in results],
@@ -227,7 +234,8 @@ def main(argv: list = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_check = sub.add_parser("check", help="lint source files")
-    p_check.add_argument("paths", nargs="*", default=["."])
+    p_check.add_argument("paths", nargs="*", default=["."], help="files or directories, or - to read stdin")
+    p_check.add_argument("--stdin-filename", metavar="NAME", help="with -, check stdin as if it were this file")
     p_check.add_argument("--scope", choices=SCOPES, help="log-calls (default), strings (Python literals), all (every line)")
     p_check.add_argument("--all", action="store_true", help="same as --scope all")
     p_check.add_argument("--format", choices=("text", "json", "github", "sarif"), default="text",

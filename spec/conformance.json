@@ -492,6 +492,67 @@
           "dev": "성공적으로 저장되었습니다"
         }
       ]
+    },
+    {
+      "id": "regressions",
+      "title": "Inputs found by property-based tests",
+      "cases": [
+        {
+          "input": "󰀀 a",
+          "reader": "󰀀 a",
+          "dev": "󰀀 a"
+        },
+        {
+          "input": "‐‐‐",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "a ‐‐‐ b",
+          "reader": "a --- b",
+          "dev": "a --- b"
+        },
+        {
+          "input": "‒•",
+          "reader": "-",
+          "dev": "-"
+        },
+        {
+          "input": "‒# 0",
+          "reader": "0",
+          "dev": "0"
+        },
+        {
+          "input": "\r***",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "\r 0",
+          "reader": "0",
+          "dev": "0"
+        },
+        {
+          "input": "\n  indented",
+          "reader": "indented",
+          "dev": "indented"
+        },
+        {
+          "input": "x\r\ny",
+          "reader": "x\ny",
+          "dev": "x\ny"
+        },
+        {
+          "input": "`a  b` 확인",
+          "reader": "a b 확인",
+          "dev": "`a  b` 확인"
+        },
+        {
+          "input": "  `a—b`  확인  ",
+          "reader": "`a—b` 확인",
+          "dev": "`a—b` 확인"
+        }
+      ]
     }
   ]
 }

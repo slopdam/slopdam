@@ -55,6 +55,20 @@ logging.info("✅ 처리 %s건 ㅡ 완료!", 3)
 - 원본 로그 레코드는 바꾸지 않으므로 핸들러마다 다른 프로필을 쓸 수 있습니다.
 - 트레이스백, URL, 인라인 코드, `key=value`의 값, 파일 경로는 건드리지 않습니다.
 
+structlog와 loguru도 같은 방식으로 씁니다. slopdam이 두 라이브러리를 필요로 하지는 않습니다.
+
+```python
+from slopdam.integrations.structlog import SlopdamProcessor
+structlog.configure(processors=[structlog.processors.add_log_level,
+                                SlopdamProcessor(profile="dev"),
+                                structlog.processors.JSONRenderer()])
+
+from slopdam.integrations.loguru import SlopdamPatcher
+logger = logger.patch(SlopdamPatcher(profile="dev"))
+```
+
+structlog 프로세서는 이벤트 메시지만 정리합니다. 다른 필드도 정리하려면 `keys=["note"]`처럼 넘깁니다.
+
 ## 소스 코드 검사와 수정
 
 ```bash
@@ -62,6 +76,8 @@ slopdam check src/                # 로그와 print 호출의 흔적을 알림. 
 slopdam --profile dev check src/  # 수정안을 dev 방식으로
 slopdam fix --diff src/           # Python 문자열 리터럴 수정 미리 보기
 slopdam fix src/                  # 실제로 고치기
+git diff | slopdam check -        # 표준 입력의 텍스트 검사
+cat app.py | slopdam check --stdin-filename app.py -   # 표준 입력을 그 파일처럼 검사
 ```
 
 ```

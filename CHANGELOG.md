@@ -2,6 +2,23 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Added
+- `slopdam check -` checks text from stdin; `--stdin-filename NAME` checks it as if it were that file.
+- structlog processor (`slopdam.integrations.structlog.SlopdamProcessor`) and loguru patcher (`slopdam.integrations.loguru.SlopdamPatcher`). Neither library is a dependency.
+- Property-based tests (Hypothesis) for idempotency, protected spans and finding spans, and `scripts/bench.py`, shown in the CI job summary.
+- `test` extra: `pip install -e ".[test]"` installs everything the test suite uses.
+- Conformance cases for the bugs below.
+
+### Fixed
+- `clean()` raised `IndexError` when the input already contained a character from the private-use range U+F0000 to U+FFFFD. Such characters are now kept as they are.
+- `clean()` was not always idempotent. Removing one trace could expose another that an earlier rule would have caught (`‒•`, `‒# x`), `\r` and other line separators were not treated as line ends by the rules, and an indented line after an empty first line kept its indentation. `clean()` now normalizes line breaks and repeats until the text stops changing. Lines with nothing to clean take the same time as before; lines with traces take about twice as long (one more pass to confirm).
+- Spaces inside protected spans (inline code, quoted `key=value` values) are no longer collapsed.
+
+### Output changes
+- `dash.hyphen` and `dash.wave` run before the markdown rules, so `‐‐‐` on its own line is removed like `---` (it used to become `---`).
+
 ## [0.3.0] - 2026-11-24
 
 ### Added

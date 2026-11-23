@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -e . pytest
+      - run: pip install -e ".[test]"
       - run: python -m pytest -q
 
   dogfood:
@@ -36,6 +36,16 @@ jobs:
       - uses: ./
         with:
           paths: src/
+
+  bench:
+    # Timing of clean() on typical log lines, shown in the job summary. Informational, never fails.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: python scripts/bench.py >> "$GITHUB_STEP_SUMMARY"
 
   spec:
     # spec/rules.json and the expected outputs in spec/conformance.json must match the Python source.

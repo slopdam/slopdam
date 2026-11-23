@@ -66,6 +66,7 @@ _PROTECT = re.compile(
     r"|`(?P<code>[^`\n]+)`"
     r"|(?<=\w=)(?P<kv>\"[^\"\n]*\"|'[^'\n]*'|[^\s,;)]+)"
     r"|(?<![\w/])(?P<path>(?:~|\.{1,2})?/[^\s\"'`,;)]+)"
+    r"|(?P<pua>[\U000F0000-\U000FFFFD])"  # input that already uses the placeholder range
 )
 
 # --- dash family -------------------------------------------------------------
@@ -157,13 +158,14 @@ RULES: tuple = (
     _r("emoji.pictograph", "basic",
        "[" + _EMOJI_CLASS.replace("️⃣‍", "") + "][" + _EMOJI_CLASS + "]*[ \t]*|[️⃣‍]+",
        _both(""), "emoji or pictograph"),
+    # Before the markdown rules: "‐‐‐" must become "---" while md.hr can still see it.
+    _r("dash.hyphen", "basic", f"[{HYPHENS}]", _both("-"), "Unicode hyphen or minus"),
+    _r("dash.wave", "basic", "[〜～]", _both("~"), "wave dash or full-width tilde"),
     _r("md.heading", "basic", r"^[ \t]*#{1,6}[ \t]+", _both(""), "markdown heading marker", re.M, ascii=True),
     _r("md.fence", "basic", r"^[ \t]*```[^\n]*\n?", _both(""), "markdown code fence", re.M, ascii=True),
     _r("md.hr", "basic", r"^[ \t]*([-*_])[ \t]*(?:\1[ \t]*){2,}$", _both(""), "markdown horizontal rule", re.M, ascii=True),
     # Only **bold**: __x__ is far more often a Python name (__name__, __init__) than emphasis.
     _r("md.emphasis", "basic", r"\*\*(.+?)\*\*", _both(_unwrap), "markdown bold", ascii=True),
-    _r("dash.hyphen", "basic", f"[{HYPHENS}]", _both("-"), "Unicode hyphen or minus"),
-    _r("dash.wave", "basic", "[〜～]", _both("~"), "wave dash or full-width tilde"),
     _r("dash.run", "basic", f"([ \t]*)([{DASHES}{EU}{LINES}]+)([ \t]*)", _both(_dash_run), "dash, 'ㅡ' or line character"),
     _r("dash.cjk-run", "basic", "[一ーｰ]{3,}", _both(""), "CJK look-alike separator"),
     _r("dash.ascii-run", "basic", r"([=\-*#~_+])\1{4,}", _both(""), "ASCII separator", ascii=True),
@@ -174,6 +176,7 @@ RULES: tuple = (
 )
 
 _MULTI_SPACE = re.compile(r"(?<=\S)[ \t]{2,}")
+_MAX_PASSES = 8
 
 
 class Sanitizer:
@@ -210,6 +213,17 @@ class Sanitizer:
 
     def clean(self, text: str, levelno: Optional[int] = None) -> str:
         ctx = self._context(levelno)
+        # Every line break the line splitter knows (\r, \u2028, ...) becomes \n, so ^ and $ in the rules see it too.
+        text = "\n".join(text.splitlines())
+        # Removing one trace can expose another (a dash before a bullet, "‒# x"); repeat until stable.
+        for _ in range(_MAX_PASSES):
+            cleaned = self._clean_once(text, ctx)
+            if cleaned == text:
+                break
+            text = cleaned
+        return text
+
+    def _clean_once(self, text: str, ctx: Context) -> str:
         saved: list = []
 
         def protect(m: "re.Match[str]") -> str:
@@ -222,12 +236,12 @@ class Sanitizer:
             return chr(_PUA + len(saved) - 1)
 
         text = self._apply(_PROTECT.sub(protect, text), ctx)
+        text = _MULTI_SPACE.sub(" ", text)  # while protected spans are still masked, so their spaces stay
         text = _PUA_RE.sub(lambda m: saved[ord(m.group(0)) - _PUA], text)
 
         lines = []
-        for i, line in enumerate(text.splitlines()):
-            line = _MULTI_SPACE.sub(" ", line)
-            line = line.strip() if i == 0 else line.rstrip()
+        for line in text.splitlines():
+            line = line.rstrip() if lines else line.strip()  # the first kept line, not line 0
             if line:
                 lines.append(line)
         return "\n".join(lines)

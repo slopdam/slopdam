@@ -16,7 +16,7 @@
     "space": " "
   },
   "default_dash_inline": "colon",
-  "protected_spans": "(?P<url>https?://[^\\s<>\\\"'`]+)|`(?P<code>[^`\\n]+)`|(?<=\\w=)(?P<kv>\\\"[^\\\"\\n]*\\\"|'[^'\\n]*'|[^\\s,;)]+)|(?<![\\w/])(?P<path>(?:~|\\.{1,2})?/[^\\s\\\"'`,;)]+)",
+  "protected_spans": "(?P<url>https?://[^\\s<>\\\"'`]+)|`(?P<code>[^`\\n]+)`|(?<=\\w=)(?P<kv>\\\"[^\\\"\\n]*\\\"|'[^'\\n]*'|[^\\s,;)]+)|(?<![\\w/])(?P<path>(?:~|\\.{1,2})?/[^\\s\\\"'`,;)]+)|(?P<pua>[\\U000F0000-\\U000FFFFD])",
   "charsets": {
     "hyphens": "‐‑−﹣－",
     "dashes": "‒–—―⸺⸻﹘︱︲⹀",
@@ -237,6 +237,40 @@
       }
     },
     {
+      "id": "dash.hyphen",
+      "level": "basic",
+      "description": "Unicode hyphen or minus",
+      "pattern": "[‐‑−﹣－]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "-"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "-"
+        }
+      }
+    },
+    {
+      "id": "dash.wave",
+      "level": "basic",
+      "description": "wave dash or full-width tilde",
+      "pattern": "[〜～]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "~"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "~"
+        }
+      }
+    },
+    {
       "id": "md.heading",
       "level": "basic",
       "description": "markdown heading marker",
@@ -307,40 +341,6 @@
         "dev": {
           "kind": "function",
           "name": "unwrap"
-        }
-      }
-    },
-    {
-      "id": "dash.hyphen",
-      "level": "basic",
-      "description": "Unicode hyphen or minus",
-      "pattern": "[‐‑−﹣－]",
-      "flags": [],
-      "actions": {
-        "reader": {
-          "kind": "replace",
-          "value": "-"
-        },
-        "dev": {
-          "kind": "replace",
-          "value": "-"
-        }
-      }
-    },
-    {
-      "id": "dash.wave",
-      "level": "basic",
-      "description": "wave dash or full-width tilde",
-      "pattern": "[〜～]",
-      "flags": [],
-      "actions": {
-        "reader": {
-          "kind": "replace",
-          "value": "~"
-        },
-        "dev": {
-          "kind": "replace",
-          "value": "~"
         }
       }
     },

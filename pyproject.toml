@@ -32,6 +32,10 @@ classifiers = [
 requires-python = ">=3.9"
 keywords = ["logging", "formatter", "linter", "korean", "ai", "slop"]
 
+[project.optional-dependencies]
+# What the test suite needs; the integration and property tests are skipped without them.
+test = ["pytest", "hypothesis", "structlog", "loguru"]
+
 [project.urls]
 Homepage = "https://github.com/slopdam/slopdam"
 Repository = "https://github.com/slopdam/slopdam"
