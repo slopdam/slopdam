@@ -45,6 +45,7 @@ console.addFilter(PlainFilter())                     # drop lines that were only
 
 file = logging.FileHandler("app.log")                # read by tools
 file.setFormatter(PlainFormatter("%(asctime)s %(levelname)s %(message)s", profile="dev"))
+file.addFilter(PlainFilter(profile="dev"))
 
 logging.basicConfig(level=logging.INFO, handlers=[console, file])
 logging.info("✅ Synced %s rows — done", 3)
