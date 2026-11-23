@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.5.0] - 2026-11-24
 
 ### Added
 - `js/`: `@slopdam/core`, the JavaScript and TypeScript package, in this repository. It reads `spec/` directly and passes every conformance case in its ESM and CommonJS builds; CI runs it on Node.js 20, 22 and 24. npm releases use `js-v*` tags. It includes pino (`@slopdam/core/pino`) and winston (`@slopdam/core/winston`) integrations and an ESLint rule (`@slopdam/core/eslint`). See `js/CHANGELOG.md`.
