@@ -1,16 +1,18 @@
-# slopdam
+<h1 align="center">slopdam</h1>
 
-[English](https://github.com/slopdam/slopdam/blob/main/README.md) | [한국어](https://github.com/slopdam/slopdam/blob/main/README.ko.md)
+<p align="center"><i>A dam for AI slop: em dashes, emoji, separator lines and markdown stay out of your logs.</i></p>
 
-[![ci](https://github.com/slopdam/slopdam/actions/workflows/ci.yml/badge.svg)](https://github.com/slopdam/slopdam/actions/workflows/ci.yml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/slopdam/slopdam/blob/main/LICENSE)
+<p align="center"><b>English</b> | <a href="https://github.com/slopdam/slopdam/blob/main/README.ko.md">한국어</a></p>
 
-**A dam for AI slop in your logs.** slopdam removes the traces AI coding tools leave in log messages and console output: em dashes and look-alike lines (including the Korean `ㅡ`), decorative emoji, separator lines, markdown bold, curly quotes and invisible characters.
+<p align="center">
+  <a href="https://github.com/slopdam/slopdam/actions/workflows/ci.yml"><img src="https://github.com/slopdam/slopdam/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pypi.org/project/slopdam/"><img src="https://img.shields.io/pypi/v/slopdam.svg" alt="PyPI"></a>
+  <a href="https://pypi.org/project/slopdam/"><img src="https://img.shields.io/pypi/pyversions/slopdam.svg" alt="Python versions"></a>
+  <a href="https://github.com/slopdam/slopdam/blob/main/spec/README.md"><img src="https://img.shields.io/badge/spec-conformance%20tested-informational.svg" alt="Spec: conformance tested"></a>
+  <a href="https://github.com/slopdam/slopdam/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
+</p>
 
-It works in two places:
-
-- **When logs are written**: a `logging` formatter and filter clean every message on its way out, with no change to your code.
-- **Before code is committed**: a linter reports traces in log calls, and a fixer rewrites the string literals in Python files.
+slopdam removes the traces AI coding tools leave in log messages and console output: em dashes and look-alike lines (including the Korean `ㅡ`), decorative emoji, separator lines, markdown bold, curly quotes and invisible characters. It cleans messages as they are written, and finds and fixes them in source code before they are committed.
 
 The same trace becomes different text depending on who reads it:
 
@@ -23,7 +25,29 @@ dev   : [OK] Saved - 3 rows processed
 - `reader` (default): plain text for people, such as CLI messages, alerts and reports.
 - `dev`: grep-friendly text for log files and collectors. Status emoji become `[OK]`, `[FAIL]` and `[WARN]` instead of disappearing.
 
-slopdam uses deterministic rules (regular expressions and character tables). It does not try to guess whether a model wrote the text: the same input always gives the same output, and every change can be traced to a rule ID.
+![slopdam demo: a Python app logging reader text to the console and dev text to a file, slopdam check finding traces in Python and JavaScript log calls, slopdam fix previewing a diff, and slopdam clean in a pipe](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/demo.gif)
+
+<sub>Recorded from real runs on a sample project with <code>scripts/demo/make_demo.py</code>; every line of output is what slopdam printed.</sub>
+
+## Highlights
+
+- One engine, two profiles. Detection is shared; `reader` writes plain sentences for people and `dev` keeps information for tools. A logger can send `reader` text to the console and `dev` text to a file at the same time.
+- Cleans logs as they are written. A `logging` formatter and filter, a structlog processor and a loguru patcher. Each handler gets its own result, tracebacks are never touched, and records that were only a separator line are dropped.
+- Finds traces before they are committed. `slopdam check` reads Python through the syntax tree and JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP and Swift line by line, looking only at log and print calls.
+- Fixes Python safely. `slopdam fix` rewrites only the text inside string literals. Quotes, prefixes, escapes, f-string expressions and `%s` placeholders stay, and nothing is written unless the file still compiles.
+- Korean-aware. The Hangul `ㅡ` in all three of its code points, `!` after Hangul, number ranges written with `~` as in Korean in `reader`, and Hangul, Hanja and kana text left alone.
+- Conservative by design. URLs, inline code, `key=value` values and file paths are protected; dates, command line flags and `__name__` are not mistaken for traces. Rules are deterministic, and property-based tests check that cleaning twice changes nothing.
+- Fits into CI. pre-commit hook, GitHub Action with pull request annotations, SARIF for code scanning, JSON output and stdin for editors. Every finding has a rule ID you can disable or ignore per line.
+- Ready for other languages. The behavior is written down as a language-neutral [spec](https://github.com/slopdam/slopdam/blob/main/spec/README.md) with conformance cases that ports to JavaScript, Go, Java and Rust will share ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)).
+- No runtime dependencies. Python 3.9 to 3.13, typed.
+
+## Screenshots
+
+| Clean log output (reader on the console, dev in the file) | Find traces in Python and JavaScript |
+|---|---|
+| ![python app.py prints reader text, and app.log holds the dev text with an [OK] tag; the separator line is dropped](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logging-en.png) | ![slopdam check lists each trace with file, line, column, rule ID and the suggested fix](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/check-en.png) |
+| **Preview fixes to Python string literals** | **Clean any program's output in a pipe** |
+| ![slopdam fix --diff shows the log calls rewritten, with the %d placeholders kept](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/fix-en.png) | ![echo piped into slopdam clean, then into slopdam --profile dev clean](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/pipe-en.png) |
 
 ## Install
 

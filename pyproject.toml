@@ -30,7 +30,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.9"
-keywords = ["logging", "formatter", "linter", "korean", "ai", "slop"]
+keywords = ["logging", "formatter", "linter", "korean", "ai", "slop", "llm", "em-dash", "emoji", "code-quality", "pre-commit", "github-action", "structlog", "loguru"]
 
 [project.optional-dependencies]
 # What the test suite needs; the integration and property tests are skipped without them.
@@ -44,6 +44,10 @@ Changelog = "https://github.com/slopdam/slopdam/blob/main/CHANGELOG.md"
 
 [project.scripts]
 slopdam = "slopdam.cli:main"
+
+[tool.hatch.build.targets.sdist]
+# README images and recordings are served from GitHub; keep them out of the source package.
+exclude = ["docs/assets"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/slopdam"]
