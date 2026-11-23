@@ -108,3 +108,5 @@ jobs:
           npm install "$GITHUB_WORKSPACE"/js/slopdam-core-*.tgz
           node -e "const {clean} = require('@slopdam/core'); if (clean('✅ **Saved** — 3 rows') !== 'Saved: 3 rows') process.exit(1)"
           node --input-type=module -e "import {clean} from '@slopdam/core'; if (clean('✅ 저장 ㅡ 완료') !== '저장: 완료') process.exit(1)"
+          node -e "require('@slopdam/core/pino').slopdamPino(); require('@slopdam/core/winston').slopdamWinston()"
+          node --input-type=module -e "import {slopdamPino} from '@slopdam/core/pino'; import {slopdamWinston} from '@slopdam/core/winston'; slopdamPino(); slopdamWinston()"

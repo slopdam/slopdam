@@ -5,6 +5,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Out
 ## [Unreleased]
 
 ### Added
+- `@slopdam/core/pino`: `slopdamPino()` returns pino options whose `hooks.logMethod` cleans each message. pino levels map to slopdam's, so `dev` drops a status tag the level already says.
+- `@slopdam/core/winston`: `slopdamWinston()` is a winston format that cleans `info.message`; each transport can use its own profile.
+- Neither integration imports its library; pino and winston are dev dependencies for the tests only.
 - `@slopdam/core`: `clean()`, `Sanitizer` with `clean()` and `findings()`, profiles, levels, `disable` and `dashInline`, as in the Python package.
 - Implements slopdam spec version 1, read from `../spec`. Every conformance case passes in the ESM and CommonJS builds. On 20,000 random inputs the output of `clean()` and `findings()` matched the Python package exactly.
 - Python's regular expression dialect is translated when the package loads, including Unicode `\w`, `\s` and `\b`, and `^` and `$` that treat only `\n` as a line break.

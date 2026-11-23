@@ -61,7 +61,7 @@ slopdam/ (이 저장소)
 
 - [x] 모든 적합성 사례를 통과하는 `@slopdam/core` ([js/](js/README.ko.md), Node.js 20 이상, ESM과 CommonJS)
 - [ ] 첫 npm 배포 (`js-v0.1.0`)
-- [ ] pino, winston 포맷터
+- [x] pino, winston 연동 (`@slopdam/core/pino`, `@slopdam/core/winston`)
 - [ ] `eslint-plugin-slopdam`: 로그 호출의 문자열 인자 검사와 자동 수정
 
 ### 0.6: Go와 JVM

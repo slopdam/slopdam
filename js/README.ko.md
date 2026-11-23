@@ -50,6 +50,39 @@ console.log(dev.findings("log.info('🚀 시작 ㅡ 정상')"));
 
 CommonJS에서도 `require("@slopdam/core")`로 똑같이 씁니다.
 
+### pino
+
+```js
+import pino from "pino";
+import { slopdamPino } from "@slopdam/core/pino";
+
+const log = pino({ ...slopdamPino({ profile: "dev" }) });
+log.info("✅ **저장 완료** %d건 ㅡ 처리했습니다!", 3);   // msg: "[OK] 저장 완료 3건 - 처리했습니다!"
+log.error(err, "❌ 업로드 실패");                       // msg: "업로드 실패", err는 그대로
+```
+
+pino가 쓰기 전에 모든 호출의 메시지를 정리합니다. 객체와 오류는 그대로 두고, 구분선만 출력하던 호출은 버립니다. 프로필은 로거 전체에 적용되므로, `reader`와 `dev`를 다른 곳에 보내려면 로거를 두 개 만드세요. 이미 `hooks.logMethod`를 쓰고 있다면 `slopdamPino({ hooks })`로 넘기면 둘 다 실행됩니다.
+
+### winston
+
+```js
+import winston from "winston";
+import { slopdamWinston } from "@slopdam/core/winston";
+
+const { combine, printf, json } = winston.format;
+winston.createLogger({
+  transports: [
+    new winston.transports.Console({ format: combine(slopdamWinston(), printf((i) => i.message)) }),
+    new winston.transports.File({ filename: "app.log", format: combine(slopdamWinston({ profile: "dev" }), json()) }),
+  ],
+});
+// 화면: "저장 완료: 3건 처리했습니다."   app.log: {"message":"[OK] 저장 완료 - 3건 처리했습니다!", ...}
+```
+
+winston은 트랜스포트마다 로그 항목의 사본을 넘기므로 트랜스포트마다 다른 프로필을 쓸 수 있습니다. `slopdamWinston()`은 `format.splat()` 뒤, `colorize()`, `printf()`, `simple()`, `json()` 앞에 둡니다. 스택 트레이스는 그대로 둡니다.
+
+두 연동 모두 pino나 winston을 불러오지 않으므로 `@slopdam/core`는 여전히 실행 의존성이 없습니다.
+
 ### 옵션
 
 | 옵션 | 값 | 기본값 |
@@ -69,7 +102,7 @@ URL, 인라인 코드, `key=value`의 값, 파일 경로는 바꾸지 않습니�
 
 ## 로드맵
 
-slopdam 0.5 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 이 핵심 패키지를 먼저 만들고, 다음으로 pino, winston 포맷터와 `eslint-plugin-slopdam`을 만듭니다.
+slopdam 0.5 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 핵심 패키지와 pino, winston 연동에 이어 `eslint-plugin-slopdam`을 만듭니다.
 
 ## 기여
 
