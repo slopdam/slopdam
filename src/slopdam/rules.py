@@ -74,7 +74,8 @@ HYPHENS = "‐‑−﹣－"
 DASHES = "‒–—―⸺⸻﹘︱︲⹀"
 EU = "ㅡￚᅳ"  # ㅡ, halfwidth ㅡ, conjoining jungseong ㅡ (NFKC target of ㅡ)
 LINES = "─━┄-┋╌-╏═⎯⏤➖"
-_CHOSEONG = re.compile("[ᄀ-ᅟꥠ-ꥼ]")
+CHOSEONG = "ᄀ-ᅟꥠ-ꥼ"  # Hangul leading consonants (jamo and extended-A), for old-style syllables
+_CHOSEONG = re.compile(f"[{CHOSEONG}]")
 _OPENERS, _CLOSERS = "([{", ")]}%"
 
 

@@ -17,11 +17,11 @@ Both files are regenerated with `python scripts/gen_spec.py`. CI runs it with `-
 
 1. Protect spans. Every match of `protected_spans` (URL, inline code, the value of `key=value`, path) is replaced by a placeholder that no rule matches.
 2. Apply the rules in the order of `rules.json`. A rule is active when the profile has an action for it, its level is at or below the chosen level, and it is not disabled. Each rule replaces all of its matches in the text produced by the previous rule.
-3. Collapse every run of two or more spaces or tabs after a non-space character into one space. Protected spans are still masked, so the spaces inside them stay.
+3. Collapse every run of two or more spaces or tabs after a non-space character into one space (`tidy.multi_space`). Protected spans are still masked, so the spaces inside them stay.
 4. Restore the protected spans. In `reader`, inline code loses its backticks when the code itself would not change.
 5. Tidy the lines: strip both ends of the first non-empty line and the right end of the others, drop empty lines, and join them with `\n`.
 
-Removing one trace can expose another (`‒•` leaves a bullet at the start of the line), so when a pass changes the text, run another pass on its result, until a pass changes nothing (at most 8 passes). The result is therefore idempotent: `clean(clean(x)) == clean(x)`.
+Removing one trace can expose another (`‒•` leaves a bullet at the start of the line), so when a pass changes the text, run another pass on its result, until a pass changes nothing (at most `tidy.max_passes` passes). The result is therefore idempotent: `clean(clean(x)) == clean(x)`.
 
 A character from the private-use range U+F0000 to U+FFFFD that is already in the input is treated as a protected span, so implementations may use that range for their placeholders.
 
@@ -38,7 +38,7 @@ A character from the private-use range U+F0000 to U+FFFFD that is already in the
 | `fullwidth` | Map full-width punctuation to its ASCII form. |
 | `unwrap` | Replace the match with its first capture group. |
 | `status_tag` | `dev` only. Replace a leading status emoji with `[OK] `, `[FAIL] ` or `[WARN] `. Return nothing when the log level is at or above `status_redundant_at` for that tag. |
-| `dash_run` | Decide what a run of dashes means from its neighbors, in this order: part of an old Hangul syllable (keep); two or more characters (separator: a space between words, otherwise nothing); between digits (range: `~` in `reader`, `-` in `dev`); at the start of a line and followed by space (list marker `- `); between words (`dash_inline` in `reader`, ` - ` in `dev`); otherwise nothing. |
+| `dash_run` | Decide what a run of dashes means from its neighbors, in this order: part of an old Hangul syllable, that is the run starts with `ᅳ` right after a character from `charsets.hangul_choseong` (keep); two or more characters (separator: a space between words, otherwise nothing); between digits (range: `~` in `reader`, `-` in `dev`); at the start of a line and followed by space (list marker `- `); between words (`dash_inline` in `reader`, ` - ` in `dev`); otherwise nothing. "Between words" means the character before the run (spaces around it included) is a letter, a digit, a protected span or one of `dash_word_before`, and the character after it is a letter, a digit, a protected span or one of `dash_word_after`. |
 
 ## Regular expressions
 

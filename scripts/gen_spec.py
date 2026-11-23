@@ -49,7 +49,13 @@ def rules_json() -> dict:
             "box_lines": rules.LINES,
             "emoji": rules._EMOJI_CLASS,
             "status": rules._STATUS,
+            "hangul_choseong": rules.CHOSEONG,
         },
+        # dash_run: a neighbor counts as part of a word when it is a letter or digit, a protected
+        # span, or one of these (before the dash: closers, after it: openers).
+        "dash_word_before": rules._CLOSERS,
+        "dash_word_after": rules._OPENERS,
+        "tidy": {"multi_space": rules._MULTI_SPACE.pattern, "max_passes": rules._MAX_PASSES},
         "status_redundant_at": {tag: logging.getLevelName(n) for tag, n in rules._REDUNDANT.items()},
         "rules": [
             {

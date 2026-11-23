@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Added
+- `spec/rules.json` now holds every constant a port needs: `charsets.hangul_choseong`, `dash_word_before` and `dash_word_after` for `dash_run`, and `tidy` (the space-collapsing pattern and the pass limit). Found while writing the JavaScript port.
+
 ## [0.4.1] - 2026-11-24
 
 ### Added
