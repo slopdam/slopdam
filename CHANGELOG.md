@@ -5,6 +5,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 ## [Unreleased]
 
 ### Added
+- `js/`: `@slopdam/core`, the JavaScript and TypeScript package, in this repository. It reads `spec/` directly and passes every conformance case in its ESM and CommonJS builds; CI runs it on Node.js 20, 22 and 24. npm releases use `js-v*` tags. See `js/CHANGELOG.md`.
 - `spec/rules.json` now holds every constant a port needs: `charsets.hangul_choseong`, `dash_word_before` and `dash_word_after` for `dash_run`, and `tidy` (the space-collapsing pattern and the pass limit). Found while writing the JavaScript port.
 
 ## [0.4.1] - 2026-11-24

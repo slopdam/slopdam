@@ -16,16 +16,18 @@ slopdam은 팀이 쓰는 모든 언어에서 AI가 남긴 흔적이 로그와 �
 ## 다른 언어가 같은 결과를 내는 방법
 
 ```
-spec/                      규칙 목록 + 적합성 사례 (이 저장소)
-  ├── Python   slopdam            기준 구현, CLI, pre-commit, GitHub Action
-  ├── JS/TS    @slopdam/core      계획
-  ├── Go       slopdam-go         계획
-  ├── JVM      slopdam-java       계획
-  └── Rust     slopdam (crate)    계획
+slopdam/ (이 저장소)
+  ├── spec/    규칙 목록 + 적합성 사례
+  ├── src/     Python    slopdam            기준 구현, CLI, pre-commit, GitHub Action
+  ├── js/      JS/TS     @slopdam/core      0.5
+  ├── go/      Go        slopdam            계획
+  ├── java/    JVM       slopdam            계획
+  └── rust/    Rust      slopdam (crate)    계획
 ```
 
 - [spec/](spec/README.ko.md)은 Python과 무관하게 동작을 정의합니다. `spec/conformance.json`의 모든 사례를 통과하면 올바른 구현이며, 각 구현의 CI가 이 사례를 실행합니다.
-- 각 구현은 slopdam 조직 아래 별도 저장소에 두어, 그 생태계의 빌드, 테스트, 배포 도구를 그대로 씁니다. 자신이 따르는 명세 버전을 고정합니다.
+- 모든 구현은 이 저장소 안의 자기 폴더에 두고, 그 생태계의 빌드, 테스트, 배포 도구를 그대로 씁니다. `spec/`을 직접 읽으므로 규칙 변경과 그것이 모든 언어에 미치는 영향을 PR 하나에서 검토하고 테스트합니다.
+- 패키지마다 배포 태그가 따로 있습니다(Python은 `v0.x`, JavaScript는 `js-v0.x`).
 - 새 규칙은 적합성 사례와 함께 명세에 먼저 들어가고, 각 구현은 새 사례를 통과하는 것으로 따라옵니다.
 - 언어별 패키지가 나오기 전에도 어느 언어에서나 CLI를 쓸 수 있습니다. 소스 코드는 `slopdam check`, 출력은 파이프로 `slopdam clean`, 그리고 pre-commit 훅과 GitHub Action이 있습니다.
 
@@ -35,7 +37,7 @@ spec/                      규칙 목록 + 적합성 사례 (이 저장소)
 |---|---|---|---|
 | Python | `slopdam` (PyPI) | `logging`, 다음은 structlog와 loguru | `slopdam check`와 `fix`, pre-commit, GitHub Action |
 | JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston, `console` 래퍼 | ESLint 플러그인 |
-| Go | `github.com/slopdam/slopdam-go` | `slog.Handler`, zap core | `go vet` 분석기 |
+| Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` 분석기 |
 | Java, Kotlin | Maven Central | Logback 변환기, Log4j2 재작성 정책 | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` 레이어, `log` | CLI |
 | 모든 언어 | CLI | 파이프로 `slopdam clean` | CLI, pre-commit, GitHub Action |
@@ -57,7 +59,8 @@ spec/                      규칙 목록 + 적합성 사례 (이 저장소)
 
 ### 0.5: JavaScript와 TypeScript
 
-- [ ] 모든 적합성 사례를 통과하는 `@slopdam/core` (Node.js와 브라우저)
+- [x] 모든 적합성 사례를 통과하는 `@slopdam/core` ([js/](js/README.ko.md), Node.js 20 이상, ESM과 CommonJS)
+- [ ] 첫 npm 배포 (`js-v0.1.0`)
 - [ ] pino, winston 포맷터
 - [ ] `eslint-plugin-slopdam`: 로그 호출의 문자열 인자 검사와 자동 수정
 
@@ -86,5 +89,5 @@ spec/                      규칙 목록 + 적합성 사례 (이 저장소)
 ## 참여 방법
 
 - slopdam이 놓친 흔적이나 잘못 바꾼 문장을 이슈 템플릿으로 알려 주세요. 확인된 사례는 적합성 사례가 됩니다.
-- 언어 구현 시작하기: 이슈로 언어를 맡겠다고 알린 뒤, `conformance.json`을 통과할 때까지 명세를 구현합니다. 저장소는 메인테이너가 조직 아래 만들어 드립니다.
+- 언어 구현 시작하기: 이슈로 언어를 맡겠다고 알린 뒤, 새 폴더에서 `conformance.json`을 통과할 때까지 명세를 구현합니다.
 - 먼저 [CONTRIBUTING.ko.md](CONTRIBUTING.ko.md)를 읽어 주세요. 모든 커밋에 DCO 서명이 필요합니다.

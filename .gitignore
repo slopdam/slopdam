@@ -14,3 +14,8 @@ CLAUDE.local.md
 .claude/
 
 .hypothesis/
+
+# JavaScript package (js/)
+node_modules/
+js/src/spec.generated.ts
+*.tgz

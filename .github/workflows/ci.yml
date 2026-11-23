@@ -72,3 +72,39 @@ jobs:
           python -m venv /tmp/smoke
           /tmp/smoke/bin/pip install dist/*.whl
           echo '✅ **Saved** — 3 rows' | /tmp/smoke/bin/slopdam clean | grep -qx 'Saved: 3 rows'
+
+  js:
+    # @slopdam/core: every conformance case against the ESM and CommonJS builds.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22", "24"]
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+      - run: npm test
+
+  js-package:
+    # What npm would publish: install the packed tarball and load both entry points.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: js
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - run: npm ci && npm run build && npm pack
+      - run: |
+          mkdir /tmp/smoke && cd /tmp/smoke && npm init -y >/dev/null
+          npm install "$GITHUB_WORKSPACE"/js/slopdam-core-*.tgz
+          node -e "const {clean} = require('@slopdam/core'); if (clean('✅ **Saved** — 3 rows') !== 'Saved: 3 rows') process.exit(1)"
+          node --input-type=module -e "import {clean} from '@slopdam/core'; if (clean('✅ 저장 ㅡ 완료') !== '저장: 완료') process.exit(1)"

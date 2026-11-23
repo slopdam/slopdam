@@ -51,4 +51,4 @@ Patterns use Python `re` syntax. Notes for other engines:
 
 ## Versioning
 
-`spec_version` changes only when the meaning of the files changes, not when rules or cases are added. Each port states which `spec_version` it implements and runs `conformance.json` in its own CI. A change to an expected output is an output change and follows the policy in [GOVERNANCE.md](../GOVERNANCE.md).
+`spec_version` changes only when the meaning of the files changes, not when rules or cases are added. Ports live in this repository and read these files directly; CI runs `conformance.json` against every one of them on each pull request. A change to an expected output is an output change and follows the policy in [GOVERNANCE.md](../GOVERNANCE.md).

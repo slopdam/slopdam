@@ -51,4 +51,4 @@
 
 ## 버전
 
-`spec_version`은 규칙이나 사례가 추가될 때가 아니라 파일의 의미가 바뀔 때만 올라갑니다. 각 구현은 자신이 따르는 `spec_version`을 밝히고, 자기 CI에서 `conformance.json`을 실행합니다. 기대 출력이 바뀌면 출력 변경이며 [GOVERNANCE.ko.md](../GOVERNANCE.ko.md)의 정책을 따릅니다.
+`spec_version`은 규칙이나 사례가 추가될 때가 아니라 파일의 의미가 바뀔 때만 올라갑니다. 구현은 모두 이 저장소에 있고 이 파일들을 직접 읽습니다. CI는 PR마다 모든 구현에 `conformance.json`을 실행합니다. 기대 출력이 바뀌면 출력 변경이며 [GOVERNANCE.ko.md](../GOVERNANCE.ko.md)의 정책을 따릅니다.
