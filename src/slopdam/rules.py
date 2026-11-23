@@ -76,7 +76,9 @@ EU = "ㅡￚᅳ"  # ㅡ, halfwidth ㅡ, conjoining jungseong ㅡ (NFKC target of
 LINES = "─━┄-┋╌-╏═⎯⏤➖"
 CHOSEONG = "ᄀ-ᅟꥠ-ꥼ"  # Hangul leading consonants (jamo and extended-A), for old-style syllables
 _CHOSEONG = re.compile(f"[{CHOSEONG}]")
-_OPENERS, _CLOSERS = "([{", ")]}%"
+# Characters next to a dash that still count as part of the words around it: brackets,
+# % and quotes, so 'A — "B"' becomes 'A: "B"' and not 'A"B"'.
+_OPENERS, _CLOSERS = "([{\"'“‘", ")]}%\"'”’"
 
 
 def _wordish(c: str, extra: str) -> bool:
