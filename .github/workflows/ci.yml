@@ -110,3 +110,4 @@ jobs:
           node --input-type=module -e "import {clean} from '@slopdam/core'; if (clean('✅ 저장 ㅡ 완료') !== '저장: 완료') process.exit(1)"
           node -e "require('@slopdam/core/pino').slopdamPino(); require('@slopdam/core/winston').slopdamWinston()"
           node --input-type=module -e "import {slopdamPino} from '@slopdam/core/pino'; import {slopdamWinston} from '@slopdam/core/winston'; slopdamPino(); slopdamWinston()"
+          node --input-type=module -e "import slopdam from '@slopdam/core/eslint'; if (!slopdam.rules['no-slop']) process.exit(1)"

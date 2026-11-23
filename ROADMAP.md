@@ -36,7 +36,7 @@ slopdam/ (this repository)
 | Language | Package | Runtime integration | Lint integration |
 |---|---|---|---|
 | Python | `slopdam` (PyPI) | `logging`; structlog and loguru next | `slopdam check` and `fix`, pre-commit, GitHub Action |
-| JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston, `console` wrapper | ESLint plugin |
+| JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston | ESLint rule (`@slopdam/core/eslint`) |
 | Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` analyzer |
 | Java, Kotlin | Maven Central | Logback converter, Log4j2 rewrite policy | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` layer, `log` | CLI |
@@ -62,7 +62,7 @@ slopdam/ (this repository)
 - [x] `@slopdam/core` in [js/](js/README.md) passing every conformance case (Node.js 20+, ESM and CommonJS)
 - [x] First npm release (`js-v0.1.0`)
 - [x] pino and winston integrations (`@slopdam/core/pino`, `@slopdam/core/winston`)
-- [ ] `eslint-plugin-slopdam`: string arguments of log calls, with autofix
+- [x] ESLint rule `slopdam/no-slop` (`@slopdam/core/eslint`): string arguments of log calls, with autofix
 
 ### 0.6: Go and the JVM
 

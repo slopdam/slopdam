@@ -81,6 +81,38 @@ winston은 트랜스포트마다 로그 항목의 사본을 넘기므로 트랜�
 
 두 연동 모두 pino나 winston을 불러오지 않으므로 `@slopdam/core`는 여전히 실행 의존성이 없습니다.
 
+### ESLint
+
+```js
+// eslint.config.js
+import slopdam from "@slopdam/core/eslint";
+
+export default [slopdam.configs.recommended];   // 또는 slopdam.configs.dev
+```
+
+```
+$ npx eslint src/
+src/sync.js
+  4:13  warning  emoji.pictograph: '✅' should be ''  slopdam/no-slop
+  4:34  warning  dash.run: 'ㅡ' should be ': '        slopdam/no-slop
+
+$ npx eslint --fix src/
+-  log.info(`✅ ${rows.length}건 동기화 ㅡ 완료`);
++  log.info(`${rows.length}건 동기화: 완료`);
+```
+
+`slopdam/no-slop` 규칙은 `console.*` 호출과, 받는 쪽 이름에 `log`가 들어간 로거 호출(`log.info`, `this.logger.warn`)의 문자열 인자를 검사합니다. 템플릿 리터럴과 `"a" + b` 같은 이어 붙이기도 포함합니다. `eslint --fix`는 문자열 안의 글자만 고칩니다. 따옴표, 이스케이프, `${...}` 표현식, `%s` 서식 자리는 그대로 두고, 양 끝에 공백을 새로 남기지 않습니다. 옵션:
+
+```js
+rules: {
+  "slopdam/no-slop": ["warn", {
+    profile: "dev",              // Sanitizer와 같은 옵션: level, disable, dashInline
+    receivers: "log|console|audit", // 로그 호출의 받는 쪽 이름을 고르는 정규식
+    functions: ["print"],        // 함께 검사할 일반 함수
+  }],
+}
+```
+
 ### 옵션
 
 | 옵션 | 값 | 기본값 |
@@ -100,7 +132,7 @@ URL, 인라인 코드, `key=value`의 값, 파일 경로는 바꾸지 않습니�
 
 ## 로드맵
 
-slopdam 0.5 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 핵심 패키지와 pino, winston 연동에 이어 `eslint-plugin-slopdam`을 만듭니다.
+slopdam 0.5 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 핵심 패키지, pino와 winston 연동, ESLint 규칙으로 이루어집니다.
 
 ## 기여
 

@@ -36,7 +36,7 @@ slopdam/ (이 저장소)
 | 언어 | 패키지 | 실행 중 연동 | 린트 연동 |
 |---|---|---|---|
 | Python | `slopdam` (PyPI) | `logging`, 다음은 structlog와 loguru | `slopdam check`와 `fix`, pre-commit, GitHub Action |
-| JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston, `console` 래퍼 | ESLint 플러그인 |
+| JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston | ESLint 규칙 (`@slopdam/core/eslint`) |
 | Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` 분석기 |
 | Java, Kotlin | Maven Central | Logback 변환기, Log4j2 재작성 정책 | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` 레이어, `log` | CLI |
@@ -62,7 +62,7 @@ slopdam/ (이 저장소)
 - [x] 모든 적합성 사례를 통과하는 `@slopdam/core` ([js/](js/README.ko.md), Node.js 20 이상, ESM과 CommonJS)
 - [x] 첫 npm 배포 (`js-v0.1.0`)
 - [x] pino, winston 연동 (`@slopdam/core/pino`, `@slopdam/core/winston`)
-- [ ] `eslint-plugin-slopdam`: 로그 호출의 문자열 인자 검사와 자동 수정
+- [x] ESLint 규칙 `slopdam/no-slop` (`@slopdam/core/eslint`): 로그 호출의 문자열 인자 검사와 자동 수정
 
 ### 0.6: Go와 JVM
 
