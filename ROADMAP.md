@@ -60,7 +60,7 @@ slopdam/ (this repository)
 ### 0.5: JavaScript and TypeScript
 
 - [x] `@slopdam/core` in [js/](js/README.md) passing every conformance case (Node.js 20+, ESM and CommonJS)
-- [ ] First npm release (`js-v0.1.0`)
+- [x] First npm release (`js-v0.1.0`)
 - [x] pino and winston integrations (`@slopdam/core/pino`, `@slopdam/core/winston`)
 - [ ] `eslint-plugin-slopdam`: string arguments of log calls, with autofix
 

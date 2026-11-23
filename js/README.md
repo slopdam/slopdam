@@ -29,8 +29,6 @@ Node.js 20 or later, or any modern browser. No runtime dependencies; ESM and Com
 npm install @slopdam/core
 ```
 
-The first npm release (`js-v0.1.0`) is on the way; until then, build it from `js/` in this repository.
-
 ## Use
 
 ```js
