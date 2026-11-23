@@ -49,10 +49,9 @@ spec/                      rule catalog + conformance cases (this repository)
 - [x] `check --format github` (pull request annotations) and `--format sarif` (code scanning)
 - [x] Type information (`py.typed`) and package build checks in CI
 
-### 0.4: Python integrations and rule quality
+### 0.4: Python integrations and rule quality (released)
 
 - [x] structlog and loguru adapters
-- [ ] Emoji ranges generated from Unicode `emoji-data.txt` instead of a hand-written table
 - [x] Property-based tests (idempotency, protected spans) and a benchmark in CI
 - [x] `slopdam check -` to lint text from stdin, for editors and other tools
 
@@ -74,6 +73,7 @@ spec/                      rule catalog + conformance cases (this repository)
 
 ### 1.0: stable
 
+- [ ] Emoji ranges generated from Unicode `emoji-data.txt` instead of a hand-written table, so the spec is complete before it is frozen
 - [ ] Spec version 1 frozen; output changes only in major versions
 - [ ] Every port passes the full conformance suite in CI
 - [ ] Documentation site with a rule reference generated from the spec
