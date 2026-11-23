@@ -81,6 +81,38 @@ winston gives every transport its own copy of the entry, so each one can use its
 
 Neither integration imports pino or winston, so `@slopdam/core` still has no runtime dependencies.
 
+### ESLint
+
+```js
+// eslint.config.js
+import slopdam from "@slopdam/core/eslint";
+
+export default [slopdam.configs.recommended];   // or slopdam.configs.dev
+```
+
+```
+$ npx eslint src/
+src/sync.js
+  4:13  warning  emoji.pictograph: '✅' should be ''  slopdam/no-slop
+  4:41  warning  dash.run: '—' should be ': '        slopdam/no-slop
+
+$ npx eslint --fix src/
+-  log.info(`✅ Synced ${rows.length} rows — done`);
++  log.info(`Synced ${rows.length} rows: done`);
+```
+
+The rule `slopdam/no-slop` checks the string arguments of `console.*` calls and of logger calls whose receiver contains `log` (`log.info`, `this.logger.warn`), including template literals and `"a" + b` concatenations. `eslint --fix` edits only the text of the literal: quotes, escape sequences, `${...}` expressions and `%s` placeholders stay, and no space is added at either end. Options:
+
+```js
+rules: {
+  "slopdam/no-slop": ["warn", {
+    profile: "dev",              // same options as Sanitizer: level, disable, dashInline
+    receivers: "log|console|audit", // regular expression for the receiver of a log call
+    functions: ["print"],        // plain functions to check as well
+  }],
+}
+```
+
 ### Options
 
 | Option | Values | Default |
@@ -100,7 +132,7 @@ The rules are not rewritten by hand. The build reads the repository's [spec/](ht
 
 ## Roadmap
 
-Part of slopdam milestone 0.5 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): the core package and the pino and winston integrations, then `eslint-plugin-slopdam`.
+Part of slopdam milestone 0.5 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): the core package, the pino and winston integrations and the ESLint rule.
 
 ## Contributing
 

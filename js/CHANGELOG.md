@@ -2,6 +2,14 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [Unreleased]
+
+### Added
+- `@slopdam/core/eslint`: an ESLint flat-config plugin with the rule `slopdam/no-slop` and `recommended` and `dev` configs. It checks string arguments of `console.*` and logger calls (template literals and `+` concatenations included) and fixes them like `slopdam fix` does for Python: only the literal's text changes, and quotes, escapes, `${...}` and `%s` stay. On 135,536 generated log calls every fixed file parsed and a second run changed nothing.
+
+### Output changes
+- From the spec: a dash next to a quote keeps the words apart (`A — "B"` becomes `A: "B"`).
+
 ## [0.1.0] - 2026-11-24
 
 ### Added

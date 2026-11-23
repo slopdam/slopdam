@@ -1,7 +1,7 @@
 {
   "name": "@slopdam/core",
   "version": "0.1.0",
-  "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages, with pino and winston integrations. JavaScript port of slopdam, conformance-tested against its spec.",
+  "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages, with pino, winston and ESLint integrations. JavaScript port of slopdam, conformance-tested against its spec.",
   "license": "MIT",
   "author": "The slopdam Authors",
   "homepage": "https://github.com/slopdam/slopdam/tree/main/js#readme",
@@ -22,7 +22,9 @@
     "em-dash",
     "emoji",
     "pino",
-    "winston"
+    "winston",
+    "eslint",
+    "eslintplugin"
   ],
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -59,6 +61,16 @@
         "default": "./dist/cjs/winston.js"
       }
     },
+    "./eslint": {
+      "import": {
+        "types": "./dist/esm/eslint.d.ts",
+        "default": "./dist/esm/eslint.js"
+      },
+      "require": {
+        "types": "./dist/cjs/eslint.d.ts",
+        "default": "./dist/cjs/eslint.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -74,6 +86,7 @@
     "prepublishOnly": "npm test"
   },
   "devDependencies": {
+    "eslint": "^10.14.0",
     "pino": "^10.4.0",
     "typescript": "~6.0.3",
     "winston": "^3.19.0"
