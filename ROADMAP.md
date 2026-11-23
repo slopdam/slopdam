@@ -42,29 +42,32 @@ spec/                      rule catalog + conformance cases (this repository)
 
 ## Milestones
 
-### 0.3: language-neutral foundation
+### 0.3: language-neutral foundation (released)
 
 - [x] Spec: rule catalog and conformance cases generated from the reference implementation and checked in CI
 - [x] GitHub Action (`uses: slopdam/slopdam@v0.3.0`)
 - [x] `check --format github` (pull request annotations) and `--format sarif` (code scanning)
 - [x] Type information (`py.typed`) and package build checks in CI
+
+### 0.4: Python integrations and rule quality
+
 - [ ] structlog and loguru adapters
 - [ ] Emoji ranges generated from Unicode `emoji-data.txt` instead of a hand-written table
 - [ ] Property-based tests (idempotency, protected spans) and a benchmark in CI
 - [ ] `slopdam check -` to lint text from stdin, for editors and other tools
 
-### 0.4: JavaScript and TypeScript
+### 0.5: JavaScript and TypeScript
 
 - [ ] `@slopdam/core` passing every conformance case, in Node.js and browsers
 - [ ] pino and winston formatters
 - [ ] `eslint-plugin-slopdam`: string arguments of log calls, with autofix
 
-### 0.5: Go and the JVM
+### 0.6: Go and the JVM
 
 - [ ] Go module with an `slog.Handler` and a `go vet` analyzer
 - [ ] Java library with a Logback converter and a Log4j2 rewrite policy
 
-### 0.6: Rust and editors
+### 0.7: Rust and editors
 
 - [ ] Rust crate with a `tracing` layer
 - [ ] Editor support on top of `check --format json` (VS Code first)

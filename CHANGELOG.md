@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.3.0] - 2026-11-24
 
 ### Added
 - `spec/`: a language-neutral rule catalog (`rules.json`) and conformance cases (`conformance.json`) that every implementation must pass. Both are generated from the Python source with `scripts/gen_spec.py` and checked in CI.

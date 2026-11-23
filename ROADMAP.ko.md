@@ -42,29 +42,32 @@ spec/                      규칙 목록 + 적합성 사례 (이 저장소)
 
 ## 마일스톤
 
-### 0.3: 언어 중립 기반
+### 0.3: 언어 중립 기반 (배포됨)
 
 - [x] 명세: 기준 구현에서 생성하고 CI에서 확인하는 규칙 목록과 적합성 사례
 - [x] GitHub Action (`uses: slopdam/slopdam@v0.3.0`)
 - [x] `check --format github`(PR 주석)과 `--format sarif`(코드 스캐닝)
 - [x] 타입 정보(`py.typed`)와 CI의 패키지 빌드 검사
+
+### 0.4: Python 연동과 규칙 품질
+
 - [ ] structlog, loguru 어댑터
 - [ ] 직접 쓴 표 대신 유니코드 `emoji-data.txt`에서 생성한 이모지 범위
 - [ ] 속성 기반 테스트(멱등성, 보호 구역)와 CI 벤치마크
 - [ ] 편집기와 다른 도구를 위한 `slopdam check -` (표준 입력 검사)
 
-### 0.4: JavaScript와 TypeScript
+### 0.5: JavaScript와 TypeScript
 
 - [ ] 모든 적합성 사례를 통과하는 `@slopdam/core` (Node.js와 브라우저)
 - [ ] pino, winston 포맷터
 - [ ] `eslint-plugin-slopdam`: 로그 호출의 문자열 인자 검사와 자동 수정
 
-### 0.5: Go와 JVM
+### 0.6: Go와 JVM
 
 - [ ] `slog.Handler`와 `go vet` 분석기를 갖춘 Go 모듈
 - [ ] Logback 변환기와 Log4j2 재작성 정책을 갖춘 Java 라이브러리
 
-### 0.6: Rust와 편집기
+### 0.7: Rust와 편집기
 
 - [ ] `tracing` 레이어를 갖춘 Rust 크레이트
 - [ ] `check --format json` 기반 편집기 지원 (VS Code부터)
