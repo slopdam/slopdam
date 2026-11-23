@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="slopdam logo: tangled lines held back by a dam, straight lines flowing out">
+  <rect width="512" height="512" rx="112" fill="#0F2A44"/>
+  <g fill="none" stroke-linecap="round" stroke-width="24">
+    <path d="M56 176 q24 -34 48 0 t48 0 t48 0" stroke="#F48FB1"/>
+    <path d="M56 256 q24 -34 48 0 t48 0 t48 0" stroke="#FFC857"/>
+    <path d="M56 336 q24 -34 48 0 t48 0 t48 0" stroke="#F48FB1"/>
+  </g>
+  <path d="M232 100 H284 Q290 260 316 412 H208 Q226 260 232 100 Z" fill="#E8EEF5"/>
+  <g stroke="#C3CFDC" stroke-width="6" stroke-linecap="butt">
+    <line x1="229" y1="196" x2="289" y2="196"/>
+    <line x1="224" y1="292" x2="298" y2="292"/>
+  </g>
+  <g stroke="#7ED6A7" stroke-linecap="round" stroke-width="24">
+    <line x1="344" y1="208" x2="456" y2="208"/>
+    <line x1="344" y1="256" x2="424" y2="256"/>
+    <line x1="344" y1="304" x2="440" y2="304"/>
+  </g>
+</svg>

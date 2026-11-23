@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Added
+- Logo (`docs/assets/logo.svg`, `logo.png`, and a square `avatar.png` for the GitHub and npm avatars), shown at the top of the READMEs.
+
 ## [0.5.0] - 2026-11-24
 
 ### Added
