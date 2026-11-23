@@ -57,7 +57,7 @@ slopdam/ (this repository)
 - [x] Property-based tests (idempotency, protected spans) and a benchmark in CI
 - [x] `slopdam check -` to lint text from stdin, for editors and other tools
 
-### 0.5: JavaScript and TypeScript
+### 0.5: JavaScript and TypeScript (released: slopdam 0.5.0 on PyPI, @slopdam/core 0.2.0 on npm)
 
 - [x] `@slopdam/core` in [js/](js/README.md) passing every conformance case (Node.js 20+, ESM and CommonJS)
 - [x] First npm release (`js-v0.1.0`)

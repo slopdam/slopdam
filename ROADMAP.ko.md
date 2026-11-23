@@ -57,7 +57,7 @@ slopdam/ (이 저장소)
 - [x] 속성 기반 테스트(멱등성, 보호 구역)와 CI 벤치마크
 - [x] 편집기와 다른 도구를 위한 `slopdam check -` (표준 입력 검사)
 
-### 0.5: JavaScript와 TypeScript
+### 0.5: JavaScript와 TypeScript (배포됨: PyPI slopdam 0.5.0, npm @slopdam/core 0.2.0)
 
 - [x] 모든 적합성 사례를 통과하는 `@slopdam/core` ([js/](js/README.ko.md), Node.js 20 이상, ESM과 CommonJS)
 - [x] 첫 npm 배포 (`js-v0.1.0`)
