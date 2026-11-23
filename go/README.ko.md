@@ -60,6 +60,19 @@ for _, f := range dev.Findings(`log.Info("🚀 시작 ㅡ 정상")`) {
 
 `Sanitizer`는 여러 고루틴에서 함께 써도 안전합니다. `Findings`는 `Clean`이 바꿀 부분을 돌려주며, `Start`와 `End`는 입력 안의 바이트 위치입니다. URL, 인라인 코드, `key=value`의 값, 파일 경로는 바꾸지 않고, 두 번 정리해도 한 번 정리한 결과와 같습니다.
 
+### log/slog
+
+```go
+console := slog.New(slopdam.NewHandler(slog.NewTextHandler(os.Stderr, nil), slopdam.Options{}))
+file := slog.New(slopdam.NewHandler(slog.NewJSONHandler(f, nil), slopdam.Options{Profile: "dev"}))
+
+console.Info("✅ **저장 완료** ㅡ 3건 처리했습니다!")   // msg="저장 완료: 3건 처리했습니다."
+file.Info("✅ **저장 완료** ㅡ 3건 처리했습니다!")      // "msg":"[OK] 저장 완료 - 3건 처리했습니다!"
+file.Error("❌ 업로드 실패", "err", err)               // "msg":"업로드 실패", err는 그대로
+```
+
+`NewHandler`는 어떤 `slog.Handler`든 감싸서 모든 레코드의 메시지를 정리합니다. 속성(attribute)은 구조화된 데이터라 그대로 두고, 구분선뿐인 레코드는 버리되 오류가 담겨 있으면 남깁니다. 표준 라이브러리의 `slogtest` 핸들러 검사를 통과합니다.
+
 ## Python과 같은 결과를 내는 방법
 
 규칙을 손으로 다시 쓰지 않습니다. `go generate`가 저장소의 [spec/rules.json](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)을 `spec_data.go`로 복사하고, 그 안의 패턴은 패키지를 불러올 때 Python 정규식 문법에서 변환됩니다(유니코드 `\w`, `\s`, `\b`와 Python의 `^`, `$`). 문맥에 따라 바꾸는 동작 네 가지만 Go로 작성했습니다. PR마다 Python, JavaScript, Go에 같은 적합성 사례를 실행합니다. 무작위 입력 20,000개에서 Go와 Python의 결과가 같았습니다.
@@ -68,7 +81,7 @@ for _, f := range dev.Findings(`log.Info("🚀 시작 ㅡ 정상")`) {
 
 ## 로드맵
 
-slopdam 0.6 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 이 패키지를 먼저 만들고, 다음으로 `log/slog` 핸들러와 `go vet` 분석기를 만듭니다.
+slopdam 0.6 마일스톤의 일부입니다([로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)). 이 패키지와 `log/slog` 핸들러에 이어 `go vet` 분석기를 만듭니다.
 
 ## 기여
 

@@ -67,7 +67,7 @@ slopdam/ (this repository)
 ### 0.6: Go and the JVM
 
 - [x] Go module ([go/](go/README.md)) passing every conformance case
-- [ ] `log/slog` handler
+- [x] `log/slog` handler (`slopdam.NewHandler`)
 - [ ] `go vet` analyzer with suggested fixes
 - [ ] Java library with a Logback converter and a Log4j2 rewrite policy
 

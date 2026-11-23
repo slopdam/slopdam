@@ -5,7 +5,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 ## [Unreleased]
 
 ### Added
-- `go/`: the Go module `github.com/slopdam/slopdam/go`, with `Clean`, `Sanitizer.Clean`, `CleanLevel` and `Findings`. It passes every conformance case, and on 20,000 random inputs it matched the Python package exactly. CI runs it on Go 1.22 and the current release and checks that `spec_data.go` matches `spec/rules.json`. Module versions are tagged `go/v*`.
+- `go/`: the Go module `github.com/slopdam/slopdam/go`, with `Clean`, `Sanitizer.Clean`, `CleanLevel` and `Findings`. It passes every conformance case, and on 20,000 random inputs it matched the Python package exactly. CI runs it on Go 1.22 and the current release and checks that `spec_data.go` matches `spec/rules.json`. Module versions are tagged `go/v*`. `slopdam.NewHandler` wraps a `log/slog` handler and cleans record messages; it passes the standard `slogtest` checks.
 - Logo (`docs/assets/logo.svg`, `logo.png`, and a square `avatar.png` for the GitHub and npm avatars), shown at the top of the READMEs.
 
 ## [0.5.0] - 2026-11-24
