@@ -125,6 +125,31 @@
           "input": "(완료) — 다음",
           "reader": "(완료): 다음",
           "dev": "(완료) - 다음"
+        },
+        {
+          "input": "Retrying 3 times — “db-01” is slow",
+          "reader": "Retrying 3 times: \"db-01\" is slow",
+          "dev": "Retrying 3 times - \"db-01\" is slow"
+        },
+        {
+          "input": "“A” — B",
+          "reader": "\"A\": B",
+          "dev": "\"A\" - B"
+        },
+        {
+          "input": "A — \"B\"",
+          "reader": "A: \"B\"",
+          "dev": "A - \"B\""
+        },
+        {
+          "input": "A — 'b'",
+          "reader": "A: 'b'",
+          "dev": "A - 'b'"
+        },
+        {
+          "input": "값 ㅡ ‘인용’",
+          "reader": "값: '인용'",
+          "dev": "값 - '인용'"
         }
       ]
     },
