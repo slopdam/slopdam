@@ -3,4 +3,4 @@
   description: Block AI-generated patterns (em dash, emoji, separators) in log calls
   entry: slopdam check
   language: python
-  types_or: [python, javascript, ts, tsx, jsx, java, kotlin, go]
+  types_or: [python, javascript, ts, tsx, jsx, java, kotlin, go, rust, ruby, php, swift]

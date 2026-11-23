@@ -29,12 +29,36 @@ jobs:
       - run: python -m pytest -q
 
   dogfood:
-    # The project's own log strings must pass its own linter.
+    # The project's own log strings must pass its own linter, run through the published GitHub Action.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./
+        with:
+          paths: src/
+
+  spec:
+    # spec/rules.json and the expected outputs in spec/conformance.json must match the Python source.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install -e .
-      - run: slopdam check src/
+      - run: python scripts/gen_spec.py --check
+
+  package:
+    # The sdist and wheel build, pass twine's metadata check and work when installed.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check --strict dist/*
+      - run: |
+          python -m venv /tmp/smoke
+          /tmp/smoke/bin/pip install dist/*.whl
+          echo '✅ **Saved** — 3 rows' | /tmp/smoke/bin/slopdam clean | grep -qx 'Saved: 3 rows'

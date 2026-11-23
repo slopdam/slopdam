@@ -251,6 +251,24 @@ def test_cli_check_json(tmp_path, capsys):
     assert hit["rule"] == "dash.run" and hit["fix"] == " - " and hit["line"] == 1
 
 
+def test_cli_check_github_annotations(tmp_path, capsys):
+    (tmp_path / "a,b.py").write_text('log.info("완료 ㅡ 100%")\n', encoding="utf-8")
+    assert main(["check", "--format", "github", str(tmp_path)]) == 1
+    line = capsys.readouterr().out.strip()
+    assert line.startswith("::warning file=") and "a%2Cb.py,line=1,col=" in line
+    assert "title=slopdam dash.run::" in line
+
+
+def test_cli_check_sarif(tmp_path, capsys):
+    (tmp_path / "a.js").write_text('console.log("🚀 started")\n', encoding="utf-8")
+    assert main(["check", "--format", "sarif", str(tmp_path)]) == 1
+    run = json.loads(capsys.readouterr().out)["runs"][0]
+    assert run["tool"]["driver"]["rules"] == [{"id": "emoji.pictograph", "shortDescription": {"text": "emoji or pictograph"}}]
+    [result] = run["results"]
+    assert result["ruleId"] == "emoji.pictograph"
+    assert result["locations"][0]["physicalLocation"]["region"] == {"startLine": 1, "startColumn": 14}
+
+
 def test_cli_check_clean_tree(tmp_path):
     (tmp_path / "ok.py").write_text(
         'logger.info("saved %d rows", n)\n'

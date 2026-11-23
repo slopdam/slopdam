@@ -97,6 +97,17 @@ repos:
       - id: slopdam
 ```
 
+GitHub Actions, with findings shown as annotations on the pull request:
+
+```yaml
+- uses: actions/checkout@v7
+- uses: slopdam/slopdam@v0.3.0
+  with:
+    paths: src/
+```
+
+`slopdam check --format` also writes `json`, `github` (workflow annotations) and `sarif` (GitHub code scanning and other SARIF viewers).
+
 Exit codes: `0` clean, `1` traces found (or `fix --diff` has changes), `2` usage or configuration error.
 
 ## Pipe
@@ -104,6 +115,13 @@ Exit codes: `0` clean, `1` traces found (or `fix --diff` has changes), `2` usage
 ```bash
 tail -f app.log | slopdam clean
 ```
+
+## Other languages
+
+slopdam is built to work the same way in every language.
+
+- **Now:** `slopdam check` lints log and print calls in JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP and Swift line by line, and the pre-commit hook and GitHub Action cover the same files. `slopdam clean` cleans the output of any program through a pipe: `node server.js 2>&1 | slopdam clean --profile dev`.
+- **Native packages:** the behavior is defined independently of Python in [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.md): the rule catalog and conformance cases that every port must pass. Packages for JavaScript, Go, Java and Rust are planned in the [roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md).
 
 ## Rules
 

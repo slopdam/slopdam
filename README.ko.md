@@ -97,6 +97,17 @@ repos:
       - id: slopdam
 ```
 
+GitHub Actions에서는 발견한 흔적을 PR에 주석(annotation)으로 표시합니다.
+
+```yaml
+- uses: actions/checkout@v7
+- uses: slopdam/slopdam@v0.3.0
+  with:
+    paths: src/
+```
+
+`slopdam check --format`은 `json`, `github`(워크플로 주석), `sarif`(GitHub 코드 스캐닝 등 SARIF 뷰어)로도 출력합니다.
+
 종료 코드: `0` 깨끗함, `1` 흔적 발견(`fix --diff`에서는 바뀔 내용 있음), `2` 옵션이나 설정 오류.
 
 ## 파이프
@@ -104,6 +115,13 @@ repos:
 ```bash
 tail -f app.log | slopdam clean
 ```
+
+## 다른 언어
+
+slopdam은 어느 언어에서나 같은 방식으로 동작하도록 만들고 있습니다.
+
+- **지금 가능한 것:** `slopdam check`는 JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP, Swift의 로그와 print 호출을 줄 단위로 검사하고, pre-commit 훅과 GitHub Action도 같은 파일을 다룹니다. `slopdam clean`은 파이프로 어떤 프로그램의 출력이든 정리합니다: `node server.js 2>&1 | slopdam clean --profile dev`
+- **언어별 패키지:** 동작은 Python과 별개로 [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.ko.md)에 정의되어 있습니다. 규칙 목록과, 모든 구현이 통과해야 하는 적합성 사례입니다. JavaScript, Go, Java, Rust 패키지는 [로드맵](https://github.com/slopdam/slopdam/blob/main/ROADMAP.ko.md)에 계획되어 있습니다.
 
 ## 규칙
 

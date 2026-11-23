@@ -1,0 +1,458 @@
+{
+  "spec_version": 1,
+  "profiles": [
+    "reader",
+    "dev"
+  ],
+  "levels": [
+    "basic",
+    "strong",
+    "strict"
+  ],
+  "dash_inline": {
+    "comma": ", ",
+    "colon": ": ",
+    "hyphen": " - ",
+    "space": " "
+  },
+  "default_dash_inline": "colon",
+  "protected_spans": "(?P<url>https?://[^\\s<>\\\"'`]+)|`(?P<code>[^`\\n]+)`|(?<=\\w=)(?P<kv>\\\"[^\\\"\\n]*\\\"|'[^'\\n]*'|[^\\s,;)]+)|(?<![\\w/])(?P<path>(?:~|\\.{1,2})?/[^\\s\\\"'`,;)]+)",
+  "charsets": {
+    "hyphens": "‐‑−﹣－",
+    "dashes": "‒–—―⸺⸻﹘︱︲⹀",
+    "hangul_eu": "ㅡￚᅳ",
+    "box_lines": "─━┄-┋╌-╏═⎯⏤➖",
+    "emoji": "🀀-🫿☀-➿⬀-⯿⌀-⏿■-◿‼⁉ℹ〰〽㊗㊙Ⓜ🇦-🇿󠀠-󠁿️⃣‍",
+    "status": {
+      "[OK]": "✅✔☑🟢🆗",
+      "[FAIL]": "❌✖🔴⛔🚫❎",
+      "[WARN]": "⚠🟡🚨"
+    }
+  },
+  "status_redundant_at": {
+    "[FAIL]": "ERROR",
+    "[WARN]": "WARNING"
+  },
+  "rules": [
+    {
+      "id": "space.invisible",
+      "level": "basic",
+      "description": "zero-width or invisible character",
+      "pattern": "[​‌⁠﻿­]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "space.nbsp",
+      "level": "basic",
+      "description": "non-breaking or ideographic space",
+      "pattern": "[  　]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": " "
+        },
+        "dev": {
+          "kind": "replace",
+          "value": " "
+        }
+      }
+    },
+    {
+      "id": "width.fullwidth",
+      "level": "basic",
+      "description": "full-width punctuation",
+      "pattern": "[，：；（）！？［］｛｝]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "function",
+          "name": "fullwidth"
+        },
+        "dev": {
+          "kind": "function",
+          "name": "fullwidth"
+        }
+      }
+    },
+    {
+      "id": "quote.double",
+      "level": "basic",
+      "description": "curly double quote",
+      "pattern": "[“”„]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "\""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "\""
+        }
+      }
+    },
+    {
+      "id": "quote.single",
+      "level": "basic",
+      "description": "curly single quote",
+      "pattern": "[‘’‚]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "'"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "'"
+        }
+      }
+    },
+    {
+      "id": "punct.ellipsis",
+      "level": "basic",
+      "description": "ellipsis character",
+      "pattern": "[…⋯]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "..."
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "..."
+        }
+      }
+    },
+    {
+      "id": "punct.arrow",
+      "level": "basic",
+      "description": "arrow symbol",
+      "pattern": "[↔⇔]️?",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "<->"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "<->"
+        }
+      }
+    },
+    {
+      "id": "punct.arrow",
+      "level": "basic",
+      "description": "arrow symbol",
+      "pattern": "[→⇒➜➡➔⟶]️?",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "->"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "->"
+        }
+      }
+    },
+    {
+      "id": "punct.arrow",
+      "level": "basic",
+      "description": "arrow symbol",
+      "pattern": "[←⇐⬅⟵]️?",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "<-"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "<-"
+        }
+      }
+    },
+    {
+      "id": "punct.bullet",
+      "level": "basic",
+      "description": "bullet symbol",
+      "pattern": "^([ \t]*)[•◦▪●▶►][ \t]*",
+      "flags": [
+        "multiline"
+      ],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "\\1- "
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "\\1- "
+        }
+      }
+    },
+    {
+      "id": "emoji.status",
+      "level": "basic",
+      "description": "status emoji",
+      "pattern": "\\A[ \t]*([✅✔☑🟢🆗❌✖🔴⛔🚫❎⚠🟡🚨])️?[ \t]*",
+      "flags": [],
+      "actions": {
+        "dev": {
+          "kind": "function",
+          "name": "status_tag"
+        }
+      }
+    },
+    {
+      "id": "emoji.pictograph",
+      "level": "basic",
+      "description": "emoji or pictograph",
+      "pattern": "[🀀-🫿☀-➿⬀-⯿⌀-⏿■-◿‼⁉ℹ〰〽㊗㊙Ⓜ🇦-🇿󠀠-󠁿][🀀-🫿☀-➿⬀-⯿⌀-⏿■-◿‼⁉ℹ〰〽㊗㊙Ⓜ🇦-🇿󠀠-󠁿️⃣‍]*[ \t]*|[️⃣‍]+",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "md.heading",
+      "level": "basic",
+      "description": "markdown heading marker",
+      "pattern": "^[ \\t]*#{1,6}[ \\t]+",
+      "flags": [
+        "multiline"
+      ],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "md.fence",
+      "level": "basic",
+      "description": "markdown code fence",
+      "pattern": "^[ \\t]*```[^\\n]*\\n?",
+      "flags": [
+        "multiline"
+      ],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "md.hr",
+      "level": "basic",
+      "description": "markdown horizontal rule",
+      "pattern": "^[ \\t]*([-*_])[ \\t]*(?:\\1[ \\t]*){2,}$",
+      "flags": [
+        "multiline"
+      ],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "md.emphasis",
+      "level": "basic",
+      "description": "markdown bold",
+      "pattern": "\\*\\*(.+?)\\*\\*",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "function",
+          "name": "unwrap"
+        },
+        "dev": {
+          "kind": "function",
+          "name": "unwrap"
+        }
+      }
+    },
+    {
+      "id": "dash.hyphen",
+      "level": "basic",
+      "description": "Unicode hyphen or minus",
+      "pattern": "[‐‑−﹣－]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "-"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "-"
+        }
+      }
+    },
+    {
+      "id": "dash.wave",
+      "level": "basic",
+      "description": "wave dash or full-width tilde",
+      "pattern": "[〜～]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "~"
+        },
+        "dev": {
+          "kind": "replace",
+          "value": "~"
+        }
+      }
+    },
+    {
+      "id": "dash.run",
+      "level": "basic",
+      "description": "dash, 'ㅡ' or line character",
+      "pattern": "([ \t]*)([‒–—―⸺⸻﹘︱︲⹀ㅡￚᅳ─━┄-┋╌-╏═⎯⏤➖]+)([ \t]*)",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "function",
+          "name": "dash_run"
+        },
+        "dev": {
+          "kind": "function",
+          "name": "dash_run"
+        }
+      }
+    },
+    {
+      "id": "dash.cjk-run",
+      "level": "basic",
+      "description": "CJK look-alike separator",
+      "pattern": "[一ーｰ]{3,}",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "dash.ascii-run",
+      "level": "basic",
+      "description": "ASCII separator",
+      "pattern": "([=\\-*#~_+])\\1{4,}",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "replace",
+          "value": ""
+        }
+      }
+    },
+    {
+      "id": "tone.exclaim",
+      "level": "basic",
+      "description": "exclamation after Korean text",
+      "pattern": "(?<=[가-힣])!+",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": "."
+        }
+      }
+    },
+    {
+      "id": "tone.filler",
+      "level": "strong",
+      "description": "filler phrase",
+      "pattern": "(?:성공적으로|완벽하게|무사히|드디어)[ \\t]*",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "replace",
+          "value": ""
+        },
+        "dev": {
+          "kind": "report"
+        }
+      }
+    },
+    {
+      "id": "tone.chatty",
+      "level": "basic",
+      "description": "chatty phrase",
+      "pattern": "\\b(?:Let's|Here's|Voila|Awesome)\\b|해볼게요|해보겠습니다|살펴보겠습니다",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "report"
+        },
+        "dev": {
+          "kind": "report"
+        }
+      }
+    },
+    {
+      "id": "symbol.non-ascii",
+      "level": "strict",
+      "description": "non-ASCII symbol",
+      "pattern": "[^\\w\\s\u0000-󰀀-󿿽]",
+      "flags": [],
+      "actions": {
+        "reader": {
+          "kind": "report"
+        },
+        "dev": {
+          "kind": "report"
+        }
+      }
+    }
+  ]
+}

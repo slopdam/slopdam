@@ -1,0 +1,497 @@
+{
+  "spec_version": 1,
+  "description": "Language-neutral conformance cases. Every implementation must produce the reader and dev outputs exactly. Inputs are curated by hand; expected outputs come from the reference implementation via scripts/gen_spec.py.",
+  "groups": [
+    {
+      "id": "dash",
+      "title": "Dashes and look-alikes, including the Hangul ㅡ",
+      "cases": [
+        {
+          "input": "완료 ㅡ 다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료ㅡ다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 —다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 ￚ 다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 ᅳ 다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 ― 다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 ﹘ 다음",
+          "reader": "완료: 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "Saved — 3 rows",
+          "reader": "Saved: 3 rows",
+          "dev": "Saved - 3 rows"
+        },
+        {
+          "input": "Saved—3 rows",
+          "reader": "Saved: 3 rows",
+          "dev": "Saved - 3 rows"
+        },
+        {
+          "input": "ㅡㅡ 진짜",
+          "reader": "진짜",
+          "dev": "진짜"
+        },
+        {
+          "input": "ㅡㅡㅡㅡㅡ",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "──── 시작 ────",
+          "reader": "시작",
+          "dev": "시작"
+        },
+        {
+          "input": "═══════",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "一一一一",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "ㅡ 항목",
+          "reader": "- 항목",
+          "dev": "- 항목"
+        },
+        {
+          "input": "완료 ㅡ",
+          "reader": "완료",
+          "dev": "완료"
+        },
+        {
+          "input": "완료 ㅡ, 다음",
+          "reader": "완료, 다음",
+          "dev": "완료, 다음"
+        },
+        {
+          "input": "3ㅡ5개",
+          "reader": "3~5개",
+          "dev": "3-5개"
+        },
+        {
+          "input": "2024–2025년",
+          "reader": "2024~2025년",
+          "dev": "2024-2025년"
+        },
+        {
+          "input": "pages 10–20",
+          "reader": "pages 10~20",
+          "dev": "pages 10-20"
+        },
+        {
+          "input": "값－1",
+          "reader": "값-1",
+          "dev": "값-1"
+        },
+        {
+          "input": "1〜3",
+          "reader": "1~3",
+          "dev": "1~3"
+        },
+        {
+          "input": "===== 시작 =====",
+          "reader": "시작",
+          "dev": "시작"
+        },
+        {
+          "input": "(완료) — 다음",
+          "reader": "(완료): 다음",
+          "dev": "(완료) - 다음"
+        }
+      ]
+    },
+    {
+      "id": "emoji",
+      "title": "Emoji and status emoji",
+      "cases": [
+        {
+          "input": "✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉",
+          "reader": "저장 완료: 2024~2025년 데이터 3건 처리했습니다.",
+          "dev": "[OK] 저장 완료 - 2024-2025년 데이터 3건 처리했습니다!"
+        },
+        {
+          "input": "✅ **Saved** — processed 3 rows for 2024–2025! 🎉",
+          "reader": "Saved: processed 3 rows for 2024~2025!",
+          "dev": "[OK] Saved - processed 3 rows for 2024-2025!"
+        },
+        {
+          "input": "❌ 실패",
+          "reader": "실패",
+          "dev": "[FAIL] 실패"
+        },
+        {
+          "input": "❌ Upload failed",
+          "reader": "Upload failed",
+          "dev": "[FAIL] Upload failed"
+        },
+        {
+          "input": "⚠️ 디스크 부족",
+          "reader": "디스크 부족",
+          "dev": "[WARN] 디스크 부족"
+        },
+        {
+          "input": "저장 ✅ 완료",
+          "reader": "저장 완료",
+          "dev": "저장 완료"
+        },
+        {
+          "input": "🚀 서버 시작 ✨",
+          "reader": "서버 시작",
+          "dev": "서버 시작"
+        },
+        {
+          "input": "🚀 Server started",
+          "reader": "Server started",
+          "dev": "Server started"
+        },
+        {
+          "input": "1️⃣ 단계",
+          "reader": "1 단계",
+          "dev": "1 단계"
+        },
+        {
+          "input": "👨‍👩‍👧 가족",
+          "reader": "가족",
+          "dev": "가족"
+        },
+        {
+          "input": "line one\n⚠️ line two",
+          "reader": "line one\nline two",
+          "dev": "line one\nline two"
+        }
+      ]
+    },
+    {
+      "id": "markdown",
+      "title": "Markdown markers",
+      "cases": [
+        {
+          "input": "**중요** 설정 변경",
+          "reader": "중요 설정 변경",
+          "dev": "중요 설정 변경"
+        },
+        {
+          "input": "**Important** setting changed",
+          "reader": "Important setting changed",
+          "dev": "Important setting changed"
+        },
+        {
+          "input": "### 단계 1",
+          "reader": "단계 1",
+          "dev": "단계 1"
+        },
+        {
+          "input": "## Step 2",
+          "reader": "Step 2",
+          "dev": "Step 2"
+        },
+        {
+          "input": "---",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "```python",
+          "reader": "",
+          "dev": ""
+        },
+        {
+          "input": "```",
+          "reader": "",
+          "dev": ""
+        }
+      ]
+    },
+    {
+      "id": "punctuation",
+      "title": "Quotes, ellipsis, arrows, bullets, invisible and full-width characters",
+      "cases": [
+        {
+          "input": "“따옴표” ‘작은’",
+          "reader": "\"따옴표\" '작은'",
+          "dev": "\"따옴표\" '작은'"
+        },
+        {
+          "input": "“quoted” ‘single’",
+          "reader": "\"quoted\" 'single'",
+          "dev": "\"quoted\" 'single'"
+        },
+        {
+          "input": "로딩 중…",
+          "reader": "로딩 중...",
+          "dev": "로딩 중..."
+        },
+        {
+          "input": "Loading…",
+          "reader": "Loading...",
+          "dev": "Loading..."
+        },
+        {
+          "input": "A → B",
+          "reader": "A -> B",
+          "dev": "A -> B"
+        },
+        {
+          "input": "A ⇒ B",
+          "reader": "A -> B",
+          "dev": "A -> B"
+        },
+        {
+          "input": "A ← B",
+          "reader": "A <- B",
+          "dev": "A <- B"
+        },
+        {
+          "input": "A ↔ B",
+          "reader": "A <-> B",
+          "dev": "A <-> B"
+        },
+        {
+          "input": "• 항목",
+          "reader": "- 항목",
+          "dev": "- 항목"
+        },
+        {
+          "input": "▶ 실행",
+          "reader": "- 실행",
+          "dev": "- 실행"
+        },
+        {
+          "input": "값​확인",
+          "reader": "값확인",
+          "dev": "값확인"
+        },
+        {
+          "input": "a b",
+          "reader": "a b",
+          "dev": "a b"
+        },
+        {
+          "input": "결과：성공（3건）",
+          "reader": "결과:성공(3건)",
+          "dev": "결과:성공(3건)"
+        }
+      ]
+    },
+    {
+      "id": "tone",
+      "title": "Tone",
+      "cases": [
+        {
+          "input": "저장되었습니다!!",
+          "reader": "저장되었습니다.",
+          "dev": "저장되었습니다!!"
+        },
+        {
+          "input": "Saved!",
+          "reader": "Saved!",
+          "dev": "Saved!"
+        },
+        {
+          "input": "성공적으로 저장되었습니다",
+          "reader": "성공적으로 저장되었습니다",
+          "dev": "성공적으로 저장되었습니다"
+        },
+        {
+          "input": "Let's start",
+          "reader": "Let's start",
+          "dev": "Let's start"
+        }
+      ]
+    },
+    {
+      "id": "protected",
+      "title": "Protected spans stay as they are",
+      "cases": [
+        {
+          "input": "url https://a.com/x—y 확인",
+          "reader": "url https://a.com/x—y 확인",
+          "dev": "url https://a.com/x—y 확인"
+        },
+        {
+          "input": "`a—b` 파일",
+          "reader": "`a—b` 파일",
+          "dev": "`a—b` 파일"
+        },
+        {
+          "input": "`config.yaml` 로드",
+          "reader": "config.yaml 로드",
+          "dev": "`config.yaml` 로드"
+        },
+        {
+          "input": "title=\"—\" 저장",
+          "reader": "title=\"—\" 저장",
+          "dev": "title=\"—\" 저장"
+        },
+        {
+          "input": "/tmp/a—b.txt 생성",
+          "reader": "/tmp/a—b.txt 생성",
+          "dev": "/tmp/a—b.txt 생성"
+        },
+        {
+          "input": "user_id=3—4",
+          "reader": "user_id=3—4",
+          "dev": "user_id=3—4"
+        }
+      ]
+    },
+    {
+      "id": "preserve",
+      "title": "Text that must not change",
+      "cases": [
+        {
+          "input": "2026-11-21 user_id=3",
+          "reader": "2026-11-21 user_id=3",
+          "dev": "2026-11-21 user_id=3"
+        },
+        {
+          "input": "a -- b",
+          "reader": "a -- b",
+          "dev": "a -- b"
+        },
+        {
+          "input": "--dry-run 옵션",
+          "reader": "--dry-run 옵션",
+          "dev": "--dry-run 옵션"
+        },
+        {
+          "input": "k8s-node-01",
+          "reader": "k8s-node-01",
+          "dev": "k8s-node-01"
+        },
+        {
+          "input": "x = y * z",
+          "reader": "x = y * z",
+          "dev": "x = y * z"
+        },
+        {
+          "input": "UTF-8",
+          "reader": "UTF-8",
+          "dev": "UTF-8"
+        },
+        {
+          "input": "一般 설정",
+          "reader": "一般 설정",
+          "dev": "一般 설정"
+        },
+        {
+          "input": "コーヒー",
+          "reader": "コーヒー",
+          "dev": "コーヒー"
+        },
+        {
+          "input": "ㅋㅋ",
+          "reader": "ㅋㅋ",
+          "dev": "ㅋㅋ"
+        },
+        {
+          "input": "그는 의사다",
+          "reader": "그는 의사다",
+          "dev": "그는 의사다"
+        },
+        {
+          "input": "※ 참고",
+          "reader": "※ 참고",
+          "dev": "※ 참고"
+        },
+        {
+          "input": "© 2026",
+          "reader": "© 2026",
+          "dev": "© 2026"
+        },
+        {
+          "input": "module __main__ started",
+          "reader": "module __main__ started",
+          "dev": "module __main__ started"
+        },
+        {
+          "input": "Retry in 5-10 seconds",
+          "reader": "Retry in 5-10 seconds",
+          "dev": "Retry in 5-10 seconds"
+        }
+      ]
+    },
+    {
+      "id": "options",
+      "title": "Non-default options",
+      "cases": [
+        {
+          "input": "완료 ㅡ 다음",
+          "options": {
+            "dash_inline": "comma"
+          },
+          "reader": "완료, 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "완료 ㅡ 다음",
+          "options": {
+            "dash_inline": "hyphen"
+          },
+          "reader": "완료 - 다음",
+          "dev": "완료 - 다음"
+        },
+        {
+          "input": "❌ 실패",
+          "options": {
+            "log_level": "ERROR"
+          },
+          "reader": "실패",
+          "dev": "실패"
+        },
+        {
+          "input": "⚠️ 디스크 부족",
+          "options": {
+            "log_level": "WARNING"
+          },
+          "reader": "디스크 부족",
+          "dev": "디스크 부족"
+        },
+        {
+          "input": "✅ 저장",
+          "options": {
+            "log_level": "ERROR"
+          },
+          "reader": "저장",
+          "dev": "[OK] 저장"
+        },
+        {
+          "input": "성공적으로 저장되었습니다",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "저장되었습니다",
+          "dev": "성공적으로 저장되었습니다"
+        }
+      ]
+    }
+  ]
+}

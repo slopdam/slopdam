@@ -20,7 +20,8 @@ from typing import Iterator
 
 from .config import SCOPES, Config, ConfigError, config_from_env, load_config
 from .fixer import fix_source
-from .rules import DASH_INLINE, LEVELS, PROFILES, Sanitizer
+from . import __version__
+from .rules import DASH_INLINE, LEVELS, PROFILES, RULES, Sanitizer
 
 SOURCE_EXTS = {".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".java", ".kt", ".go", ".rb", ".php", ".rs", ".swift"}
 SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "__pycache__", ".tox", "target"}
@@ -113,6 +114,13 @@ def check(args: argparse.Namespace) -> int:
         json.dump([{"path": p, "line": n, "col": c, "rule": r, "text": t, "fix": x} for p, n, c, r, t, x in results],
                   sys.stdout, ensure_ascii=False, indent=2)
         print()
+    elif args.format == "github":
+        # https://docs.github.com/actions/reference/workflow-commands-for-github-actions#setting-a-warning-message
+        for path, lineno, col, rule, text, fix in results:
+            print(f"::warning file={_gh(_uri(path), True)},line={lineno},col={col},title=slopdam {rule}::{_gh(_message(text, fix))}")
+    elif args.format == "sarif":
+        json.dump(_sarif(results), sys.stdout, ensure_ascii=False, indent=2)
+        print()
     else:
         for path, lineno, col, rule, text, fix in results:
             shown = "report only" if fix is None else f"-> {fix!r}"
@@ -120,6 +128,48 @@ def check(args: argparse.Namespace) -> int:
         if results:
             print(f"\n{len(results)} finding(s), profile={cfg.profile}", file=sys.stderr)
     return 1 if results else 0
+
+
+def _message(text: str, fix) -> str:
+    return f"{text!r} (report only)" if fix is None else f"{text!r} -> {fix!r}"
+
+
+def _gh(value: str, prop: bool = False) -> str:
+    """Escape a workflow command value (properties also escape ':' and ',')."""
+    value = value.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+    return value.replace(":", "%3A").replace(",", "%2C") if prop else value
+
+
+def _uri(path: str) -> str:
+    path = path.replace(os.sep, "/")
+    return path[2:] if path.startswith("./") else path
+
+
+def _sarif(results: list) -> dict:
+    """SARIF 2.1.0 for GitHub code scanning and other SARIF viewers."""
+    ids = sorted({r for _, _, _, r, _, _ in results})
+    descriptions = {r.id: r.description for r in RULES}
+    return {
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [{
+            "tool": {"driver": {
+                "name": "slopdam",
+                "version": __version__,
+                "informationUri": "https://github.com/slopdam/slopdam",
+                "rules": [{"id": i, "shortDescription": {"text": descriptions.get(i, i)}} for i in ids],
+            }},
+            "results": [{
+                "ruleId": rule,
+                "level": "warning",
+                "message": {"text": _message(text, fix)},
+                "locations": [{"physicalLocation": {
+                    "artifactLocation": {"uri": _uri(path)},
+                    "region": {"startLine": lineno, "startColumn": col},
+                }}],
+            } for path, lineno, col, rule, text, fix in results],
+        }],
+    }
 
 
 def fix(args: argparse.Namespace) -> int:
@@ -180,7 +230,8 @@ def main(argv: list = None) -> int:
     p_check.add_argument("paths", nargs="*", default=["."])
     p_check.add_argument("--scope", choices=SCOPES, help="log-calls (default), strings (Python literals), all (every line)")
     p_check.add_argument("--all", action="store_true", help="same as --scope all")
-    p_check.add_argument("--format", choices=("text", "json"), default="text")
+    p_check.add_argument("--format", choices=("text", "json", "github", "sarif"), default="text",
+                         help="github: annotations for GitHub Actions, sarif: for code scanning")
     p_check.set_defaults(func=check)
 
     p_fix = sub.add_parser("fix", help="rewrite string literals in Python files")

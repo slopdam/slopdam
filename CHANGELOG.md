@@ -2,6 +2,16 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Added
+- `spec/`: a language-neutral rule catalog (`rules.json`) and conformance cases (`conformance.json`) that every implementation must pass. Both are generated from the Python source with `scripts/gen_spec.py` and checked in CI.
+- GitHub Action: `uses: slopdam/slopdam@v0.3.0` runs `slopdam check` and shows findings as pull request annotations.
+- `check --format github` (workflow annotations) and `--format sarif` (code scanning).
+- `py.typed`, so type checkers use slopdam's type hints.
+- The pre-commit hook also checks Rust, Ruby, PHP and Swift files, matching the CLI.
+- ROADMAP.md: plan for JavaScript, Go, JVM and Rust packages built on the spec.
+
 ## [0.2.0] - 2026-11-23
 
 ### Added

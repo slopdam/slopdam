@@ -126,6 +126,14 @@ def _status_tag(m: "re.Match[str]", ctx: Context) -> str:
 _FULLWIDTH = str.maketrans("，：；（）！？［］｛｝", ",:;()!?[]{}")
 
 
+def _fullwidth(m: "re.Match[str]", ctx: Context) -> str:
+    return m.group(0).translate(_FULLWIDTH)
+
+
+def _unwrap(m: "re.Match[str]", ctx: Context) -> str:
+    return m.group(1)
+
+
 def _r(id: str, level: str, pattern: str, actions: Dict[str, Action], description: str,
        flags: int = 0, ascii: bool = False) -> Rule:
     return Rule(id, level, re.compile(pattern, flags), actions, description, ascii)
@@ -135,7 +143,7 @@ def _r(id: str, level: str, pattern: str, actions: Dict[str, Action], descriptio
 RULES: tuple = (
     _r("space.invisible", "basic", "[​‌⁠﻿­]", _both(""), "zero-width or invisible character"),
     _r("space.nbsp", "basic", "[  　]", _both(" "), "non-breaking or ideographic space"),
-    _r("width.fullwidth", "basic", "[，：；（）！？［］｛｝]", _both(lambda m, c: m.group(0).translate(_FULLWIDTH)), "full-width punctuation"),
+    _r("width.fullwidth", "basic", "[，：；（）！？［］｛｝]", _both(_fullwidth), "full-width punctuation"),
     _r("quote.double", "basic", "[“”„]", _both('"'), "curly double quote"),
     _r("quote.single", "basic", "[‘’‚]", _both("'"), "curly single quote"),
     _r("punct.ellipsis", "basic", "[…⋯]", _both("..."), "ellipsis character"),
@@ -153,7 +161,7 @@ RULES: tuple = (
     _r("md.fence", "basic", r"^[ \t]*```[^\n]*\n?", _both(""), "markdown code fence", re.M, ascii=True),
     _r("md.hr", "basic", r"^[ \t]*([-*_])[ \t]*(?:\1[ \t]*){2,}$", _both(""), "markdown horizontal rule", re.M, ascii=True),
     # Only **bold**: __x__ is far more often a Python name (__name__, __init__) than emphasis.
-    _r("md.emphasis", "basic", r"\*\*(.+?)\*\*", _both(lambda m, c: m.group(1)), "markdown bold", ascii=True),
+    _r("md.emphasis", "basic", r"\*\*(.+?)\*\*", _both(_unwrap), "markdown bold", ascii=True),
     _r("dash.hyphen", "basic", f"[{HYPHENS}]", _both("-"), "Unicode hyphen or minus"),
     _r("dash.wave", "basic", "[〜～]", _both("~"), "wave dash or full-width tilde"),
     _r("dash.run", "basic", f"([ \t]*)([{DASHES}{EU}{LINES}]+)([ \t]*)", _both(_dash_run), "dash, 'ㅡ' or line character"),

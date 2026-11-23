@@ -15,8 +15,19 @@ classifiers = [
     "Intended Audience :: Developers",
     "Natural Language :: English",
     "Natural Language :: Korean",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
     "Topic :: System :: Logging",
+    "Topic :: Text Processing :: Filters",
+    "Typing :: Typed",
 ]
 requires-python = ">=3.9"
 keywords = ["logging", "formatter", "linter", "korean", "ai", "slop"]

@@ -32,6 +32,7 @@ A rule pull request needs all of the following (see the checklist in [docs/RULES
 5. **An idempotency case**: running the cleaner twice must give the same result.
 6. **A ReDoS-safe pattern.** No nested quantifiers such as `(a+)+` and no overlapping alternatives inside a repetition such as `(a|a)*`. See [SECURITY.md](SECURITY.md).
 7. **Provenance** for any list taken from another project, with a license on the allowlist below. Ideas from other tools are welcome; copied lists are not.
+8. **Conformance cases.** Add the inputs from 1 and 2 to [spec/conformance.json](spec/conformance.json), run `python scripts/gen_spec.py`, and check the generated outputs in the diff. Ports in other languages pick up the rule from these cases.
 
 ## Changes to output
 

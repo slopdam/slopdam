@@ -1,0 +1,13 @@
+# Sections for "Generate release notes" on GitHub releases.
+changelog:
+  exclude:
+    authors: [dependabot]
+  categories:
+    - title: Output changes
+      labels: [output-change]
+    - title: New rules
+      labels: [rule-request]
+    - title: Fixes
+      labels: [false-positive, bug]
+    - title: Other changes
+      labels: ["*"]
