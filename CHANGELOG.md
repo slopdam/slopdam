@@ -4,6 +4,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Added
+- README demo recording and screenshots in English and Korean, made from real runs on a sample project by `scripts/demo/make_demo.py`.
+
 ### Fixed
 - `PlainFilter` on one handler no longer changes what the next handler sees. With the README setup (reader on the console, dev in the file), the file used to get the reader text, without `[OK]` tags. On Python 3.12+ the filter gives its handler a cleaned copy; before 3.12 it keeps the original message for `PlainFilter` and `PlainFormatter` on later handlers.
 
