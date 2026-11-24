@@ -7,7 +7,7 @@
 
   <groupId>io.github.slopdam</groupId>
   <artifactId>slopdam-parent</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
   <packaging>pom</packaging>
 
   <name>slopdam (Java)</name>
@@ -19,6 +19,13 @@
       <url>https://github.com/slopdam/slopdam/blob/main/LICENSE</url>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <id>slopdam</id>
+      <name>The slopdam Authors</name>
+      <url>https://github.com/slopdam</url>
+    </developer>
+  </developers>
   <scm>
     <url>https://github.com/slopdam/slopdam</url>
     <connection>scm:git:https://github.com/slopdam/slopdam.git</connection>
@@ -87,4 +94,67 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <!-- mvn -P release deploy: sources, javadoc and signatures, uploaded to Maven Central.
+         Used by .github/workflows/release-java.yml; needs the Central token and a GPG key. -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.4.0</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals><goal>jar-no-fork</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.12.0</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals><goal>jar</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.8</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals><goal>sign</goal></goals>
+                <configuration>
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.12.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

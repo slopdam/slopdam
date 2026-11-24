@@ -7,7 +7,7 @@ name: release
 
 on:
   push:
-    tags: ["v*"]  # Python only; the JavaScript package uses js-v* tags (release-js.yml)
+    tags: ["v*"]  # Python only: JavaScript uses js-v* (release-js.yml), Java java-v* (release-java.yml)
 
 jobs:
   build:
