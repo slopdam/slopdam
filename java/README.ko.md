@@ -33,7 +33,15 @@ dev   : [OK] 저장 완료 - 2024-2025년 데이터 3건 처리했습니다!
 | `io.github.slopdam:slopdam-logback` | Logback 패턴용 `%slopdam` | Logback(사용 중인 것) |
 | `io.github.slopdam:slopdam-log4j2` | Log4j 2 패턴용 `%slopdam` | Log4j 2(사용 중인 것) |
 
-Java 11 이상에서 동작합니다. Maven Central 첫 배포를 준비 중이며, 그 전에는 `java/`에서 `mvn install`로 빌드해 쓰세요.
+Java 11 이상에서 동작하며, Maven Central에서 받습니다.
+
+```xml
+<dependency>
+  <groupId>io.github.slopdam</groupId>
+  <artifactId>slopdam</artifactId>            <!-- 또는 slopdam-logback, slopdam-log4j2 -->
+  <version>0.1.0</version>
+</dependency>
+```
 
 ## 사용법
 

@@ -33,7 +33,15 @@ dev   : [OK] Saved - 3 rows processed
 | `io.github.slopdam:slopdam-logback` | `%slopdam` for Logback patterns | Logback (yours) |
 | `io.github.slopdam:slopdam-log4j2` | `%slopdam` for Log4j 2 patterns | Log4j 2 (yours) |
 
-Java 11 or later. The first release to Maven Central is on the way; until then, build with `mvn install` in `java/`.
+Java 11 or later, from Maven Central:
+
+```xml
+<dependency>
+  <groupId>io.github.slopdam</groupId>
+  <artifactId>slopdam</artifactId>            <!-- or slopdam-logback, slopdam-log4j2 -->
+  <version>0.1.0</version>
+</dependency>
+```
 
 ## Use
 

@@ -64,7 +64,7 @@ slopdam/ (this repository)
 - [x] pino and winston integrations (`@slopdam/core/pino`, `@slopdam/core/winston`)
 - [x] ESLint rule `slopdam/no-slop` (`@slopdam/core/eslint`): string arguments of log calls, with autofix
 
-### 0.6: Go and the JVM
+### 0.6: Go and the JVM (released: Go module 0.1.0, Java 0.1.0, slopdam 0.6.0, @slopdam/core 0.2.1)
 
 - [x] Go module ([go/](go/README.md)) passing every conformance case
 - [x] `log/slog` handler (`slopdam.NewHandler`)

@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.6.0] - 2026-11-25
 
 ### Added
 - `java/`: the Java library `io.github.slopdam:slopdam` (Java 11+, no dependencies) with `Sanitizer.clean` and `findings`, plus `slopdam-logback` and `slopdam-log4j2`, which add a `%slopdam` pattern converter with a profile per appender. It passes every conformance case, and on 20,000 random inputs it matched the Python package exactly. CI runs it on Java 17 and 21.

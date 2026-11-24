@@ -64,7 +64,7 @@ slopdam/ (이 저장소)
 - [x] pino, winston 연동 (`@slopdam/core/pino`, `@slopdam/core/winston`)
 - [x] ESLint 규칙 `slopdam/no-slop` (`@slopdam/core/eslint`): 로그 호출의 문자열 인자 검사와 자동 수정
 
-### 0.6: Go와 JVM
+### 0.6: Go와 JVM (배포됨: Go 모듈 0.1.0, Java 0.1.0, slopdam 0.6.0, @slopdam/core 0.2.1)
 
 - [x] 모든 적합성 사례를 통과하는 Go 모듈 ([go/](go/README.ko.md))
 - [x] `log/slog` 핸들러 (`slopdam.NewHandler`)

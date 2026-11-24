@@ -1,0 +1,42 @@
+name: release-java
+
+# Push a tag like java-v0.1.0 to publish io.github.slopdam:slopdam, slopdam-logback and
+# slopdam-log4j2 to Maven Central. Python uses v* tags, JavaScript js-v*, Go go/v*.
+#
+# One-time setup (maintainers):
+#   1. central.sonatype.com: sign in with GitHub and verify the namespace io.github.slopdam.
+#   2. Generate a user token there and save it as the secrets CENTRAL_USERNAME and CENTRAL_TOKEN.
+#   3. Create a GPG key, publish its public part to keys.openpgp.org, and save the private key
+#      (gpg --armor --export-secret-keys) as GPG_PRIVATE_KEY and its passphrase as GPG_PASSPHRASE.
+
+on:
+  push:
+    tags: ["java-v*"]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: java
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_TOKEN
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Tag matches the version in pom.xml
+        run: test "java-v$(mvn -q -B help:evaluate -Dexpression=project.version -DforceStdout)" = "$GITHUB_REF_NAME"
+      - run: mvn -B -P release deploy
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
