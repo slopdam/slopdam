@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Fixed
+- `go/vet` v0.1.0 was tagged on the commit before its `go.mod` dropped the `replace` directive, so `go install .../slopdamvet@v0.1.0` refused it. v0.1.1 is the first installable version, and `go.mod` retracts v0.1.0 so `@latest` never picks it.
+
 ## [0.6.0] - 2026-11-25
 
 ### Added
