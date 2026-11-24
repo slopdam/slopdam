@@ -19,3 +19,6 @@ CLAUDE.local.md
 node_modules/
 js/src/spec.generated.ts
 *.tgz
+
+# Java (java/)
+target/

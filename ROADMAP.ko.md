@@ -21,7 +21,7 @@ slopdam/ (이 저장소)
   ├── src/     Python    slopdam            기준 구현, CLI, pre-commit, GitHub Action
   ├── js/      JS/TS     @slopdam/core      0.5
   ├── go/      Go        slopdam            0.6
-  ├── java/    JVM       slopdam            계획
+  ├── java/    JVM       slopdam            0.6
   └── rust/    Rust      slopdam (crate)    계획
 ```
 
@@ -38,7 +38,7 @@ slopdam/ (이 저장소)
 | Python | `slopdam` (PyPI) | `logging`, 다음은 structlog와 loguru | `slopdam check`와 `fix`, pre-commit, GitHub Action |
 | JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston | ESLint 규칙 (`@slopdam/core/eslint`) |
 | Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` 분석기 |
-| Java, Kotlin | Maven Central | Logback 변환기, Log4j2 재작성 정책 | CLI |
+| Java, Kotlin | `io.github.slopdam:slopdam` (Maven Central) | Logback, Log4j 2 `%slopdam` 변환기 | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` 레이어, `log` | CLI |
 | 모든 언어 | CLI | 파이프로 `slopdam clean` | CLI, pre-commit, GitHub Action |
 
@@ -69,7 +69,7 @@ slopdam/ (이 저장소)
 - [x] 모든 적합성 사례를 통과하는 Go 모듈 ([go/](go/README.ko.md))
 - [x] `log/slog` 핸들러 (`slopdam.NewHandler`)
 - [x] 자동 수정을 제안하는 `go vet` 분석기 (`slopdamvet`)
-- [ ] Logback 변환기와 Log4j2 재작성 정책을 갖춘 Java 라이브러리
+- [x] 모든 적합성 사례를 통과하는 Java 라이브러리 ([java/](java/README.ko.md)), Logback과 Log4j 2용 `%slopdam` 변환기 포함
 
 ### 0.7: Rust와 편집기
 

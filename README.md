@@ -42,7 +42,7 @@ dev   : [OK] Saved - 3 rows processed
 - Korean-aware. The Hangul `ㅡ` in all three of its code points, `!` after Hangul, number ranges written with `~` as in Korean in `reader`, and Hangul, Hanja and kana text left alone.
 - Conservative by design. URLs, inline code, `key=value` values and file paths are protected; dates, command line flags and `__name__` are not mistaken for traces. Rules are deterministic, and property-based tests check that cleaning twice changes nothing.
 - Fits into CI. pre-commit hook, GitHub Action with pull request annotations, SARIF for code scanning, JSON output and stdin for editors. Every finding has a rule ID you can disable or ignore per line.
-- Ready for other languages. The behavior is written down as a language-neutral [spec](https://github.com/slopdam/slopdam/blob/main/spec/README.md) with conformance cases. The JavaScript and TypeScript package [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.md) and the [Go module](https://github.com/slopdam/slopdam/blob/main/go/README.md) already pass all of them; Java and Rust follow ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)).
+- Ready for other languages. The behavior is written down as a language-neutral [spec](https://github.com/slopdam/slopdam/blob/main/spec/README.md) with conformance cases. The JavaScript and TypeScript package [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.md), the [Go module](https://github.com/slopdam/slopdam/blob/main/go/README.md) and the [Java library](https://github.com/slopdam/slopdam/blob/main/java/README.md) already pass all of them; Rust follows ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)).
 - No runtime dependencies. Python 3.9 to 3.13, typed.
 
 ## Screenshots
@@ -166,7 +166,7 @@ tail -f app.log | slopdam clean
 slopdam is built to work the same way in every language.
 
 - **Now:** `slopdam check` lints log and print calls in JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP and Swift line by line, and the pre-commit hook and GitHub Action cover the same files. `slopdam clean` cleans the output of any program through a pipe: `node server.js 2>&1 | slopdam clean --profile dev`.
-- **Native packages:** the behavior is defined independently of Python in [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.md): the rule catalog and conformance cases that every port must pass. The JavaScript and TypeScript package [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.md) lives in `js/` and the Go module [github.com/slopdam/slopdam/go](https://github.com/slopdam/slopdam/blob/main/go/README.md) in `go/`; both pass every case. Java and Rust are planned in the [roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md).
+- **Native packages:** the behavior is defined independently of Python in [spec/](https://github.com/slopdam/slopdam/blob/main/spec/README.md): the rule catalog and conformance cases that every port must pass. The JavaScript and TypeScript package [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.md) lives in `js/` and the Go module [github.com/slopdam/slopdam/go](https://github.com/slopdam/slopdam/blob/main/go/README.md) in `go/`; the Java library [io.github.slopdam:slopdam](https://github.com/slopdam/slopdam/blob/main/java/README.md) in `java/`; all of them pass every case. Rust is planned in the [roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md).
 
 ## Rules
 

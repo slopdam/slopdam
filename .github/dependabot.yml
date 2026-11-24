@@ -20,3 +20,7 @@ updates:
     directory: /go/vet
     schedule:
       interval: monthly
+  - package-ecosystem: maven
+    directory: /java
+    schedule:
+      interval: monthly
