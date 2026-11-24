@@ -21,7 +21,7 @@ slopdam/ (this repository)
   ├── src/     Python    slopdam            reference implementation, CLI, pre-commit, GitHub Action
   ├── js/      JS/TS     @slopdam/core      0.5
   ├── go/      Go        slopdam            0.6
-  ├── java/    JVM       slopdam            planned
+  ├── java/    JVM       slopdam            0.6
   └── rust/    Rust      slopdam (crate)    planned
 ```
 
@@ -38,7 +38,7 @@ slopdam/ (this repository)
 | Python | `slopdam` (PyPI) | `logging`; structlog and loguru next | `slopdam check` and `fix`, pre-commit, GitHub Action |
 | JavaScript, TypeScript | `@slopdam/core` (npm) | pino, winston | ESLint rule (`@slopdam/core/eslint`) |
 | Go | `github.com/slopdam/slopdam/go` | `slog.Handler`, zap core | `go vet` analyzer |
-| Java, Kotlin | Maven Central | Logback converter, Log4j2 rewrite policy | CLI |
+| Java, Kotlin | `io.github.slopdam:slopdam` (Maven Central) | Logback and Log4j 2 `%slopdam` converters | CLI |
 | Rust | `slopdam` (crates.io) | `tracing` layer, `log` | CLI |
 | Any | CLI | `slopdam clean` in a pipe | CLI, pre-commit, GitHub Action |
 
@@ -69,7 +69,7 @@ slopdam/ (this repository)
 - [x] Go module ([go/](go/README.md)) passing every conformance case
 - [x] `log/slog` handler (`slopdam.NewHandler`)
 - [x] `go vet` analyzer with suggested fixes (`slopdamvet`)
-- [ ] Java library with a Logback converter and a Log4j2 rewrite policy
+- [x] Java library ([java/](java/README.md)) passing every conformance case, with `%slopdam` converters for Logback and Log4j 2
 
 ### 0.7: Rust and editors
 

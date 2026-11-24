@@ -148,3 +148,22 @@ jobs:
       - run: go vet ./...
       - run: go test ./...
       - run: go build -o /tmp/slopdamvet ./cmd/slopdamvet && cd .. && go vet -vettool=/tmp/slopdamvet ./...
+
+  java:
+    # The Java modules: core (every conformance case), Logback and Log4j 2 converters.
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ["17", "21"]
+    defaults:
+      run:
+        working-directory: java
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - run: mvn -B verify

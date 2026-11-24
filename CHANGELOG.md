@@ -5,6 +5,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 ## [Unreleased]
 
 ### Added
+- `java/`: the Java library `io.github.slopdam:slopdam` (Java 11+, no dependencies) with `Sanitizer.clean` and `findings`, plus `slopdam-logback` and `slopdam-log4j2`, which add a `%slopdam` pattern converter with a profile per appender. It passes every conformance case, and on 20,000 random inputs it matched the Python package exactly. CI runs it on Java 17 and 21.
 - `go/`: the Go module `github.com/slopdam/slopdam/go`, with `Clean`, `Sanitizer.Clean`, `CleanLevel` and `Findings`. It passes every conformance case, and on 20,000 random inputs it matched the Python package exactly. CI runs it on Go 1.22 and the current release and checks that `spec_data.go` matches `spec/rules.json`. Module versions are tagged `go/v*`. `slopdam.NewHandler` wraps a `log/slog` handler and cleans record messages; it passes the standard `slogtest` checks. `go/vet` (its own module) is a `go/analysis` analyzer with suggested fixes, run as `slopdamvet` or `go vet -vettool`.
 - Logo (`docs/assets/logo.svg`, `logo.png`, and a square `avatar.png` for the GitHub and npm avatars), shown at the top of the READMEs.
 

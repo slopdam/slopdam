@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: MIT -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.slopdam</groupId>
+    <artifactId>slopdam-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>slopdam</artifactId>
+  <name>slopdam</name>
+  <description>Strip AI-generated traces from log messages. No dependencies.</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <resources>
+      <!-- The spec in this repository, packaged next to the classes. -->
+      <resource>
+        <directory>${project.basedir}/../../spec</directory>
+        <includes>
+          <include>rules.json</include>
+        </includes>
+        <targetPath>io/github/slopdam</targetPath>
+      </resource>
+    </resources>
+  </build>
+</project>
