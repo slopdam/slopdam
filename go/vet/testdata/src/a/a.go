@@ -1,0 +1,24 @@
+package a
+
+import (
+	"fmt"
+	"log"
+	"log/slog"
+)
+
+type service struct{ logger *slog.Logger }
+
+func examples(s service, n int, url string) {
+	log.Printf("✅ **Saved** %d rows — done!", n)  // want `slopdam emoji.pictograph: "✅" should be ""` `slopdam md.emphasis: "\*\*Saved\*\*" should be "Saved"` `slopdam dash.run: "—" should be ": "`
+	slog.Info("🚀 Started — ok")                   // want `slopdam emoji.pictograph` `slopdam dash.run`
+	s.logger.Warn("⚠️ Retrying… “db-01” is slow") // want `emoji.pictograph` `punct.ellipsis` `quote.double` `quote.double`
+	fmt.Println(`✅ 저장 ㅡ ` + fmt.Sprint(n) + "건")  // want `emoji.pictograph` `dash.run: "ㅡ" should be ": "`
+	log.Print("Let's go")                         // want `slopdam tone.chatty: "Let's"`
+
+	log.Print("Saved 3 rows: done")
+	log.Printf("see %s for 2024-2025", url)
+	title := "✅ — not a log call"
+	_ = fmt.Sprintf("%s — kept", title)
+	log.Printf("%v — %d", url, n) // want `dash.run: "—" should be ": "`
+	log.Print("‒• 항목")            // want `dash.run: "‒" should be ""`
+}

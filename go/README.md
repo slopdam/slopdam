@@ -73,6 +73,20 @@ file.Error("❌ Upload failed", "err", err)     // "msg":"Upload failed", err un
 
 `NewHandler` wraps any `slog.Handler` and cleans the message of every record. Attributes are structured data and stay as they are, and a record that was only a separator line is dropped unless it carries an error. It passes the standard library's `slogtest` handler checks.
 
+### go vet
+
+```bash
+go install github.com/slopdam/slopdam/go/vet/cmd/slopdamvet@latest
+slopdamvet ./...                          # or: go vet -vettool=$(which slopdamvet) ./...
+```
+
+```
+sync.go:12:14: slopdam emoji.pictograph: "✅" should be ""
+sync.go:12:32: slopdam dash.run: "—" should be ": "
+```
+
+`slopdamvet -fix ./...` applies the suggested fixes: `log.Printf("✅ Synced %d rows — done", n)` becomes `log.Printf("Synced %d rows: done", n)`. It checks the string arguments of calls on `log`, `slog`, `fmt` and any receiver whose name contains `log` (`s.logger.Warn`), including `"a" + b` concatenations. Only the literal's text changes: quotes, escapes and format verbs such as `%v` or `%d` stay. Flags: `-profile dev`, `-level`, `-disable emoji,dash.run`, `-dash-inline`, `-receivers`. The analyzer is a separate module (`go/vet`, Go 1.26+) so the package itself keeps no dependency on `golang.org/x/tools`.
+
 ## How it stays in step with Python
 
 The rules are not rewritten by hand. `go generate` copies the repository's [spec/rules.json](https://github.com/slopdam/slopdam/blob/main/spec/README.md) into `spec_data.go`; its patterns are translated from Python's regular expression dialect when the package loads (Unicode `\w`, `\s` and `\b`, and Python's `^` and `$`), and only the four context-dependent actions are written in Go. Every pull request runs the conformance cases against Python, JavaScript and Go. On 20,000 random inputs, Go and Python gave identical results.
@@ -81,7 +95,7 @@ The one dependency is [regexp2](https://github.com/dlclark/regexp2) (MIT), becau
 
 ## Roadmap
 
-Part of slopdam milestone 0.6 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): this package and the `log/slog` handler, then a `go vet` analyzer.
+Part of slopdam milestone 0.6 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): this package, the `log/slog` handler and the `go vet` analyzer.
 
 ## Contributing
 

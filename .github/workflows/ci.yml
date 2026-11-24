@@ -132,3 +132,19 @@ jobs:
       - run: go vet ./...
       - run: test -z "$(gofmt -l .)"
       - run: go test ./...
+
+  go-vet:
+    # The go vet analyzer (its own module, Go 1.26+ because of golang.org/x/tools).
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: go/vet
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+          cache-dependency-path: go/vet/go.sum
+      - run: go vet ./...
+      - run: go test ./...
+      - run: go build -o /tmp/slopdamvet ./cmd/slopdamvet && cd .. && go vet -vettool=/tmp/slopdamvet ./...
