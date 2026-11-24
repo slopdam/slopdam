@@ -121,6 +121,22 @@ const noSlop = {
       return name !== null && methodSet.has(name) && receiverRe.test(source.getText(callee.object));
     }
 
+    /** Apply each finding's fix at its span, as the Python fixer does; overlaps are skipped. */
+    function rewrite(text: string, quote: string): string {
+      let out = "";
+      let last = 0;
+      for (const f of sanitizer.findings(text)) {
+        if (f.start < last || f.fix === null) continue;
+        let fix = f.fix;
+        if (fix.includes("\\") || fix.includes(quote) || (quote === "`" && fix.includes("${"))) {
+          fix = fix.replace(/\\/g, "\\\\").split(quote).join("\\" + quote).replace(/\$\{/g, "\\${");
+        }
+        out += text.slice(last, f.start) + fix;
+        last = f.end;
+      }
+      return out + text.slice(last);
+    }
+
     /** The literal's body (between the quotes or backticks) and the pieces that must not change. */
     function bodyOf(node: Node): { start: number; body: string; spans: Array<[number, number]>; quote: string } | null {
       const raw: string = source.getText(node);
@@ -155,22 +171,23 @@ const noSlop = {
       const found = sanitizer.findings(masked.text);
       if (!found.length) return;
 
-      // Apply each fix at its span, as the Python fixer does; overlapping findings are skipped.
-      let out = "";
-      let last = 0;
+      // Report what the first pass finds, overlapping findings skipped.
       const shown = [];
+      let last = 0;
       for (const f of found) {
-        if (f.start < last) continue;
-        shown.push(f);
-        if (f.fix === null) continue;
-        let fix = f.fix;
-        if (fix.includes("\\") || fix.includes(quote) || (quote === "`" && fix.includes("${"))) {
-          fix = fix.replace(/\\/g, "\\\\").split(quote).join("\\" + quote).replace(/\$\{/g, "\\${");
+        if (f.start >= last) {
+          shown.push(f);
+          last = f.end;
         }
-        out += masked.text.slice(last, f.start) + fix;
-        last = f.end;
       }
-      out += masked.text.slice(last);
+      // Apply the fixes and repeat until nothing changes: removing one trace can expose another
+      // (the dash in "‒•" leaves a bullet at the start of the string), as in clean().
+      let out = masked.text;
+      for (let pass = 0; pass < 8; pass++) {
+        const next = rewrite(out, quote);
+        if (next === out) break;
+        out = next;
+      }
       let newBody = unmask(out, masked.pieces);
       if (newBody !== null) {
         // Do not leave a space at either end that the original literal did not have.
@@ -182,11 +199,12 @@ const noSlop = {
       for (const f of shown) {
         const from = start + masked.where(f.start);
         const to = start + masked.where(f.end);
+        const text = body.slice(masked.where(f.start), masked.where(f.end)).trim(); // source text, not the masked one
         context.report({
           node,
           loc: { start: source.getLocFromIndex(from), end: source.getLocFromIndex(to) },
           messageId: f.fix === null ? "report" : "fixable",
-          data: { rule: f.ruleId, text: f.text, fix: f.fix ?? "" },
+          data: { rule: f.ruleId, text, fix: f.fix ?? "" },
           fix: replacement === null ? null : (fixer: any) => fixer.replaceTextRange(node.range, replacement),
         });
       }

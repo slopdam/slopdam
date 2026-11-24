@@ -199,3 +199,11 @@ def test_cli_check_scope_strings_uses_literals(tmp_path, capsys):
     assert main(["check", "--scope", "strings", "--format", "json", str(tmp_path)]) == 1
     hit = json.loads(capsys.readouterr().out)[-1]
     assert (hit["line"], hit["col"], hit["rule"]) == (1, 10, "dash.run")  # the span starts at the space before the dash
+
+
+def test_fix_repeats_until_stable():
+    # Removing the dash exposes a bullet at the start of the string; one run fixes both.
+    src = 'import logging\nlog = logging.getLogger()\nlog.info("‒• 항목")\n'
+    once, edits = fix_source(src, Sanitizer())
+    assert once.splitlines()[2] == 'log.info("- 항목")'
+    assert fix_source(once, Sanitizer())[0] == once
