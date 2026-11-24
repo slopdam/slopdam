@@ -136,13 +136,13 @@ const pua = 0xF0000
 
 func isPUA(r rune) bool { return r >= 0xF0000 && r <= 0xFFFFD }
 
-type context struct {
+type cleanCtx struct {
 	profile    string
 	dashInline string
 	levelno    int
 }
 
-type action func(m *regexp2.Match, s []rune, ctx *context) string
+type action func(m *regexp2.Match, s []rune, ctx *cleanCtx) string
 
 func group(m *regexp2.Match, n int) string {
 	g := m.GroupByNumber(n)
@@ -173,7 +173,7 @@ func wordish(r rune, extra string) bool {
 }
 
 var functions = map[string]action{
-	"fullwidth": func(m *regexp2.Match, _ []rune, _ *context) string {
+	"fullwidth": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string {
 		return strings.Map(func(r rune) rune {
 			if r >= 0xFF01 && r <= 0xFF5E {
 				return r - 0xFEE0
@@ -181,8 +181,8 @@ var functions = map[string]action{
 			return r
 		}, m.String())
 	},
-	"unwrap": func(m *regexp2.Match, _ []rune, _ *context) string { return group(m, 1) },
-	"status_tag": func(m *regexp2.Match, _ []rune, ctx *context) string {
+	"unwrap": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string { return group(m, 1) },
+	"status_tag": func(m *regexp2.Match, _ []rune, ctx *cleanCtx) string {
 		r, _ := utf8.DecodeRuneInString(group(m, 1))
 		tag := statusOf[r]
 		if at, ok := spec.StatusRedundantAt[tag]; ok && ctx.levelno != LevelNone && ctx.levelno >= levelNumber(at) {
@@ -190,7 +190,7 @@ var functions = map[string]action{
 		}
 		return tag + " "
 	},
-	"dash_run": func(m *regexp2.Match, s []rune, ctx *context) string {
+	"dash_run": func(m *regexp2.Match, s []rune, ctx *cleanCtx) string {
 		start, end := m.Index, m.Index+m.Length
 		lead, run, trail := group(m, 1), []rune(group(m, 2)), group(m, 3)
 		leadLen := utf8.RuneCountInString(lead)
@@ -373,7 +373,7 @@ func New(o Options) (*Sanitizer, error) {
 		switch a.Kind {
 		case "replace":
 			value := a.Value
-			act = func(m *regexp2.Match, _ []rune, _ *context) string { return expand(value, m) }
+			act = func(m *regexp2.Match, _ []rune, _ *cleanCtx) string { return expand(value, m) }
 		case "function":
 			act = functions[a.Name]
 			if act == nil {
@@ -400,7 +400,7 @@ var defaultSanitizer *Sanitizer
 // Clean removes AI traces with the default options (reader, basic).
 func Clean(text string) string { return defaultSanitizer.Clean(text) }
 
-func (s *Sanitizer) apply(text []rune, ctx *context) []rune {
+func (s *Sanitizer) apply(text []rune, ctx *cleanCtx) []rune {
 	for _, r := range s.rules {
 		if r.action == nil {
 			continue
@@ -417,7 +417,7 @@ func (s *Sanitizer) Clean(text string) string { return s.CleanLevel(text, LevelN
 // CleanLevel is Clean for a log record at the given level (LevelError, LevelWarning, ...), so
 // that dev drops a [FAIL] or [WARN] tag the level already says.
 func (s *Sanitizer) CleanLevel(text string, level int) string {
-	ctx := &context{profile: s.profile, dashInline: s.dashInline, levelno: level}
+	ctx := &cleanCtx{profile: s.profile, dashInline: s.dashInline, levelno: level}
 	cur := joinLines(splitlines([]rune(text)))
 	for pass := 0; pass < spec.Tidy.MaxPasses; pass++ {
 		next := s.cleanOnce(cur, ctx)
@@ -440,7 +440,7 @@ func joinLines(lines [][]rune) []rune {
 	return out
 }
 
-func (s *Sanitizer) cleanOnce(text []rune, ctx *context) []rune {
+func (s *Sanitizer) cleanOnce(text []rune, ctx *cleanCtx) []rune {
 	var saved [][]rune
 	masked := sub(protect, text, func(m *regexp2.Match) string {
 		kept := []rune(m.String())
@@ -481,7 +481,7 @@ func (s *Sanitizer) cleanOnce(text []rune, ctx *context) []rune {
 // Findings reports what Clean would change, in one pass and without tidying, with byte
 // offsets into text.
 func (s *Sanitizer) Findings(text string) []Finding {
-	ctx := &context{profile: s.profile, dashInline: s.dashInline, levelno: LevelNone}
+	ctx := &cleanCtx{profile: s.profile, dashInline: s.dashInline, levelno: LevelNone}
 	orig := []rune(text)
 	var work []rune
 	var spans [][2]int // per rune of work: its span in orig (runes)

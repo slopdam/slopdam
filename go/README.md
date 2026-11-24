@@ -60,6 +60,19 @@ for _, f := range dev.Findings(`log.Info("🚀 Started — ok")`) {
 
 A `Sanitizer` is safe for concurrent use. `Findings` reports what `Clean` would change, with `Start` and `End` as byte offsets into the input. URLs, inline code, `key=value` values and file paths are never changed, and cleaning twice gives the same result as cleaning once.
 
+### log/slog
+
+```go
+console := slog.New(slopdam.NewHandler(slog.NewTextHandler(os.Stderr, nil), slopdam.Options{}))
+file := slog.New(slopdam.NewHandler(slog.NewJSONHandler(f, nil), slopdam.Options{Profile: "dev"}))
+
+console.Info("✅ **Saved** 3 rows — done!")   // msg="Saved 3 rows: done!"
+file.Info("✅ **Saved** 3 rows — done!")      // "msg":"[OK] Saved 3 rows - done!"
+file.Error("❌ Upload failed", "err", err)     // "msg":"Upload failed", err untouched
+```
+
+`NewHandler` wraps any `slog.Handler` and cleans the message of every record. Attributes are structured data and stay as they are, and a record that was only a separator line is dropped unless it carries an error. It passes the standard library's `slogtest` handler checks.
+
 ## How it stays in step with Python
 
 The rules are not rewritten by hand. `go generate` copies the repository's [spec/rules.json](https://github.com/slopdam/slopdam/blob/main/spec/README.md) into `spec_data.go`; its patterns are translated from Python's regular expression dialect when the package loads (Unicode `\w`, `\s` and `\b`, and Python's `^` and `$`), and only the four context-dependent actions are written in Go. Every pull request runs the conformance cases against Python, JavaScript and Go. On 20,000 random inputs, Go and Python gave identical results.
@@ -68,7 +81,7 @@ The one dependency is [regexp2](https://github.com/dlclark/regexp2) (MIT), becau
 
 ## Roadmap
 
-Part of slopdam milestone 0.6 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): this package first, then a `log/slog` handler and a `go vet` analyzer.
+Part of slopdam milestone 0.6 ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)): this package and the `log/slog` handler, then a `go vet` analyzer.
 
 ## Contributing
 
