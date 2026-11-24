@@ -12,6 +12,3 @@ require (
 	golang.org/x/mod v0.42.0 // indirect
 	golang.org/x/sync v0.24.0 // indirect
 )
-
-// Built against the module in the parent directory; released with the same version tag.
-replace github.com/slopdam/slopdam/go => ../

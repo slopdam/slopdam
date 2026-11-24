@@ -119,6 +119,8 @@ jobs:
       fail-fast: false
       matrix:
         go: ["1.22", "stable"]
+    env:
+      GOWORK: "off" # go/go.work needs Go 1.26 for the analyzer; the package itself supports 1.22
     defaults:
       run:
         working-directory: go

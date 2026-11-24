@@ -1,0 +1,9 @@
+go 1.26.0
+
+// Local development: the analyzer in vet/ builds against the package in this directory
+// instead of the released github.com/slopdam/slopdam/go. Not used by anyone importing the
+// modules; the core's own CI job turns it off (GOWORK=off) to test on Go 1.22.
+use (
+	.
+	./vet
+)
