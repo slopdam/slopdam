@@ -1,11 +1,12 @@
 # Hugging Face
 
-Two repositories on the Hub, both built from this folder:
+Three repositories on the Hub, all built from this folder:
 
 | Hub repo | Type | Source |
 |---|---|---|
 | [`slopdam/log-slop`](https://huggingface.co/datasets/slopdam/log-slop) | Dataset | `dataset/generate.py` writes it, `dataset/README.md` is its card |
 | [`slopdam/slopdam`](https://huggingface.co/spaces/slopdam/slopdam) | Space (static) | `space/` as is |
+| [`slopdam/README`](https://huggingface.co/spaces/slopdam/README) | Space (static) | `org-card/README.md`, shown as the card on [huggingface.co/slopdam](https://huggingface.co/slopdam) |
 
 There is no model. slopdam's rules are deterministic, so a trained model would only approximate them, and deciding whether text was written by AI is out of scope.
 
@@ -32,6 +33,12 @@ hf upload slopdam/log-slop hf/dataset/out . --type dataset --commit-message "log
 hf repos create slopdam/slopdam --type space --sdk static
 hf upload slopdam/slopdam hf/space . --type space --commit-message "slopdam 0.6.0"
 ```
+
+```bash
+hf upload slopdam/README hf/org-card/README.md README.md --type space --commit-message "Organization card"
+```
+
+The card Space must hold only `README.md`: a static Space with an `index.html` shows that page as the card instead.
 
 The Space is one HTML page that loads `@slopdam/core` from jsDelivr at the version written in `space/index.html`; bump it after each npm release. It is static because Gradio and Docker Spaces under an organization need a paid plan, while static Spaces are free.
 
