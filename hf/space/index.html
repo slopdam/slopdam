@@ -1,0 +1,165 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT -->
+<!-- slopdam on Hugging Face Spaces: paste a log message, see the reader and dev output and
+     every trace with its rule ID. Runs @slopdam/core from npm in the browser; nothing is sent anywhere. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>slopdam</title>
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1d1f23; --muted: #626872; --line: #dfe2e7; --panel: #f6f7f9;
+    --accent: #2f6fde; --mark: #fde7a8;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111317; --fg: #e6e8eb; --muted: #9aa1ab; --line: #2b2f36; --panel: #191c21;
+            --accent: #7aa7f5; --mark: #5a4a17; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; align-items: center; gap: 12px; }
+  header img { width: 44px; height: 44px; }
+  h1 { font-size: 22px; margin: 0; }
+  .version { color: var(--muted); font-size: 13px; font-weight: 400; }
+  p.lead { color: var(--muted); margin: 8px 0 20px; }
+  a { color: var(--accent); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  label.title { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+  textarea, output { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px;
+         background: var(--panel); color: var(--fg); padding: 10px 12px;
+         font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "D2Coding", monospace; }
+  textarea { min-height: 160px; resize: vertical; background: var(--bg); }
+  output { white-space: pre-wrap; word-break: break-word; min-height: 64px; margin-bottom: 14px; }
+  .hint { color: var(--muted); font-weight: 400; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 12px 0; font-size: 14px; }
+  .controls fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .controls legend { float: left; font-weight: 600; margin-right: 6px; font-size: 13px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; }
+  .examples button { border: 1px solid var(--line); background: var(--panel); color: var(--fg); border-radius: 6px;
+         padding: 4px 8px; font: inherit; font-size: 13px; cursor: pointer; max-width: 100%;
+         overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .examples button:hover { border-color: var(--accent); }
+  h2 { font-size: 15px; margin: 24px 0 8px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  td code { font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--mark);
+            border-radius: 3px; padding: 0 3px; white-space: pre; }
+  .empty { color: var(--muted); }
+  footer { margin-top: 32px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logo.png" alt="slopdam logo">
+    <h1>slopdam <span class="version" id="version"></span></h1>
+  </header>
+  <p class="lead">Removes the traces AI coding tools leave in log messages: em dashes and the Korean <code>ㅡ</code>,
+    emoji, markdown, curly quotes, separators. Deterministic rules, no model. It runs in your browser; the text is not sent anywhere.
+    <a href="https://github.com/slopdam/slopdam">GitHub</a> ·
+    <a href="https://huggingface.co/datasets/slopdam/log-slop">Dataset</a></p>
+
+  <div class="grid">
+    <div>
+      <label class="title" for="input">Log message</label>
+      <textarea id="input" spellcheck="false"></textarea>
+      <div class="controls">
+        <fieldset id="level"><legend>Level</legend></fieldset>
+        <fieldset id="dash"><legend>Inline dash (reader)</legend></fieldset>
+      </div>
+      <div class="examples" id="examples" aria-label="Examples"></div>
+    </div>
+    <div>
+      <label class="title" for="reader">reader <span class="hint">for people</span></label>
+      <output id="reader" for="input"></output>
+      <label class="title" for="dev">dev <span class="hint">for log files and tools</span></label>
+      <output id="dev" for="input"></output>
+    </div>
+  </div>
+
+  <h2>Findings <span class="hint">(reader)</span></h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Rule</th><th>Text</th><th>Fix</th><th>Span</th></tr></thead>
+      <tbody id="findings"></tbody>
+    </table>
+  </div>
+
+  <footer>MIT. Also on <a href="https://pypi.org/project/slopdam/">PyPI</a>,
+    <a href="https://www.npmjs.com/package/@slopdam/core">npm</a>, Go and Java, all with the same output.</footer>
+</main>
+
+<script type="module">
+  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.2.1/dist/esm/index.js";
+
+  const EXAMPLES = [
+    "✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉",
+    "✅ **Saved** 3 rows — done! 🎉",
+    "🚀 Server started — listening on https://localhost:8080 (see `--port`)",
+    "⚠️ 재시도 중… “db-01” 응답이 느립니다\n──────────\n• 다음 단계: 캐시 확인",
+    "Let's go! Here's the summary: user_id=42 region=ap-northeast-2",
+  ];
+  const DASHES = ["colon", "comma", "hyphen", "space"];
+  const $ = (id) => document.getElementById(id);
+
+  function radios(box, name, values, checked) {
+    for (const v of values) {
+      const label = document.createElement("label");
+      const input = Object.assign(document.createElement("input"), { type: "radio", name, value: v, checked: v === checked });
+      label.append(input, " " + v);
+      box.append(label);
+    }
+  }
+  radios($("level"), "level", LEVELS, "basic");
+  radios($("dash"), "dash", DASHES, "colon");
+  for (const text of EXAMPLES) {
+    const b = Object.assign(document.createElement("button"), { type: "button", textContent: text.split("\n")[0], title: text });
+    b.addEventListener("click", () => { $("input").value = text; run(); });
+    $("examples").append(b);
+  }
+  $("version").textContent = "spec v1 · @slopdam/core 0.2.1";
+  $("input").value = EXAMPLES[0];
+
+  const picked = (name) => document.querySelector(`input[name=${name}]:checked`).value;
+  const show = (s) => JSON.stringify(s).slice(1, -1);
+
+  function run() {
+    const text = $("input").value;
+    const opts = { level: picked("level"), dashInline: picked("dash") };
+    const reader = new Sanitizer({ ...opts, profile: "reader" });
+    const dev = new Sanitizer({ ...opts, profile: "dev" });
+    $("reader").textContent = reader.clean(text);
+    $("dev").textContent = dev.clean(text);
+    const rows = reader.findings(text).map((f) => {
+      const tr = document.createElement("tr");
+      const cell = (content, code) => {
+        const td = document.createElement("td");
+        if (code) td.append(Object.assign(document.createElement("code"), { textContent: content }));
+        else td.textContent = content;
+        tr.append(td);
+      };
+      cell(f.ruleId);
+      cell(show(f.text), true);
+      f.fix === null ? cell("(report only)") : cell(show(f.fix), true);
+      cell(`${f.start}:${f.end}`);
+      return tr;
+    });
+    if (!rows.length) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td colspan="4" class="empty">Nothing to clean.</td>';
+      rows.push(tr);
+    }
+    $("findings").replaceChildren(...rows);
+  }
+  document.addEventListener("input", run);
+  run();
+</script>
+</body>
+</html>
