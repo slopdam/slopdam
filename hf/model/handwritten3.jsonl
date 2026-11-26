@@ -1,0 +1,44 @@
+{"id": "hand3-00", "input": "Lo and behold, the index rebuilt in 3s", "reader": "Lo and behold, the index rebuilt in 3s", "target": "The index rebuilt in 3s", "chatter": true}
+{"id": "hand3-01", "input": "Fun fact: 40% of requests hit the cache", "reader": "Fun fact: 40% of requests hit the cache", "target": "40% of requests hit the cache", "chatter": true}
+{"id": "hand3-02", "input": "Bravo! Every shard is healthy", "reader": "Bravo! Every shard is healthy", "target": "Every shard is healthy", "chatter": true}
+{"id": "hand3-03", "input": "Good morning! Nightly export finished", "reader": "Good morning! Nightly export finished", "target": "Nightly export finished", "chatter": true}
+{"id": "hand3-04", "input": "Peace of mind: backups verified", "reader": "Peace of mind: backups verified", "target": "Backups verified", "chatter": true}
+{"id": "hand3-05", "input": "Hats off! Latency dropped to 80ms", "reader": "Hats off! Latency dropped to 80ms", "target": "Latency dropped to 80ms", "chatter": true}
+{"id": "hand3-06", "input": "Interesting, the worker never picked up job 17", "reader": "Interesting, the worker never picked up job 17", "target": "The worker never picked up job 17", "chatter": true}
+{"id": "hand3-07", "input": "Kudos, the migration ran without locks", "reader": "Kudos, the migration ran without locks", "target": "The migration ran without locks", "chatter": true}
+{"id": "hand3-08", "input": "Plot twist: the bug was in the retry loop", "reader": "Plot twist: the bug was in the retry loop", "target": "The bug was in the retry loop", "chatter": true}
+{"id": "hand3-09", "input": "High five! Coverage is at 91%", "reader": "High five! Coverage is at 91%", "target": "Coverage is at 91%", "chatter": true}
+{"id": "hand3-10", "input": "Thankfully, no rows were lost", "reader": "Thankfully, no rows were lost", "target": "No rows were lost", "chatter": true}
+{"id": "hand3-11", "input": "Sadly, the upload to the CDN failed", "reader": "Sadly, the upload to the CDN failed", "target": "The upload to the CDN failed", "chatter": true}
+{"id": "hand3-12", "input": "축하드려요! 배포가 무사히 끝났습니다", "reader": "축하드려요. 배포가 무사히 끝났습니다", "target": "배포가 무사히 끝났습니다", "chatter": true}
+{"id": "hand3-13", "input": "기분 좋은 소식! 응답 시간이 절반이 됐어요", "reader": "기분 좋은 소식. 응답 시간이 절반이 됐어요", "target": "응답 시간이 절반이 됐어요", "chatter": true}
+{"id": "hand3-14", "input": "아쉽게도 업로드에 실패했습니다", "reader": "아쉽게도 업로드에 실패했습니다", "target": "업로드에 실패했습니다", "chatter": true}
+{"id": "hand3-15", "input": "놀랍게도 캐시 적중률이 99%입니다", "reader": "놀랍게도 캐시 적중률이 99%입니다", "target": "캐시 적중률이 99%입니다", "chatter": true}
+{"id": "hand3-16", "input": "이제 안심하셔도 됩니다. 백업 검증 완료", "reader": "이제 안심하셔도 됩니다. 백업 검증 완료", "target": "백업 검증 완료", "chatter": true}
+{"id": "hand3-17", "input": "수고하셨습니다! 테스트 전부 통과", "reader": "수고하셨습니다. 테스트 전부 통과", "target": "테스트 전부 통과", "chatter": true}
+{"id": "hand3-18", "input": "감사하게도 데이터 손실은 없습니다", "reader": "감사하게도 데이터 손실은 없습니다", "target": "데이터 손실은 없습니다", "chatter": true}
+{"id": "hand3-19", "input": "드릴 말씀은, 결제 모듈이 멈췄다는 겁니다", "reader": "드릴 말씀은, 결제 모듈이 멈췄다는 겁니다", "target": "결제 모듈이 멈췄다는 겁니다", "chatter": true}
+{"id": "hand3-20", "input": "에헴, 인덱스 재구성이 끝났습니다", "reader": "에헴, 인덱스 재구성이 끝났습니다", "target": "인덱스 재구성이 끝났습니다", "chatter": true}
+{"id": "hand3-21", "input": "기대하셔도 좋아요! 새 버전 배포 완료", "reader": "기대하셔도 좋아요. 새 버전 배포 완료", "target": "새 버전 배포 완료", "chatter": true}
+{"id": "hand3-22", "input": "흥미롭게도 오류가 새벽에만 납니다", "reader": "흥미롭게도 오류가 새벽에만 납니다", "target": "오류가 새벽에만 납니다", "chatter": true}
+{"id": "hand3-23", "input": "반갑게도 지연이 사라졌습니다", "reader": "반갑게도 지연이 사라졌습니다", "target": "지연이 사라졌습니다", "chatter": true}
+{"id": "hand3-24", "input": "Bravo-ui build failed at step 3", "reader": "Bravo-ui build failed at step 3", "target": "Bravo-ui build failed at step 3", "chatter": false}
+{"id": "hand3-25", "input": "Good morning email job skipped", "reader": "Good morning email job skipped", "target": "Good morning email job skipped", "chatter": false}
+{"id": "hand3-26", "input": "Peace keeper service restarted", "reader": "Peace keeper service restarted", "target": "Peace keeper service restarted", "chatter": false}
+{"id": "hand3-27", "input": "Hats inventory synced from warehouse", "reader": "Hats inventory synced from warehouse", "target": "Hats inventory synced from warehouse", "chatter": false}
+{"id": "hand3-28", "input": "Interesting events filter returned 0 rows", "reader": "Interesting events filter returned 0 rows", "target": "Interesting events filter returned 0 rows", "chatter": false}
+{"id": "hand3-29", "input": "Kudos points recalculated for 210 users", "reader": "Kudos points recalculated for 210 users", "target": "Kudos points recalculated for 210 users", "chatter": false}
+{"id": "hand3-30", "input": "Plot rendering took 1.2s", "reader": "Plot rendering took 1.2s", "target": "Plot rendering took 1.2s", "chatter": false}
+{"id": "hand3-31", "input": "High CPU on worker-7", "reader": "High CPU on worker-7", "target": "High CPU on worker-7", "chatter": false}
+{"id": "hand3-32", "input": "Thankful-api deprecated endpoint called", "reader": "Thankful-api deprecated endpoint called", "target": "Thankful-api deprecated endpoint called", "chatter": false}
+{"id": "hand3-33", "input": "Sadly-named branch removed by policy", "reader": "Sadly-named branch removed by policy", "target": "Sadly-named branch removed by policy", "chatter": false}
+{"id": "hand3-34", "input": "축하 메시지 템플릿 3개 저장", "reader": "축하 메시지 템플릿 3개 저장", "target": "축하 메시지 템플릿 3개 저장", "chatter": false}
+{"id": "hand3-35", "input": "기분 분석 모델 로드 실패", "reader": "기분 분석 모델 로드 실패", "target": "기분 분석 모델 로드 실패", "chatter": false}
+{"id": "hand3-36", "input": "아쉬움 지표 계산 생략", "reader": "아쉬움 지표 계산 생략", "target": "아쉬움 지표 계산 생략", "chatter": false}
+{"id": "hand3-37", "input": "놀이공원 예약 12건 취소", "reader": "놀이공원 예약 12건 취소", "target": "놀이공원 예약 12건 취소", "chatter": false}
+{"id": "hand3-38", "input": "이제부터 로그 보존 기간은 30일", "reader": "이제부터 로그 보존 기간은 30일", "target": "이제부터 로그 보존 기간은 30일", "chatter": false}
+{"id": "hand3-39", "input": "수고비 정산 7건 완료", "reader": "수고비 정산 7건 완료", "target": "수고비 정산 7건 완료", "chatter": false}
+{"id": "hand3-40", "input": "감사 로그 4건 기록", "reader": "감사 로그 4건 기록", "target": "감사 로그 4건 기록", "chatter": false}
+{"id": "hand3-41", "input": "드릴 장비 점검 일정 등록", "reader": "드릴 장비 점검 일정 등록", "target": "드릴 장비 점검 일정 등록", "chatter": false}
+{"id": "hand3-42", "input": "흥미 태그 추천 결과 비어 있음", "reader": "흥미 태그 추천 결과 비어 있음", "target": "흥미 태그 추천 결과 비어 있음", "chatter": false}
+{"id": "hand3-43", "input": "반갑다 챗봇 응답 지연 2초", "reader": "반갑다 챗봇 응답 지연 2초", "target": "반갑다 챗봇 응답 지연 2초", "chatter": false}
