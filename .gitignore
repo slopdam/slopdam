@@ -26,3 +26,4 @@ target/
 # Hugging Face dataset build output (hf/dataset/generate.py)
 hf/dataset/out/
 hf/dataset/out-check/
+hf/model/out/

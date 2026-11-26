@@ -89,6 +89,7 @@ KO = [
     "{url}에서 페이지 {n}개를 가져왔습니다", "{kv} 설정으로 {name}을 시작합니다",
 ]
 TEMPLATES = {"en": EN, "ko": KO}
+SPLITS = ("train", "validation", "test")
 HELD_OUT = 5  # template i goes to the test split when i % HELD_OUT == HELD_OUT - 1
 TAILS = {
     "en": ["done", "all good", "no errors", "see details", "next step queued", "retry scheduled", "check the dashboard"],
@@ -111,16 +112,23 @@ STATUS = {"ok": ["✅", "✔️", "🟢"], "fail": ["❌", "🔴", "⛔"], "warn
 PICTO = ["🚀", "🎉", "✨", "🔥", "📦", "💾", "🔧", "📊", "🧹", "👀", "💡", "🛠️", "🙌", "📈", "🧪", "⏱️"]
 DASHES = ["—", "–", "―", "ㅡ", "─"]
 SEPARATORS = ["==========", "----------", "──────────", "ㅡㅡㅡㅡㅡㅡ", "**********", "━━━━━━━━━━", "ーーーーーー", "一一一一一一"]
-# Chatty openers. The first ones match slopdam's tone.chatty rule (which only reports them); the
-# rest are not covered by any rule. Either way `target` drops them and `reader` keeps them.
+# Chatty openers. A few match slopdam's tone.chatty rule (which only reports them); the rest are
+# not covered by any rule. Either way `target` drops them and `reader` keeps them. The *_TEST lists
+# are only used in the test split, so a model scored there has to handle openers it never saw.
 CHATTY = {
-    "en": ["Let's go!", "Here's the summary:", "Awesome!", "Voila!", "Great news!", "Good news:", "Alright,",
-           "All set!", "Heads up:", "Just so you know,", "Quick update:", "Nice!", "Boom!", "Done and dusted:"],
-    "ko": ["살펴보겠습니다.", "해볼게요.", "해보겠습니다.", "좋은 소식입니다!", "자,", "알려드립니다:", "참고로",
-           "짜잔!", "확인해 보니", "정리하면"],
+    "en": ["Let's go!", "Here's the summary:", "Awesome!", "Great news!", "Alright,", "All set!", "Heads up:",
+           "Just so you know,", "Quick update:", "Nice!", "Boom!", "Done and dusted:", "Perfect!", "Hooray!",
+           "Good to go:", "Sweet!"],
+    "ko": ["살펴보겠습니다.", "해볼게요.", "좋은 소식입니다!", "자,", "알려드립니다:", "참고로", "짜잔!", "확인해 보니",
+           "정리하면", "좋습니다!", "네,", "결론적으로"],
 }
-# Filler adverbs. Korean ones match tone.filler (removed at the strong level); "Successfully" has no rule.
-FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "드디어 "], "en": ["Successfully "]}
+CHATTY_TEST = {
+    "en": ["Voila!", "Good news:", "Fantastic!", "FYI:", "Here we go:", "Excellent!", "Okay,"],
+    "ko": ["해보겠습니다.", "완벽합니다!", "말씀드리면", "다행히", "알려 드릴게요:"],
+}
+# Filler adverbs. Korean ones in the rule list are removed at the strong level; the others have no rule.
+FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "깔끔하게 "], "en": ["Successfully ", "Seamlessly "]}
+FILLER_TEST = {"ko": ["드디어 ", "순조롭게 "], "en": ["Finally "]}
 BLOCK_TITLES = {"en": ["## Summary", "### Results", "**Status**", "## Done"], "ko": ["## 요약", "### 결과", "**상태**", "## 완료"]}
 
 KINDS = ["status_emoji", "pictograph", "bold", "inline_dash", "range_dash", "separator", "heading", "bullet",
@@ -153,15 +161,16 @@ def hard_negative(rng: random.Random, base: str) -> str:
     ])()
 
 
-def line(rng: random.Random, lang: str, templates: list, roll: float, inline: bool = False) -> dict:
+def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = False) -> dict:
     """One message: a clean base, then traces injected according to a random plan.
 
     Two texts are built side by side: `text` gets every trace, `kept` gets all but the
     rewrite-only ones (filler, chatty), so slopdam's reader output of `kept` is the target."""
+    templates = pool["templates"]
     tid = rng.randrange(len(templates))
     template = templates[tid][1]
-    pool = [k for k in KINDS if not (inline and k in LINE_SHAPE)]
-    kinds = rng.sample(pool, k=rng.choice([1, 1, 2, 2, 3, 4])) if roll >= 0.25 else []
+    allowed = [k for k in KINDS if not (inline and k in LINE_SHAPE)]
+    kinds = rng.sample(allowed, k=rng.choice([1, 1, 2, 2, 3, 4])) if roll >= 0.25 else []
     if "heading" in kinds and "bullet" in kinds:
         kinds.remove("bullet")  # "• # text" is not something anyone writes
     # A range like 2024-2025 gets an en or em dash only when that trace is injected.
@@ -214,7 +223,7 @@ def line(rng: random.Random, lang: str, templates: list, roll: float, inline: bo
     if "exclaim" in kinds:
         both(lambda s: s + ("!" if lang == "en" else "!!"))
     if "filler" in kinds:
-        f = rng.choice(FILLER[lang])
+        f = rng.choice(pool["filler"])
         if lang == "ko":
             t[0] = f + t[0]
         elif t[0][:1].isupper() and t[0][1:2].islower():
@@ -224,7 +233,7 @@ def line(rng: random.Random, lang: str, templates: list, roll: float, inline: bo
             if not kinds:
                 kinds.append("pictograph")
     if "chatty" in kinds:
-        t[0] = rng.choice(CHATTY[lang]) + " " + t[0]
+        t[0] = rng.choice(pool["chatty"]) + " " + t[0]
     if "pictograph" in kinds:
         p, front = rng.choice(PICTO), rng.random() < 0.5
         both(lambda s: f"{p} {s}" if front else f"{s} {p}")
@@ -245,12 +254,12 @@ def line(rng: random.Random, lang: str, templates: list, roll: float, inline: bo
     return {"lang": lang, "template_id": tid, "input": t[0], "kept": t[1], "injected": sorted(kinds)}
 
 
-def make(rng: random.Random, lang: str, templates: list) -> dict:
+def make(rng: random.Random, lang: str, pool: dict) -> dict:
     """A single line, or (8% of the time) a multi-line summary block the way assistants write them:
     an optional title, then two to four items, each with inline traces only."""
     if rng.random() >= 0.08:
-        return line(rng, lang, templates, rng.random())
-    parts = [line(rng, lang, templates, 0.25 + 0.75 * rng.random(), inline=True) for _ in range(rng.randint(2, 4))]
+        return line(rng, lang, pool, rng.random())
+    parts = [line(rng, lang, pool, 0.25 + 0.75 * rng.random(), inline=True) for _ in range(rng.randint(2, 4))]
     title = [rng.choice(BLOCK_TITLES[lang])] if rng.random() < 0.6 else []
     bullet = rng.choice(["- ", "• ", "* ", ""])
     join = lambda key: "\n".join(title + [bullet + p[key] for p in parts])  # noqa: E731
@@ -281,9 +290,11 @@ def label(row: dict) -> dict:
 
 def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
     rng = random.Random(seed)
-    pools = {split: {lang: [(i, t) for i, t in enumerate(TEMPLATES[lang])
-                            if (i % HELD_OUT == HELD_OUT - 1) == (split == "test")] for lang in TEMPLATES}
-             for split in ("train", "validation", "test")}
+    pools = {split: {lang: {
+        "templates": [(i, t) for i, t in enumerate(TEMPLATES[lang]) if (i % HELD_OUT == HELD_OUT - 1) == (split == "test")],
+        "chatty": (CHATTY_TEST if split == "test" else CHATTY)[lang],
+        "filler": (FILLER_TEST if split == "test" else FILLER)[lang],
+    } for lang in TEMPLATES} for split in SPLITS}
     seen, splits = set(), {"train": [], "validation": [], "test": []}
     for split, count in (("test", test_rows), ("validation", validation_rows), ("train", rows)):
         while len(splits[split]) < count:
@@ -305,7 +316,6 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
 
 FIELDS = ["id", "lang", "template_id", "input", "reader", "dev", "reader_strong", "target", "changed", "injected",
           "rule_ids", "findings"]
-SPLITS = ("train", "validation", "test")
 
 
 def write(data: dict, out: Path) -> dict:

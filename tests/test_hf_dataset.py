@@ -38,3 +38,13 @@ def test_test_split_uses_held_out_templates():
     data = gen.build(600, 60, 60, 13)
     seen = {r["template_id"] for split in ("train", "validation") for r in data[split]}
     assert seen.isdisjoint({r["template_id"] for r in data["test"]})
+
+
+def test_test_split_uses_held_out_openers():
+    data = gen.build(600, 60, 300, 17)
+    held = tuple(p for lang in ("en", "ko") for p in gen.CHATTY_TEST[lang] + gen.FILLER_TEST[lang])
+    trained = tuple(p for lang in ("en", "ko") for p in gen.CHATTY[lang] + gen.FILLER[lang])
+    assert not set(held) & set(trained)
+    rewrites = [r for r in data["test"] if r["target"] != r["reader"]]
+    assert rewrites and all(not r["input"].startswith(trained) for r in rewrites if "block" not in r["injected"]
+                            and not set(r["injected"]) - {"chatty", "filler"})
