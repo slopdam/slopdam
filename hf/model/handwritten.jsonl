@@ -1,0 +1,34 @@
+{"id": "hand-00", "input": "Great, the migration finished in 42s", "reader": "Great, the migration finished in 42s", "target": "The migration finished in 42s", "chatter": true}
+{"id": "hand-01", "input": "Wonderful! All 312 tests passed", "reader": "Wonderful! All 312 tests passed", "target": "All 312 tests passed", "chatter": true}
+{"id": "hand-02", "input": "Good news, everyone: deploy to staging is live", "reader": "Good news, everyone: deploy to staging is live", "target": "Deploy to staging is live", "chatter": true}
+{"id": "hand-03", "input": "Okay! Cache cleared for orders", "reader": "Okay! Cache cleared for orders", "target": "Cache cleared for orders", "chatter": true}
+{"id": "hand-04", "input": "So, the worker restarted after OOM", "reader": "So, the worker restarted after OOM", "target": "The worker restarted after OOM", "chatter": true}
+{"id": "hand-05", "input": "Yay! Backup uploaded to s3://backups/db.dump", "reader": "Yay! Backup uploaded to s3://backups/db.dump", "target": "Backup uploaded to s3://backups/db.dump", "chatter": true}
+{"id": "hand-06", "input": "Phew, retry 3 of 5 succeeded", "reader": "Phew, retry 3 of 5 succeeded", "target": "Retry 3 of 5 succeeded", "chatter": true}
+{"id": "hand-07", "input": "Cool, synced 1,204 rows from billing", "reader": "Cool, synced 1,204 rows from billing", "target": "Synced 1,204 rows from billing", "chatter": true}
+{"id": "hand-08", "input": "Just a heads-up: certificate expires in 9 days", "reader": "Just a heads-up: certificate expires in 9 days", "target": "Certificate expires in 9 days", "chatter": true}
+{"id": "hand-09", "input": "Smoothly rotated keys for auth", "reader": "Smoothly rotated keys for auth", "target": "Rotated keys for auth", "chatter": true}
+{"id": "hand-10", "input": "Successfully exported report to ./out/report.csv", "reader": "Successfully exported report to ./out/report.csv", "target": "Exported report to ./out/report.csv", "chatter": true}
+{"id": "hand-11", "input": "Here is what happened: request to https://api.example.com timed out", "reader": "Here is what happened: request to https://api.example.com timed out", "target": "Request to https://api.example.com timed out", "chatter": true}
+{"id": "hand-12", "input": "좋아요! 캐시를 비웠습니다", "reader": "좋아요. 캐시를 비웠습니다", "target": "캐시를 비웠습니다", "chatter": true}
+{"id": "hand-13", "input": "다행스럽게도 결제 3건이 승인되었습니다", "reader": "다행스럽게도 결제 3건이 승인되었습니다", "target": "결제 3건이 승인되었습니다", "chatter": true}
+{"id": "hand-14", "input": "음, 연결이 끊겨서 다시 시도합니다", "reader": "음, 연결이 끊겨서 다시 시도합니다", "target": "연결이 끊겨서 다시 시도합니다", "chatter": true}
+{"id": "hand-15", "input": "알겠습니다. 설정 파일을 다시 읽었습니다", "reader": "알겠습니다. 설정 파일을 다시 읽었습니다", "target": "설정 파일을 다시 읽었습니다", "chatter": true}
+{"id": "hand-16", "input": "보시다시피 디스크 사용량이 91%입니다", "reader": "보시다시피 디스크 사용량이 91%입니다", "target": "디스크 사용량이 91%입니다", "chatter": true}
+{"id": "hand-17", "input": "기쁜 소식입니다! 배포가 끝났습니다", "reader": "기쁜 소식입니다. 배포가 끝났습니다", "target": "배포가 끝났습니다", "chatter": true}
+{"id": "hand-18", "input": "문제없이 테이블 12개를 옮겼습니다", "reader": "문제없이 테이블 12개를 옮겼습니다", "target": "테이블 12개를 옮겼습니다", "chatter": true}
+{"id": "hand-19", "input": "요약하자면, 테스트 120개 중 3개 실패", "reader": "요약하자면, 테스트 120개 중 3개 실패", "target": "테스트 120개 중 3개 실패", "chatter": true}
+{"id": "hand-20", "input": "✅ Awesome sauce! Build v2.3.1 passed", "reader": "Awesome sauce! Build v2.3.1 passed", "target": "Build v2.3.1 passed", "chatter": true}
+{"id": "hand-21", "input": "## 결과\n- 좋아요, 동기화 완료\n- 오류 없음", "reader": "결과\n- 좋아요, 동기화 완료\n- 오류 없음", "target": "결과\n- 동기화 완료\n- 오류 없음", "chatter": true}
+{"id": "hand-22", "input": "Finally block executed in OrderService.close", "reader": "Finally block executed in OrderService.close", "target": "Finally block executed in OrderService.close", "chatter": false}
+{"id": "hand-23", "input": "Nice level set to 10 for worker-3", "reader": "Nice level set to 10 for worker-3", "target": "Nice level set to 10 for worker-3", "chatter": false}
+{"id": "hand-24", "input": "Great Lakes region added to the map", "reader": "Great Lakes region added to the map", "target": "Great Lakes region added to the map", "chatter": false}
+{"id": "hand-25", "input": "Okay status received from upstream", "reader": "Okay status received from upstream", "target": "Okay status received from upstream", "chatter": false}
+{"id": "hand-26", "input": "Perfect hash table built with 4096 keys", "reader": "Perfect hash table built with 4096 keys", "target": "Perfect hash table built with 4096 keys", "chatter": false}
+{"id": "hand-27", "input": "FYI header missing in request 42", "reader": "FYI header missing in request 42", "target": "FYI header missing in request 42", "chatter": false}
+{"id": "hand-28", "input": "Alright, alright, alright is not a valid locale", "reader": "Alright, alright, alright is not a valid locale", "target": "Alright, alright, alright is not a valid locale", "chatter": false}
+{"id": "hand-29", "input": "자동 재시도 3회 실패", "reader": "자동 재시도 3회 실패", "target": "자동 재시도 3회 실패", "chatter": false}
+{"id": "hand-30", "input": "네트워크 정책을 적용했습니다", "reader": "네트워크 정책을 적용했습니다", "target": "네트워크 정책을 적용했습니다", "chatter": false}
+{"id": "hand-31", "input": "정리 작업이 끝났습니다: 임시 파일 12개", "reader": "정리 작업이 끝났습니다: 임시 파일 12개", "target": "정리 작업이 끝났습니다: 임시 파일 12개", "chatter": false}
+{"id": "hand-32", "input": "결론 필드가 비어 있습니다", "reader": "결론 필드가 비어 있습니다", "target": "결론 필드가 비어 있습니다", "chatter": false}
+{"id": "hand-33", "input": "Voilà.txt uploaded to /tmp", "reader": "Voilà.txt uploaded to /tmp", "target": "Voilà.txt uploaded to /tmp", "chatter": false}
