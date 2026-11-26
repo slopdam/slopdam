@@ -1,0 +1,44 @@
+{"id": "hand2-00", "input": "Sure thing! Restarted the ingest worker", "reader": "Sure thing! Restarted the ingest worker", "target": "Restarted the ingest worker", "chatter": true}
+{"id": "hand2-01", "input": "Bingo, the leak was in the cache layer", "reader": "Bingo, the leak was in the cache layer", "target": "The leak was in the cache layer", "chatter": true}
+{"id": "hand2-02", "input": "Hey there! Queue depth is back to 0", "reader": "Hey there! Queue depth is back to 0", "target": "Queue depth is back to 0", "chatter": true}
+{"id": "hand2-03", "input": "Woohoo! Release 4.2.0 is out", "reader": "Woohoo! Release 4.2.0 is out", "target": "Release 4.2.0 is out", "chatter": true}
+{"id": "hand2-04", "input": "Right, so the cron ran twice at 02:00", "reader": "Right, so the cron ran twice at 02:00", "target": "The cron ran twice at 02:00", "chatter": true}
+{"id": "hand2-05", "input": "Spoiler: the timeout was 5s, not 50s", "reader": "Spoiler: the timeout was 5s, not 50s", "target": "The timeout was 5s, not 50s", "chatter": true}
+{"id": "hand2-06", "input": "Long story short, replica lag is 12s", "reader": "Long story short, replica lag is 12s", "target": "Replica lag is 12s", "chatter": true}
+{"id": "hand2-07", "input": "Mission accomplished! 18 shards rebalanced", "reader": "Mission accomplished! 18 shards rebalanced", "target": "18 shards rebalanced", "chatter": true}
+{"id": "hand2-08", "input": "Ta-da: generated report.pdf", "reader": "Ta-da: generated report.pdf", "target": "Generated report.pdf", "chatter": true}
+{"id": "hand2-09", "input": "Oh nice, the flaky test passed 10 times", "reader": "Oh nice, the flaky test passed 10 times", "target": "The flaky test passed 10 times", "chatter": true}
+{"id": "hand2-10", "input": "Bottom line: 3 of 40 checks failed", "reader": "Bottom line: 3 of 40 checks failed", "target": "3 of 40 checks failed", "chatter": true}
+{"id": "hand2-11", "input": "Drumroll please... the build is green", "reader": "Drumroll please... the build is green", "target": "The build is green", "chatter": true}
+{"id": "hand2-12", "input": "오케이! 큐를 비웠습니다", "reader": "오케이. 큐를 비웠습니다", "target": "큐를 비웠습니다", "chatter": true}
+{"id": "hand2-13", "input": "짠, 배포 끝났어요", "reader": "짠, 배포 끝났어요", "target": "배포 끝났어요", "chatter": true}
+{"id": "hand2-14", "input": "반가운 소식이에요! 결제 오류가 사라졌습니다", "reader": "반가운 소식이에요. 결제 오류가 사라졌습니다", "target": "결제 오류가 사라졌습니다", "chatter": true}
+{"id": "hand2-15", "input": "일단 정리해 드리면, 실패 2건입니다", "reader": "일단 정리해 드리면, 실패 2건입니다", "target": "실패 2건입니다", "chatter": true}
+{"id": "hand2-16", "input": "좋아, 인덱스를 새로 만들었습니다", "reader": "좋아, 인덱스를 새로 만들었습니다", "target": "인덱스를 새로 만들었습니다", "chatter": true}
+{"id": "hand2-17", "input": "한마디로 말하면 디스크가 꽉 찼습니다", "reader": "한마디로 말하면 디스크가 꽉 찼습니다", "target": "디스크가 꽉 찼습니다", "chatter": true}
+{"id": "hand2-18", "input": "우선 결과부터 말씀드리면 테스트 전부 통과입니다", "reader": "우선 결과부터 말씀드리면 테스트 전부 통과입니다", "target": "테스트 전부 통과입니다", "chatter": true}
+{"id": "hand2-19", "input": "오, 캐시 적중률이 97%입니다", "reader": "오, 캐시 적중률이 97%입니다", "target": "캐시 적중률이 97%입니다", "chatter": true}
+{"id": "hand2-20", "input": "됐습니다! 마이그레이션 완료", "reader": "됐습니다. 마이그레이션 완료", "target": "마이그레이션 완료", "chatter": true}
+{"id": "hand2-21", "input": "보고드립니다: 백업 3개 생성", "reader": "보고드립니다: 백업 3개 생성", "target": "백업 3개 생성", "chatter": true}
+{"id": "hand2-22", "input": "휴, 재시도 끝에 연결됐습니다", "reader": "휴, 재시도 끝에 연결됐습니다", "target": "재시도 끝에 연결됐습니다", "chatter": true}
+{"id": "hand2-23", "input": "아하, 원인은 만료된 토큰이었습니다", "reader": "아하, 원인은 만료된 토큰이었습니다", "target": "원인은 만료된 토큰이었습니다", "chatter": true}
+{"id": "hand2-24", "input": "Sure-fire retry policy loaded for billing", "reader": "Sure-fire retry policy loaded for billing", "target": "Sure-fire retry policy loaded for billing", "chatter": false}
+{"id": "hand2-25", "input": "Bingo card service returned 503", "reader": "Bingo card service returned 503", "target": "Bingo card service returned 503", "chatter": false}
+{"id": "hand2-26", "input": "Right pane failed to render", "reader": "Right pane failed to render", "target": "Right pane failed to render", "chatter": false}
+{"id": "hand2-27", "input": "Spoiler tag parser updated", "reader": "Spoiler tag parser updated", "target": "Spoiler tag parser updated", "chatter": false}
+{"id": "hand2-28", "input": "Bottom line chart rendered in 40ms", "reader": "Bottom line chart rendered in 40ms", "target": "Bottom line chart rendered in 40ms", "chatter": false}
+{"id": "hand2-29", "input": "Mission 7781 not found in planner", "reader": "Mission 7781 not found in planner", "target": "Mission 7781 not found in planner", "chatter": false}
+{"id": "hand2-30", "input": "Hey-ho.wav uploaded to /media", "reader": "Hey-ho.wav uploaded to /media", "target": "Hey-ho.wav uploaded to /media", "chatter": false}
+{"id": "hand2-31", "input": "Drumroll.mp3 is missing from the bundle", "reader": "Drumroll.mp3 is missing from the bundle", "target": "Drumroll.mp3 is missing from the bundle", "chatter": false}
+{"id": "hand2-32", "input": "Woohoo-api returned 200 in 31ms", "reader": "Woohoo-api returned 200 in 31ms", "target": "Woohoo-api returned 200 in 31ms", "chatter": false}
+{"id": "hand2-33", "input": "Long story fields truncated at 4096 chars", "reader": "Long story fields truncated at 4096 chars", "target": "Long story fields truncated at 4096 chars", "chatter": false}
+{"id": "hand2-34", "input": "오케이 버튼 클릭 이벤트 12건 수집", "reader": "오케이 버튼 클릭 이벤트 12건 수집", "target": "오케이 버튼 클릭 이벤트 12건 수집", "chatter": false}
+{"id": "hand2-35", "input": "짠물 센서 값이 범위를 벗어났습니다", "reader": "짠물 센서 값이 범위를 벗어났습니다", "target": "짠물 센서 값이 범위를 벗어났습니다", "chatter": false}
+{"id": "hand2-36", "input": "반가운 손님 쿠폰 3장 발급", "reader": "반가운 손님 쿠폰 3장 발급", "target": "반가운 손님 쿠폰 3장 발급", "chatter": false}
+{"id": "hand2-37", "input": "일단위 집계 작업 시작", "reader": "일단위 집계 작업 시작", "target": "일단위 집계 작업 시작", "chatter": false}
+{"id": "hand2-38", "input": "좋아요 집계 1,203건 반영", "reader": "좋아요 집계 1,203건 반영", "target": "좋아요 집계 1,203건 반영", "chatter": false}
+{"id": "hand2-39", "input": "한마디 댓글 필터 적용", "reader": "한마디 댓글 필터 적용", "target": "한마디 댓글 필터 적용", "chatter": false}
+{"id": "hand2-40", "input": "우선순위 큐 길이 42", "reader": "우선순위 큐 길이 42", "target": "우선순위 큐 길이 42", "chatter": false}
+{"id": "hand2-41", "input": "보고서 7건 생성", "reader": "보고서 7건 생성", "target": "보고서 7건 생성", "chatter": false}
+{"id": "hand2-42", "input": "휴면 계정 12개 정리", "reader": "휴면 계정 12개 정리", "target": "휴면 계정 12개 정리", "chatter": false}
+{"id": "hand2-43", "input": "아하 앱 빌드 실패", "reader": "아하 앱 빌드 실패", "target": "아하 앱 빌드 실패", "chatter": false}
