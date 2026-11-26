@@ -48,3 +48,14 @@ def test_test_split_uses_held_out_openers():
     rewrites = [r for r in data["test"] if r["target"] != r["reader"]]
     assert rewrites and all(not r["input"].startswith(trained) for r in rewrites if "block" not in r["injected"]
                             and not set(r["injected"]) - {"chatty", "filler"})
+
+
+def test_lookalikes_are_untouched_and_held_out():
+    for lang in ("en", "ko"):
+        assert not set(gen.LOOKALIKE[lang]) & set(gen.LOOKALIKE_TEST[lang])
+    reader = Sanitizer("reader")
+    rng = gen.random.Random(3)
+    for lang in ("en", "ko"):
+        for t in gen.LOOKALIKE[lang] + gen.LOOKALIKE_TEST[lang]:
+            text = gen.fill(rng, t)
+            assert reader.clean(text) == text, text

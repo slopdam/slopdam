@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import re
 import time
 
 import torch
@@ -28,11 +29,12 @@ def pieces(tok, text: str) -> list:
 
 
 def rebuild(text: str, offsets: list, labels: list) -> str:
-    """Apply piece tags to text. A gap after a deleted piece is dropped; leading gaps are kept."""
+    """Apply piece tags to text. Spaces after a deleted piece are dropped (line breaks stay);
+    leading gaps are kept."""
     out, pos, deleted = [], 0, False
     for (s, e), t in zip(offsets, labels):
-        if not deleted or pos == 0:
-            out.append(text[pos:s])
+        gap = text[pos:s]
+        out.append(gap if not deleted or pos == 0 else "\n" * gap.count("\n"))
         if t != DELETE:
             piece = text[s:e]
             out.append(piece[:1].upper() + piece[1:] if t == UPPER else piece)
@@ -51,6 +53,50 @@ def whole_words(offsets: list, labels: list) -> list:
             out.append(t)
         else:
             out.append(DELETE if first == DELETE else KEEP)
+    return out
+
+
+LINE_START = re.compile(r"[ \t]*(?:[-*+•][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?")
+UNSAFE = re.compile(r"[0-9/\\_=@]|\.\w|\w\.\w")
+# An opener ends in punctuation, or (Korean only) in a connective ending such as -면, -로, -히.
+OPENER_END = re.compile(r"(?:[,:!?.…]|[\uac00-\ud7a3]*[면로히도피대럼과만데서])$")
+
+
+def guard(text: str, offsets: list, labels: list) -> list:
+    """The safety envelope around the model. Per line, deletions are kept only if they form one
+    run of whole pieces starting where the line's text starts (after a list or heading marker),
+    leave something behind, end in punctuation or a Korean connective ending, and contain no
+    digits, paths, file names or key=value. Upper-casing
+    is kept only on the first piece after that run. Any other line is left exactly as it was."""
+    out = list(labels)
+    line_start = 0
+    lines = []
+    for line in text.split("\n"):
+        lines.append((line_start, line_start + len(line)))
+        line_start += len(line) + 1
+    for a, b in lines:
+        idx = [i for i, (s, _) in enumerate(offsets) if a <= s < b]
+        if not idx or all(labels[i] == KEEP for i in idx):
+            continue
+        start = a + LINE_START.match(text, a, b).end() - a
+        run = [i for i in idx if labels[i] == DELETE]
+        first_kept = next((i for i in idx if labels[i] != DELETE and offsets[i][0] >= start), None)
+        ok = (
+            not run
+            or (
+                offsets[run[0]][0] == start
+                and run == list(range(run[0], run[-1] + 1))
+                and first_kept is not None
+                and first_kept == run[-1] + 1
+                and not UNSAFE.search(text[offsets[run[0]][0] : offsets[run[-1]][1]])
+                and OPENER_END.search(text[offsets[run[0]][0] : offsets[run[-1]][1]])
+            )
+        )
+        uppers = [i for i in idx if labels[i] == UPPER]
+        ok = ok and all(i == first_kept and run for i in uppers)
+        if not ok:
+            for i in idx:
+                out[i] = KEEP
     return out
 
 
@@ -82,7 +128,7 @@ def encode(tok, rows: list):
     return keep, lost
 
 
-def predict(model, tok, texts: list, device, batch: int = 64) -> list:
+def predict(model, tok, texts: list, device, batch: int = 64, use_guard: bool = True) -> list:
     model.eval()
     out = []
     with torch.no_grad():
@@ -95,7 +141,8 @@ def predict(model, tok, texts: list, device, batch: int = 64) -> list:
             for k, text in enumerate(chunk):
                 n = int(enc["attention_mask"][k].sum())
                 spans = offsets[k, :n].tolist()
-                out.append(rebuild(text, spans, whole_words(spans, pred[k, :n].tolist())))
+                labels = whole_words(spans, pred[k, :n].tolist())
+                out.append(rebuild(text, spans, guard(text, spans, labels) if use_guard else labels))
     model.train()
     return out
 
@@ -103,7 +150,8 @@ def predict(model, tok, texts: list, device, batch: int = 64) -> list:
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--check", action="store_true")
-    p.add_argument("--rows", type=int, default=30000, help="train rows to use")
+    p.add_argument("--rows", type=int, default=60000, help="train rows to use")
+    p.add_argument("--hand", default="handwritten2.jsonl", help="handwritten set in hf/model/")
     p.add_argument("--epochs", type=int, default=2)
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=5e-5)
@@ -113,7 +161,9 @@ def main(argv=None) -> int:
     random.seed(a.seed)
     torch.manual_seed(a.seed)
     tok = AutoTokenizer.from_pretrained(BASE)
-    train, val, test = (load(s) for s in ("train", "validation", "test"))
+    # The model's job is chatty openers only: filler adverbs stay with slopdam's word list, since
+    # unseen ones cannot be told from content ("Finally block ...").
+    train, val, test = ([r for r in load(s) if "filler" not in r["injected"]] for s in ("train", "validation", "test"))
     random.shuffle(train)
     examples, lost = encode(tok, train[: a.rows])
     print(f"{len(examples)} rows usable, {lost} dropped (a piece only partly deleted)", flush=True)
@@ -145,13 +195,13 @@ def main(argv=None) -> int:
             if (i // a.batch) % 200 == 0:
                 print(f"epoch {epoch + 1} step {i // a.batch}: loss {loss.item():.4f}, {time.time() - start:.0f}s", flush=True)
 
-    hand = [json.loads(line) for line in open(HERE / "handwritten.jsonl", encoding="utf-8")]
+    hand = [json.loads(line) for line in open(HERE / a.hand, encoding="utf-8")]
     hand_out = predict(model, tok, [r["reader"] for r in hand], device)
     for r, y in zip(hand, hand_out):
         if y != r["target"]:
             print(f"MISS {r['reader']!r} -> {y!r} (want {r['target']!r})")
     result = {
-        "base": BASE, "train_rows": len(examples), "epochs": a.epochs, "seconds": round(time.time() - start),
+        "base": BASE, "scope": "chatty openers (rows with filler excluded)", "hand": a.hand, "train_rows": len(examples), "epochs": a.epochs, "seconds": round(time.time() - start),
         "validation": score(val, predict(model, tok, [r["reader"] for r in val], device)),
         "test": score(test, predict(model, tok, [r["reader"] for r in test], device)),
         "handwritten": {
