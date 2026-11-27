@@ -197,6 +197,14 @@ public final class Sanitizer {
       return out.toString();
     });
     FUNCTIONS.put("unwrap", (m, s, ctx) -> m.group(1) == null ? "" : m.group(1));
+    // Inside a double-quoted string a plain quote would end it, so it is escaped.
+    FUNCTIONS.put("quote_double", (m, s, ctx) -> {
+      int start = s.lastIndexOf('\n', m.start() - 1) + 1, n = 0;
+      for (int j = start; j < m.start(); j++) {
+        if (s.charAt(j) == '"' && (j == start || s.charAt(j - 1) != '\\')) n++;
+      }
+      return n % 2 == 1 ? "\\\"" : "\"";
+    });
     FUNCTIONS.put("status_tag", (m, s, ctx) -> {
       String tag = STATUS_OF.get(m.group(1).codePointAt(0));
       Object at = REDUNDANT.get(tag);

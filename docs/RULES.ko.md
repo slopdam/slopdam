@@ -9,7 +9,7 @@
 | `space.invisible` | basic | 폭 없는 공백, ZWNJ, WJ, BOM, 소프트 하이픈 | 삭제 | 삭제 |
 | `space.nbsp` | basic | 줄 바꿈 없는 공백, 좁은 NBSP, 전각 공백 | 공백 | 공백 |
 | `width.fullwidth` | basic | `，：；（）！？［］｛｝` | 반각 | 반각 |
-| `quote.double` / `quote.single` | basic | `“ ” „` / `‘ ’ ‚` | `"` / `'` | `"` / `'` |
+| `quote.double` / `quote.single` | basic | `“ ” „` / `‘ ’ ‚` | `"` / `'` (큰따옴표 문자열 안에서는 `\"`라서 JSON과 logfmt가 깨지지 않음) | reader와 같음 |
 | `punct.ellipsis` | basic | `…` `⋯` | `...` | `...` |
 | `punct.arrow` | basic | `→ ⇒ ➜ ➡ ⟶` / `← ⇐ ⬅` / `↔ ⇔` | `->` / `<-` / `<->` | 같음 |
 | `punct.bullet` | basic | 줄 앞의 `• ◦ ▪ ● ▶ ►` | `- ` | `- ` |

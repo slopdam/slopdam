@@ -186,6 +186,23 @@ var functions = map[string]action{
 		}, m.String())
 	},
 	"unwrap": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string { return group(m, 1) },
+	// Inside a double-quoted string a plain quote would end it, so it is escaped.
+	"quote_double": func(m *regexp2.Match, text []rune, _ *cleanCtx) string {
+		start := m.Index
+		for start > 0 && text[start-1] != '\n' {
+			start--
+		}
+		n := 0
+		for j := start; j < m.Index; j++ {
+			if text[j] == '"' && (j == start || text[j-1] != '\\') {
+				n++
+			}
+		}
+		if n%2 == 1 {
+			return `\"`
+		}
+		return `"`
+	},
 	"status_tag": func(m *regexp2.Match, _ []rune, ctx *cleanCtx) string {
 		r, _ := utf8.DecodeRuneInString(group(m, 1))
 		tag := statusOf[r]

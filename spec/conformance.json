@@ -662,6 +662,31 @@
           "input": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context",
           "reader": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context",
           "dev": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context"
+        },
+        {
+          "input": "{\"msg\":\"Synced 3 records from “analytics”\",\"n\":3}",
+          "reader": "{\"msg\":\"Synced 3 records from \\\"analytics\\\"\",\"n\":3}",
+          "dev": "{\"msg\":\"Synced 3 records from \\\"analytics\\\"\",\"n\":3}"
+        },
+        {
+          "input": "level=info msg=\"Loaded “prod” config — ok\" retry=3",
+          "reader": "level=info msg=\"Loaded \\\"prod\\\" config: ok\" retry=3",
+          "dev": "level=info msg=\"Loaded \\\"prod\\\" config - ok\" retry=3"
+        },
+        {
+          "input": "“Saved” — done",
+          "reader": "\"Saved\": done",
+          "dev": "\"Saved\" - done"
+        },
+        {
+          "input": "He said \"ok\" and “bye”",
+          "reader": "He said \"ok\" and \"bye\"",
+          "dev": "He said \"ok\" and \"bye\""
+        },
+        {
+          "input": "note=“x” msg=\"a “b” c\"",
+          "reader": "note=“x” msg=\"a \\\"b\\\" c\"",
+          "dev": "note=“x” msg=\"a \\\"b\\\" c\""
         }
       ]
     }

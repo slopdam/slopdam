@@ -89,6 +89,14 @@ const FUNCTIONS: Record<string, Fn> = {
 
   unwrap: (m) => m[1] ?? "",
 
+  quote_double: (m) => {
+    // Inside a double-quoted string a plain quote would end it, so it is escaped.
+    const before = m.input.slice(m.input.lastIndexOf("\n", m.index - 1) + 1, m.index);
+    let n = 0;
+    for (let j = 0; j < before.length; j++) if (before[j] === '"' && (j === 0 || before[j - 1] !== "\\")) n++;
+    return n % 2 ? '\\"' : '"';
+  },
+
   status_tag: (m, ctx) => {
     const tag = STATUS_OF[m[1]!]!;
     const at = SPEC.status_redundant_at[tag];
