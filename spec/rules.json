@@ -16,7 +16,7 @@
     "space": " "
   },
   "default_dash_inline": "colon",
-  "protected_spans": "(?P<url>https?://[^\\s<>\\\"'`]+)|`(?P<code>[^`\\n]+)`|(?<=\\w=)(?P<kv>\\\"[^\\\"\\n]*\\\"|'[^'\\n]*'|[^\\s,;)]+)|(?<![\\w/])(?P<path>(?:~|\\.{1,2})?/[^\\s\\\"'`,;)]+)|(?P<pua>[\\U000F0000-\\U000FFFFD])",
+  "protected_spans": "(?P<url>https?://[^\\s<>\\\"'`]+)|`(?P<code>[^`\\n]+)`|(?<=\\w=)(?<!msg=)(?<!message=)(?<!error=)(?P<kv>\\\"[^\\\"\\n]*\\\"|'[^'\\n]*'|[^\\s,;)]+)|(?<![\\w/])(?P<path>(?:~|\\.{1,2})?/[^\\s\\\"'`,;)]+)|(?P<pua>[\\U000F0000-\\U000FFFFD])",
   "charsets": {
     "hyphens": "‐‑−﹣－",
     "dashes": "‒–—―⸺⸻﹘︱︲⹀",
@@ -33,7 +33,9 @@
   "dash_word_before": ")]}%\"'”’",
   "dash_word_after": "([{\"'“‘",
   "tidy": {
+    "scope": "changed_lines",
     "multi_space": "(?<=\\S)[ \\t]{2,}",
+    "quote_space": "[ \\t]+(?=[\\\"'](?:[\\s,;}\\]]|$))",
     "max_passes": 8
   },
   "status_redundant_at": {
@@ -300,7 +302,7 @@
       "id": "md.fence",
       "level": "basic",
       "description": "markdown code fence",
-      "pattern": "^[ \\t]*```[^\\n]*\\n?",
+      "pattern": "^[ \\t]*```[^\\n]*",
       "flags": [
         "multiline"
       ],
@@ -355,7 +357,7 @@
       "id": "dash.run",
       "level": "basic",
       "description": "dash, 'ㅡ' or line character",
-      "pattern": "([ \t]*)([‒–—―⸺⸻﹘︱︲⹀ㅡￚᅳ─━┄-┋╌-╏═⎯⏤➖]+)([ \t]*)",
+      "pattern": "([ \t]*)(?<![+|│┃║┆┇┊┋┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬╒╓╕╖╘╙╛╜╞╟╡╢╤╥╧╨╪╫╭╮╯╰‒–—―⸺⸻﹘︱︲⹀ㅡￚᅳ─━┄-┋╌-╏═⎯⏤➖])([‒–—―⸺⸻﹘︱︲⹀ㅡￚᅳ─━┄-┋╌-╏═⎯⏤➖]+)(?![+|│┃║┆┇┊┋┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬╒╓╕╖╘╙╛╜╞╟╡╢╤╥╧╨╪╫╭╮╯╰‒–—―⸺⸻﹘︱︲⹀ㅡￚᅳ─━┄-┋╌-╏═⎯⏤➖])([ \t]*)",
       "flags": [],
       "actions": {
         "reader": {
@@ -389,7 +391,7 @@
       "id": "dash.ascii-run",
       "level": "basic",
       "description": "ASCII separator",
-      "pattern": "([=\\-*#~_+])\\1{4,}",
+      "pattern": "(?<![=\\-*#~_+|])([=\\-*#~_+])\\1{4,}(?![=\\-*#~_+|])",
       "flags": [],
       "actions": {
         "reader": {

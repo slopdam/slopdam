@@ -64,7 +64,8 @@ _PUA_RE = re.compile("[\U000F0000-\U000FFFFD]")
 _PROTECT = re.compile(
     r"(?P<url>https?://[^\s<>\"'`]+)"
     r"|`(?P<code>[^`\n]+)`"
-    r"|(?<=\w=)(?P<kv>\"[^\"\n]*\"|'[^'\n]*'|[^\s,;)]+)"
+    # key=value is data, except the human-readable message of a logfmt line (msg=, message=, error=).
+    r"|(?<=\w=)(?<!msg=)(?<!message=)(?<!error=)(?P<kv>\"[^\"\n]*\"|'[^'\n]*'|[^\s,;)]+)"
     r"|(?<![\w/])(?P<path>(?:~|\.{1,2})?/[^\s\"'`,;)]+)"
     r"|(?P<pua>[\U000F0000-\U000FFFFD])"  # input that already uses the placeholder range
 )
@@ -74,6 +75,8 @@ HYPHENS = "‐‑−﹣－"
 DASHES = "‒–—―⸺⸻﹘︱︲⹀"
 EU = "ㅡￚᅳ"  # ㅡ, halfwidth ㅡ, conjoining jungseong ㅡ (NFKC target of ㅡ)
 LINES = "─━┄-┋╌-╏═⎯⏤➖"
+# Table borders: a dash run that touches one of these is part of a table, not a separator.
+TABLE_EDGES = "+|│┃║┆┇┊┋┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬╒╓╕╖╘╙╛╜╞╟╡╢╤╥╧╨╪╫╭╮╯╰"
 CHOSEONG = "ᄀ-ᅟꥠ-ꥼ"  # Hangul leading consonants (jamo and extended-A), for old-style syllables
 _CHOSEONG = re.compile(f"[{CHOSEONG}]")
 # Characters next to a dash that still count as part of the words around it: brackets,
@@ -165,20 +168,26 @@ RULES: tuple = (
     _r("dash.hyphen", "basic", f"[{HYPHENS}]", _both("-"), "Unicode hyphen or minus"),
     _r("dash.wave", "basic", "[〜～]", _both("~"), "wave dash or full-width tilde"),
     _r("md.heading", "basic", r"^[ \t]*#{1,6}[ \t]+", _both(""), "markdown heading marker", re.M, ascii=True),
-    _r("md.fence", "basic", r"^[ \t]*```[^\n]*\n?", _both(""), "markdown code fence", re.M, ascii=True),
+    _r("md.fence", "basic", r"^[ \t]*```[^\n]*", _both(""), "markdown code fence", re.M, ascii=True),
     _r("md.hr", "basic", r"^[ \t]*([-*_])[ \t]*(?:\1[ \t]*){2,}$", _both(""), "markdown horizontal rule", re.M, ascii=True),
     # Only **bold**: __x__ is far more often a Python name (__name__, __init__) than emphasis.
     _r("md.emphasis", "basic", r"\*\*(.+?)\*\*", _both(_unwrap), "markdown bold", ascii=True),
-    _r("dash.run", "basic", f"([ \t]*)([{DASHES}{EU}{LINES}]+)([ \t]*)", _both(_dash_run), "dash, 'ㅡ' or line character"),
+    _r("dash.run", "basic",
+       f"([ \t]*)(?<![{TABLE_EDGES}{DASHES}{EU}{LINES}])([{DASHES}{EU}{LINES}]+)(?![{TABLE_EDGES}{DASHES}{EU}{LINES}])([ \t]*)",
+       _both(_dash_run), "dash, 'ㅡ' or line character"),
     _r("dash.cjk-run", "basic", "[一ーｰ]{3,}", _both(""), "CJK look-alike separator"),
-    _r("dash.ascii-run", "basic", r"([=\-*#~_+])\1{4,}", _both(""), "ASCII separator", ascii=True),
+    _r("dash.ascii-run", "basic", r"(?<![=\-*#~_+|])([=\-*#~_+])\1{4,}(?![=\-*#~_+|])", _both(""), "ASCII separator", ascii=True),
     _r("tone.exclaim", "basic", "(?<=[가-힣])!+", {"reader": "."}, "exclamation after Korean text"),
     _r("tone.filler", "strong", r"(?:성공적으로|완벽하게|무사히|드디어)[ \t]*", {"reader": "", "dev": None}, "filler phrase"),
     _r("tone.chatty", "basic", r"\b(?:Let's|Here's|Voila|Awesome)\b|해볼게요|해보겠습니다|살펴보겠습니다", _both(None), "chatty phrase", ascii=True),
     _r("symbol.non-ascii", "strict", "[^\\w\\s\x00-\x7f\U000F0000-\U000FFFFD]", _both(None), "non-ASCII symbol"),
 )
 
+# Tidying after a rule changed a line: runs of spaces become one, and no space is left before a
+# closing quote ('"Saved 3 rows 🎉"' -> '"Saved 3 rows"'). Lines no rule changed keep their
+# spacing, so aligned columns and tables stay intact.
 _MULTI_SPACE = re.compile(r"(?<=\S)[ \t]{2,}")
+_QUOTE_SPACE = re.compile(r"[ \t]+(?=[\"'](?:[\s,;}\]]|$))")
 _MAX_PASSES = 8
 
 
@@ -238,8 +247,14 @@ class Sanitizer:
             saved.append(kept)
             return chr(_PUA + len(saved) - 1)
 
-        text = self._apply(_PROTECT.sub(protect, text), ctx)
-        text = _MULTI_SPACE.sub(" ", text)  # while protected spans are still masked, so their spaces stay
+        masked = _PROTECT.sub(protect, text)
+        applied = self._apply(masked, ctx)
+        # No rule adds or removes a line break, so lines can be compared one to one. Tidy while
+        # protected spans are still masked, so their spaces stay.
+        text = "\n".join(
+            _QUOTE_SPACE.sub("", _MULTI_SPACE.sub(" ", after)) if after != before else after
+            for before, after in zip(masked.split("\n"), applied.split("\n"))
+        )
         text = _PUA_RE.sub(lambda m: saved[ord(m.group(0)) - _PUA], text)
 
         lines = []

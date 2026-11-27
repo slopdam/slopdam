@@ -42,6 +42,7 @@ public final class Sanitizer {
   private static final Map<String, Object> DASH_INLINE = map(SPEC.get("dash_inline"));
   private static final Pattern PROTECT = PyRegex.compile((String) SPEC.get("protected_spans"), false);
   private static final Pattern MULTI_SPACE = PyRegex.compile((String) map(SPEC.get("tidy")).get("multi_space"), false);
+  private static final Pattern QUOTE_SPACE = PyRegex.compile((String) map(SPEC.get("tidy")).get("quote_space"), false);
   private static final int MAX_PASSES = ((Double) map(SPEC.get("tidy")).get("max_passes")).intValue();
   private static final String WORD_BEFORE = (String) SPEC.get("dash_word_before");
   private static final String WORD_AFTER = (String) SPEC.get("dash_word_after");
@@ -350,8 +351,15 @@ public final class Sanitizer {
       saved.add(kept);
       return new String(Character.toChars(PUA + saved.size() - 1));
     });
-    String out = apply(masked, ctx);
-    out = sub(MULTI_SPACE, out, m -> " ");
+    // No rule adds or removes a line break, so lines compare one to one. Only lines a rule
+    // changed are tidied, while protected spans are still masked.
+    String[] before = masked.split("\n", -1);
+    String[] after = apply(masked, ctx).split("\n", -1);
+    for (int i = 0; i < after.length; i++) {
+      if (i < before.length && after[i].equals(before[i])) continue;
+      after[i] = sub(QUOTE_SPACE, sub(MULTI_SPACE, after[i], m -> " "), m -> "");
+    }
+    String out = String.join("\n", after);
     StringBuilder restored = new StringBuilder();
     out.codePoints().forEach(cp -> {
       if (isPua(cp) && cp - PUA < saved.size()) restored.append(saved.get(cp - PUA));

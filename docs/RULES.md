@@ -24,7 +24,7 @@ Rules run in the order listed. `reader` is the default profile. "off" means the 
 | `dash.wave` | basic | `〜 ～` | `~` | `~` |
 | `dash.run` | basic | **`ㅡ` `ￚ` `ᅳ`**, `‒ – — ― ⸺ ⸻ ﹘ ︱ ︲ ⹀`, `─ ━ ┄`-`┋` `╌`-`╏` `═ ⎯ ⏤ ➖` | See the table below | See the table below |
 | `dash.cjk-run` | basic | Three or more `一 ー ｰ` in a row | Removed | Removed |
-| `dash.ascii-run` | basic | Five or more of the same `= - * # ~ _ +` | Removed | Removed |
+| `dash.ascii-run` | basic | Five or more of the same `= - * # ~ _ +`, not touching `+` or `\|` (a table border such as `+-----+` stays) | Removed | Removed |
 | `tone.exclaim` | basic | `!` right after Hangul | `.` | off |
 | `tone.filler` | strong | Korean filler words such as `성공적으로` | Removed | report |
 | `tone.chatty` | basic | Chatty phrases such as `Let's` and `Here's` | report | report |
@@ -46,11 +46,13 @@ A conjoining `ᅳ` (U+1173) right after a leading consonant is part of a syllabl
 
 ## Protected spans
 
-No rule touches URLs, inline code in backticks, the value in `key=value`, or paths that start with `/`, `./`, `../` or `~/`.
+No rule touches URLs, inline code in backticks, the value in `key=value`, or paths that start with `/`, `./`, `../` or `~/`. The exception is the message of a logfmt line: the value of a key ending in `msg`, `message` or `error` (`msg="✅ Saved — done"`) is cleaned like any text.
+
+A dash run that touches a table edge (`+ |` or a box-drawing corner or junction such as `┌ ┬ ┼ ║`) is part of a table and is kept, so `┌─────┬─────┐` and `|------|------|` stay.
 
 ## After the rules
 
-Repeated spaces collapse to one, and leading and trailing spaces and empty lines are removed. If the result is empty, `PlainFilter` drops the log record.
+In a line a rule changed, repeated spaces collapse to one and no space is left before a closing quote (`{"msg":"Saved 🎉"}` becomes `{"msg":"Saved"}`). A line no rule changed keeps its spacing, so aligned columns (`kubectl get pods`, tables) stay as they are. Then leading and trailing spaces and empty lines are removed. If the result is empty, `PlainFilter` drops the log record.
 
 ## Checklist for a new rule
 

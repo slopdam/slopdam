@@ -4,6 +4,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Output changes
+- Structured output is left intact. Found while building structured log data for log-slop (#34). In every port:
+  - Only lines a rule changed are tidied. A line with no trace keeps its spacing, so aligned columns such as `kubectl get pods` output and tables are no longer squeezed (`NAME      READY` used to become `NAME READY`).
+  - A dash run that touches a table edge (`+ |` or a box-drawing corner or junction) is kept: `+------+`, `|------|` and `┌─────┬─────┐` used to lose their dashes.
+  - The value of a logfmt key ending in `msg`, `message` or `error` is cleaned: `msg="✅ Saved — done"` becomes `msg="Saved: done"`. Other `key=value` values stay protected.
+  - No space is left before a closing quote when a trace at the end of a quoted string is removed: `{"msg":"Saved 🎉"}` becomes `{"msg":"Saved"}`, not `{"msg":"Saved "}`.
+  - `md.fence` no longer consumes the line break after a fence; the empty line it leaves is dropped as before, so the output is the same.
+- The spec's `tidy` block gains `scope` and `quote_space`. A new conformance group, `structured`, covers tables, aligned columns, logfmt, JSON lines, stack traces and diffs. On 20,000 random inputs, JavaScript, Go and Java match Python exactly.
+
 ### Fixed
 - `go/vet` v0.1.0 was tagged on the commit before its `go.mod` dropped the `replace` directive, so `go install .../slopdamvet@v0.1.0` refused it. v0.1.1 is the first installable version, and `go.mod` retracts v0.1.0 so `@latest` never picks it.
 

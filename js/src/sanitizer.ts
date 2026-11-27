@@ -64,6 +64,7 @@ const PUA_RE = /[\u{F0000}-\u{FFFFD}]/u;
 const PUA_RE_G = /[\u{F0000}-\u{FFFFD}]/gu;
 const PROTECT = compile(SPEC.protected_spans);
 const MULTI_SPACE = compile(SPEC.tidy.multi_space);
+const QUOTE_SPACE = compile(SPEC.tidy.quote_space);
 
 /** The whole character that ends at index i, or starts at index i. */
 function charBefore(s: string, i: number): string {
@@ -217,8 +218,14 @@ export class Sanitizer {
       saved.push(kept);
       return String.fromCodePoint(PUA + saved.length - 1);
     });
-    let out = this.apply(masked, ctx);
-    out = sub(MULTI_SPACE, out, () => " ");
+    const applied = this.apply(masked, ctx);
+    // No rule adds or removes a line break, so lines compare one to one. Only lines a rule
+    // changed are tidied, while protected spans are still masked.
+    const before = masked.split("\n");
+    let out = applied
+      .split("\n")
+      .map((line, i) => (line === before[i] ? line : sub(QUOTE_SPACE, sub(MULTI_SPACE, line, () => " "), () => "")))
+      .join("\n");
     out = out.replace(PUA_RE_G, (c) => saved[c.codePointAt(0)! - PUA]!);
     const lines: string[] = [];
     for (let line of splitlines(out)) {
