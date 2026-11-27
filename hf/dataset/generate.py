@@ -207,7 +207,7 @@ def hard_negative(rng: random.Random, base: str) -> str:
     ])()
 
 
-def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = False) -> dict:
+def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = False, plain: bool = False) -> dict:
     """One message: a clean base, then traces injected according to a random plan.
 
     Two texts are built side by side: `text` gets every trace, `kept` gets all but the
@@ -215,7 +215,7 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
     templates = pool["templates"]
     tid = rng.randrange(len(templates))
     template = templates[tid][1]
-    allowed = [k for k in KINDS if not (inline and k in LINE_SHAPE)]
+    allowed = [k for k in KINDS if not (inline and k in LINE_SHAPE) and not (plain and k in REWRITE_ONLY)]
     kinds = rng.sample(allowed, k=rng.choice([1, 1, 2, 2, 3, 4])) if roll >= 0.25 else []
     if "heading" in kinds and "bullet" in kinds:
         kinds.remove("bullet")  # "• # text" is not something anyone writes
@@ -303,10 +303,143 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
     return {"lang": lang, "template_id": tid, "input": t[0], "kept": t[1], "injected": sorted(kinds)}
 
 
-def make(rng: random.Random, lang: str, pool: dict) -> dict:
-    """A single line, or (8% of the time) a multi-line summary block the way assistants write them:
-    an optional title, then two to four items, each with inline traces only."""
-    if rng.random() >= 0.08:
+# --- structured output ---------------------------------------------------------------------------
+# A traced message inside a log format: the structure must survive, the message gets cleaned.
+CLASSES = ["OrderService", "UserRepository", "PaymentClient", "CacheWarmer", "JobRunner", "Ingestor"]
+
+
+def _ts(rng: random.Random) -> str:
+    return f"2025-{rng.randint(1, 12):02d}-{rng.randint(1, 28):02d}T{rng.randint(0, 23):02d}:{rng.randint(0, 59):02d}:{rng.randint(0, 59):02d}Z"
+
+
+def _json_line(rng, msg):
+    level = rng.choice(["info", "warn", "error", "debug"])
+    fields = {"ts": _ts(rng), "level": level, rng.choice(["msg", "message"]): msg}
+    fields[rng.choice(["user_id", "request_id", "shard", "attempt"])] = rng.randint(1, 9999)
+    return json.dumps(fields, ensure_ascii=False, separators=(",", ":") if rng.random() < 0.5 else (", ", ": "))
+
+
+def _logfmt(rng, msg):
+    key = rng.choice(["msg", "message", "error", "errmsg"])
+    return f'ts={_ts(rng)} level={rng.choice(["info", "warn", "error"])} {key}="{msg}" {rng.choice(KVS)}'
+
+
+def _prefixed(rng, msg):
+    t = _ts(rng).replace("T", " ").rstrip("Z")
+    return rng.choice([
+        f"{t} INFO  [main] c.e.{rng.choice(CLASSES)} - {msg}",
+        f"[{t}] {rng.choice(['INFO', 'WARN', 'ERROR'])}: {msg}",
+        f"{t} {rng.choice(['I', 'W', 'E'])} {rng.choice(NAMES)}[{rng.randint(100, 9999)}]: {msg}",
+    ])
+
+
+FORMATS = {"json_line": _json_line, "logfmt": _logfmt, "log_prefix": _prefixed}
+
+
+def structured(rng: random.Random, lang: str, pool: dict) -> dict:
+    """One traced message in a log format. Openers and fillers are left out: they are judged at
+    the start of a line, which here is the format, not the message."""
+    for _ in range(20):
+        part = line(rng, lang, pool, 0.25 + 0.75 * rng.random(), inline=True, plain=True)
+        if '"' not in part["input"] and "\\" not in part["input"]:
+            break
+    kind = rng.choice(sorted(FORMATS))
+    state = rng.getstate()
+    text = FORMATS[kind](rng, part["input"])
+    rng.setstate(state)  # same timestamp, level and fields around both messages
+    kept = FORMATS[kind](rng, part["kept"])
+    return {"lang": lang, "template_id": part["template_id"], "input": text, "kept": kept,
+            "injected": sorted(set(part["injected"]) | {kind})}
+
+
+# Output that only looks risky: stack traces, tables, diffs and JSON data. slopdam must leave it
+# exactly as it is. Half of the shapes only appear in the test split.
+def _py_trace(rng):
+    f = rng.choice(["main.py", "worker.py", "jobs/run.py"])
+    return (f"Traceback (most recent call last):\n  File \"/app/{f}\", line {rng.randint(2, 400)}, in <module>\n"
+            f"    {rng.choice(['main()', 'run(job)', 'sync()'])}\n{rng.choice(['ValueError', 'KeyError', 'TimeoutError'])}: "
+            f"{rng.choice(['bad value', 'user_id', 'timed out after 30s'])}")
+
+
+def _java_trace(rng):
+    c = rng.choice(CLASSES)
+    return (f"java.lang.{rng.choice(['IllegalStateException', 'NullPointerException'])}: {rng.choice(['Queue full', 'id is null'])}\n"
+            f"\tat com.example.{c}.run({c}.java:{rng.randint(10, 300)})\n\tat java.base/java.lang.Thread.run(Thread.java:833)")
+
+
+def _go_panic(rng):
+    return (f"panic: {rng.choice(['runtime error: index out of range [3] with length 3', 'nil map write'])}\n"
+            f"goroutine 1 [running]:\nmain.main()\n\t/app/main.go:{rng.randint(5, 90)} +0x{rng.randint(16, 255):x}")
+
+
+def _cells(rng):
+    rows = [(n, str(rng.randint(0, 999))) for n in rng.sample(NAMES, 3)]
+    w0 = max(len("name"), *(len(r[0]) for r in rows)) + 2
+    w1 = max(len("count"), *(len(r[1]) for r in rows)) + 2
+    return rows, w0, w1
+
+
+def _ascii_table(rng):
+    rows, w0, w1 = _cells(rng)
+    border = f"+{'-' * w0}+{'-' * w1}+"
+    body = [f"| {a.ljust(w0 - 1)}| {b.rjust(w1 - 2)} |" for a, b in [("name", "count")] + rows]
+    return "\n".join([border, body[0], border, *body[1:], border])
+
+
+def _box_table(rng):
+    rows, w0, w1 = _cells(rng)
+    line_ = lambda l, m, r: f"{l}{'─' * w0}{m}{'─' * w1}{r}"  # noqa: E731
+    body = [f"│ {a.ljust(w0 - 1)}│ {b.rjust(w1 - 2)} │" for a, b in [("name", "count")] + rows]
+    return "\n".join([line_("┌", "┬", "┐"), body[0], line_("├", "┼", "┤"), *body[1:], line_("└", "┴", "┘")])
+
+
+def _md_table(rng):
+    rows, w0, w1 = _cells(rng)
+    body = [f"| {a.ljust(w0 - 1)}| {b.ljust(w1 - 1)}|" for a, b in [("name", "count")] + rows]
+    return "\n".join([body[0], f"|{'-' * w0}|{'-' * w1}|", *body[1:]])
+
+
+def _kubectl(rng):
+    pods = [(f"{n}-{rng.randint(1000, 9999):x}", rng.choice(["1/1", "0/1", "2/2"]), rng.choice(["Running", "Pending", "CrashLoopBackOff"]),
+             str(rng.randint(0, 12))) for n in rng.sample(NAMES, 3)]
+    cols = [("NAME", 0), ("READY", 1), ("STATUS", 2), ("RESTARTS", 3)]
+    w = [max(len(h), *(len(p[i]) for p in pods)) + 3 for h, i in cols]
+    fmt = lambda r: "".join(v.ljust(w[i]) for i, v in enumerate(r)).rstrip()  # noqa: E731
+    return "\n".join([fmt([h for h, _ in cols]), *(fmt(p) for p in pods)])
+
+
+def _diff(rng):
+    a = rng.randint(1, 200)
+    return (f"@@ -{a},3 +{a},3 @@\n-timeout = {rng.randint(5, 60)}\n+timeout = {rng.randint(61, 120)}\n"
+            f" retries = {rng.randint(1, 5)}")
+
+
+def _json_data(rng):
+    return json.dumps({"range": f"{rng.randint(2015, 2024)}-{rng.randint(2025, 2026)}", "route": f"{rng.choice(NAMES)}->{rng.choice(NAMES)}",
+                       "flag": rng.choice(["--force", "--dry-run", "-v"]), "since": f"{rng.randint(2015, 2025)}-01-01"})
+
+
+SHAPES = {"train": [_py_trace, _ascii_table, _md_table, _diff, _json_data],
+          "test": [_java_trace, _go_panic, _box_table, _kubectl]}
+
+
+def shape(rng: random.Random, lang: str, split: str) -> dict:
+    f = rng.choice(SHAPES["test" if split == "test" else "train"])
+    text = f(rng)
+    assert READER.clean(text) == text, (f.__name__, text)
+    return {"lang": lang, "template_id": f"shape-{f.__name__.strip('_')}", "input": text, "kept": text, "injected": []}
+
+
+def make(rng: random.Random, lang: str, pool: dict, split: str = "train") -> dict:
+    """A single line (78%), a multi-line summary block the way assistants write them (8%: an
+    optional title, then two to four items with inline traces only), a traced message inside a
+    log format (10%), or structured output that must not change (4%)."""
+    roll = rng.random()
+    if roll < 0.04:
+        return shape(rng, lang, split)
+    if roll < 0.14:
+        return structured(rng, lang, pool)
+    if roll >= 0.22:
         return line(rng, lang, pool, rng.random())
     parts = [line(rng, lang, pool, 0.25 + 0.75 * rng.random(), inline=True) for _ in range(rng.randint(2, 4))]
     title = [rng.choice(BLOCK_TITLES[lang])] if rng.random() < 0.6 else []
@@ -349,7 +482,7 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
     for split, count in (("test", test_rows), ("validation", validation_rows), ("train", rows)):
         while len(splits[split]) < count:
             lang = "ko" if rng.random() < 0.5 else "en"
-            row = make(rng, lang, pools[split][lang])
+            row = make(rng, lang, pools[split][lang], split)
             if row["input"] in seen:
                 continue  # no input appears twice, within or across splits
             seen.add(row["input"])

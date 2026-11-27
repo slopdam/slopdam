@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: MIT
 """The Hugging Face dataset generator: deterministic, and its labels are slopdam's output."""
 import importlib.util
+import json
+import re
 from pathlib import Path
 
 from slopdam import Sanitizer
@@ -59,3 +61,18 @@ def test_lookalikes_are_untouched_and_held_out():
         for t in gen.LOOKALIKE[lang] + gen.LOOKALIKE_TEST[lang]:
             text = gen.fill(rng, t)
             assert reader.clean(text) == text, text
+
+
+def test_structured_rows_keep_their_structure():
+    data = gen.build(1500, 50, 300, 19)
+    rows = [r for split in gen.SPLITS for r in data[split]]
+    jsonl = [r for r in rows if "json_line" in r["injected"]]
+    assert jsonl and all(json.loads(r["reader"]) and json.loads(r["dev"]) for r in jsonl)
+    logfmt = [r for r in rows if "logfmt" in r["injected"]]
+    unescaped = re.compile(r'(?<!\\)"')
+    assert logfmt and all(r["reader"].startswith("ts=") and len(unescaped.findall(r["reader"])) == 2 for r in logfmt)
+    shapes = [r for r in rows if r["template_id"].startswith("shape-")]
+    assert shapes and all(not r["changed"] and r["dev"] == r["input"] for r in shapes)
+    train = {r["template_id"] for r in data["train"] if r["template_id"].startswith("shape-")}
+    test = {r["template_id"] for r in data["test"] if r["template_id"].startswith("shape-")}
+    assert train and test and train.isdisjoint(test)

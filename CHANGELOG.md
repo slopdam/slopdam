@@ -6,7 +6,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ### Output changes
 - A curly double quote inside a double-quoted string becomes `\"`, so JSON lines and logfmt messages stay valid: `{"msg":"from “analytics”"}` becomes `{"msg":"from \"analytics\""}` instead of breaking the JSON. Outside a string it still becomes `"`. Found while building structured log data for log-slop (#34).
-- Structured output is left intact. Found while building structured log data for log-slop (#34). In every port:
+- Structured output is left intact (#40). Found while building structured log data for log-slop (#34). In every port:
   - Only lines a rule changed are tidied. A line with no trace keeps its spacing, so aligned columns such as `kubectl get pods` output and tables are no longer squeezed (`NAME      READY` used to become `NAME READY`).
   - A dash run that touches a table edge (`+ |` or a box-drawing corner or junction) is kept: `+------+`, `|------|` and `┌─────┬─────┐` used to lose their dashes.
   - The value of a logfmt key ending in `msg`, `message` or `error` is cleaned: `msg="✅ Saved — done"` becomes `msg="Saved: done"`. Other `key=value` values stay protected.
