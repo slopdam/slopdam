@@ -36,7 +36,7 @@ export interface RulesSpec {
   };
   dash_word_before: string;
   dash_word_after: string;
-  tidy: { multi_space: string; max_passes: number };
+  tidy: { scope: "changed_lines"; multi_space: string; quote_space: string; max_passes: number };
   status_redundant_at: Record<string, string>;
   rules: RuleSpec[];
 }

@@ -15,9 +15,9 @@ Both files are regenerated with `python scripts/gen_spec.py`. CI runs it with `-
 
 `clean(text, options)` first turns every line break (`\r\n`, `\r`, `\u2028` and the others Python's `str.splitlines` knows) into `\n`. Then it runs one pass of these steps:
 
-1. Protect spans. Every match of `protected_spans` (URL, inline code, the value of `key=value`, path) is replaced by a placeholder that no rule matches.
+1. Protect spans. Every match of `protected_spans` (URL, inline code, the value of `key=value` unless the key ends in `msg`, `message` or `error`, path) is replaced by a placeholder that no rule matches.
 2. Apply the rules in the order of `rules.json`. A rule is active when the profile has an action for it, its level is at or below the chosen level, and it is not disabled. Each rule replaces all of its matches in the text produced by the previous rule.
-3. Collapse every run of two or more spaces or tabs after a non-space character into one space (`tidy.multi_space`). Protected spans are still masked, so the spaces inside them stay.
+3. Tidy the lines the rules changed (`tidy.scope` is `changed_lines`). No rule adds or removes a line break, so the text before and after step 2 has the same lines. In each line that differs, collapse every run of two or more spaces or tabs after a non-space character into one space (`tidy.multi_space`), then remove spaces before a closing quote (`tidy.quote_space`). Lines no rule changed are left as they are. Protected spans are still masked, so the spaces inside them stay.
 4. Restore the protected spans. In `reader`, inline code loses its backticks when the code itself would not change.
 5. Tidy the lines: strip both ends of the first non-empty line and the right end of the others, drop empty lines, and join them with `\n`.
 

@@ -569,13 +569,99 @@
         },
         {
           "input": "`a  b` 확인",
-          "reader": "a b 확인",
+          "reader": "a  b 확인",
           "dev": "`a  b` 확인"
         },
         {
           "input": "  `a—b`  확인  ",
-          "reader": "`a—b` 확인",
-          "dev": "`a—b` 확인"
+          "reader": "`a—b`  확인",
+          "dev": "`a—b`  확인"
+        }
+      ]
+    },
+    {
+      "id": "structured",
+      "title": "Aligned columns, tables, logfmt and JSON lines",
+      "cases": [
+        {
+          "input": "NAME      READY   STATUS    RESTARTS\napi-7d9   1/1     Running   0",
+          "reader": "NAME      READY   STATUS    RESTARTS\napi-7d9   1/1     Running   0",
+          "dev": "NAME      READY   STATUS    RESTARTS\napi-7d9   1/1     Running   0"
+        },
+        {
+          "input": "┌─────┬─────┐\n│ api │ 3   │\n└─────┴─────┘",
+          "reader": "┌─────┬─────┐\n│ api │ 3   │\n└─────┴─────┘",
+          "dev": "┌─────┬─────┐\n│ api │ 3   │\n└─────┴─────┘"
+        },
+        {
+          "input": "╔═════╗\n║ ok  ║\n╚═════╝",
+          "reader": "╔═════╗\n║ ok  ║\n╚═════╝",
+          "dev": "╔═════╗\n║ ok  ║\n╚═════╝"
+        },
+        {
+          "input": "| name | count |\n|------|-------|\n| api  | 3     |",
+          "reader": "| name | count |\n|------|-------|\n| api  | 3     |",
+          "dev": "| name | count |\n|------|-------|\n| api  | 3     |"
+        },
+        {
+          "input": "+----------+-------+\n| a        | 1     |\n+----------+-------+",
+          "reader": "+----------+-------+\n| a        | 1     |\n+----------+-------+",
+          "dev": "+----------+-------+\n| a        | 1     |\n+----------+-------+"
+        },
+        {
+          "input": "========\nTitle\n========",
+          "reader": "Title",
+          "dev": "Title"
+        },
+        {
+          "input": "Saved 3 rows ──── done",
+          "reader": "Saved 3 rows done",
+          "dev": "Saved 3 rows done"
+        },
+        {
+          "input": "a     b ✅",
+          "reader": "a b",
+          "dev": "a b"
+        },
+        {
+          "input": "col1    col2\n✅ done    ok",
+          "reader": "col1    col2\ndone ok",
+          "dev": "col1    col2\ndone ok"
+        },
+        {
+          "input": "level=info msg=\"✅ Saved 3 rows — done\" duration=12ms",
+          "reader": "level=info msg=\"Saved 3 rows: done\" duration=12ms",
+          "dev": "level=info msg=\"Saved 3 rows - done\" duration=12ms"
+        },
+        {
+          "input": "level=error error=\"❌ upload failed → retry\" retry=3 path=/a—b",
+          "reader": "level=error error=\"upload failed -> retry\" retry=3 path=/a—b",
+          "dev": "level=error error=\"upload failed -> retry\" retry=3 path=/a—b"
+        },
+        {
+          "input": "errmsg=\"완료 ㅡ 다음\" user_id=42",
+          "reader": "errmsg=\"완료: 다음\" user_id=42",
+          "dev": "errmsg=\"완료 - 다음\" user_id=42"
+        },
+        {
+          "input": "{\"level\":\"info\",\"msg\":\"Saved 3 rows 🎉\",\"n\":3}",
+          "reader": "{\"level\":\"info\",\"msg\":\"Saved 3 rows\",\"n\":3}",
+          "dev": "{\"level\":\"info\",\"msg\":\"Saved 3 rows\",\"n\":3}"
+        },
+        {
+          "input": "{\"msg\":\"✅ Saved — done! 🎉\"}",
+          "reader": "{\"msg\":\"Saved: done!\"}",
+          "dev": "{\"msg\":\"Saved - done!\"}"
+        },
+        {
+          "input": "Traceback (most recent call last):\n  File \"/app/main.py\", line 12, in <module>\n    main()\nValueError: bad value",
+          "reader": "Traceback (most recent call last):\n  File \"/app/main.py\", line 12, in <module>\n    main()\nValueError: bad value",
+          "dev": "Traceback (most recent call last):\n  File \"/app/main.py\", line 12, in <module>\n    main()\nValueError: bad value"
+        },
+        {
+          "input": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context",
+          "reader": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context",
+          "dev": "@@ -1,3 +1,3 @@\n-old line\n+new line\n context"
         }
       ]
     }

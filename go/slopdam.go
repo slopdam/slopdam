@@ -87,7 +87,9 @@ type rulesSpec struct {
 	DashWordBefore string `json:"dash_word_before"`
 	DashWordAfter  string `json:"dash_word_after"`
 	Tidy           struct {
+		Scope      string `json:"scope"`
 		MultiSpace string `json:"multi_space"`
+		QuoteSpace string `json:"quote_space"`
 		MaxPasses  int    `json:"max_passes"`
 	} `json:"tidy"`
 	StatusRedundantAt map[string]string `json:"status_redundant_at"`
@@ -98,6 +100,7 @@ var (
 	spec       rulesSpec
 	protect    *regexp2.Regexp
 	multiSpace *regexp2.Regexp
+	quoteSpace *regexp2.Regexp
 	choseong   *regexp2.Regexp
 	statusOf   = map[rune]string{}
 	compiled   = map[int]*regexp2.Regexp{}
@@ -120,6 +123,7 @@ func init() {
 	}
 	protect = must(spec.ProtectedSpans, nil)
 	multiSpace = must(spec.Tidy.MultiSpace, nil)
+	quoteSpace = must(spec.Tidy.QuoteSpace, nil)
 	choseong = regexp2.MustCompile("^["+spec.Charsets.HangulChoseong+"]$", regexp2.None)
 	for tag, chars := range spec.Charsets.Status {
 		for _, c := range chars {
@@ -455,7 +459,18 @@ func (s *Sanitizer) cleanOnce(text []rune, ctx *cleanCtx) []rune {
 		return string(rune(pua + len(saved) - 1))
 	})
 	out := s.apply(masked, ctx)
-	out = sub(multiSpace, out, func(*regexp2.Match) string { return " " })
+	// No rule adds or removes a line break, so lines compare one to one. Only lines a rule
+	// changed are tidied, while protected spans are still masked.
+	before := strings.Split(string(masked), "\n")
+	after := strings.Split(string(out), "\n")
+	for i, line := range after {
+		if i < len(before) && line == before[i] {
+			continue
+		}
+		r := sub(multiSpace, []rune(line), func(*regexp2.Match) string { return " " })
+		after[i] = string(sub(quoteSpace, r, func(*regexp2.Match) string { return "" }))
+	}
+	out = []rune(strings.Join(after, "\n"))
 	restored := make([]rune, 0, len(out))
 	for _, r := range out {
 		if isPUA(r) && int(r-pua) < len(saved) {

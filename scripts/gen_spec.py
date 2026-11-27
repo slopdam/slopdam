@@ -55,7 +55,8 @@ def rules_json() -> dict:
         # span, or one of these (before the dash: closers, after it: openers).
         "dash_word_before": rules._CLOSERS,
         "dash_word_after": rules._OPENERS,
-        "tidy": {"multi_space": rules._MULTI_SPACE.pattern, "max_passes": rules._MAX_PASSES},
+        "tidy": {"scope": "changed_lines", "multi_space": rules._MULTI_SPACE.pattern,
+                 "quote_space": rules._QUOTE_SPACE.pattern, "max_passes": rules._MAX_PASSES},
         "status_redundant_at": {tag: logging.getLevelName(n) for tag, n in rules._REDUNDANT.items()},
         "rules": [
             {
