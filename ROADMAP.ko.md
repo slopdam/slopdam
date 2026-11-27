@@ -10,7 +10,7 @@ slopdam은 팀이 쓰는 모든 언어에서 AI가 남긴 흔적이 로그와 �
 
 1. **엔진 하나, 프로필 둘.** 탐지는 같고, `reader`는 사람이 읽기 쉬운 문장을, `dev`는 grep과 파싱이 쉬운 문장을 씁니다.
 2. **흔적을 막는 두 지점.** 실행 중에는 그 언어의 로거용 포맷터가 출력을 정리합니다. 병합 전에는 린터가 소스 코드의 흔적을 찾고, 안전한 것은 고칩니다.
-3. **결정적이고 보수적.** 같은 입력과 설정이면 결과가 늘 같고, 두 번 정리해도 바뀌지 않으며, 날짜, 옵션, URL, 경로, 코드, 한중일 본문은 건드리지 않습니다. 모델도 네트워크도 쓰지 않습니다.
+3. **결정적이고 보수적.** 같은 입력과 설정이면 결과가 늘 같고, 두 번 정리해도 바뀌지 않으며, 날짜, 옵션, URL, 경로, 코드, 한중일 본문은 건드리지 않습니다. 규칙은 모델도 네트워크도 쓰지 않습니다. 단어 목록으로는 다 잡을 수 없는 인사말을 위한 모델([chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)) 하나만 선택 사항으로 두며, 기본으로 꺼져 있고, 지우기만 하며, 모든 삭제는 정해진 안전 장치를 통과해야 합니다.
 4. **실행 의존성 없음.** 언어별 핵심 패키지는 외부 의존성 없이 동작합니다. 표준 라이브러리로 명세를 돌릴 수 없는 경우만 예외입니다: Go는 `regexp`에 뒤쪽 탐색과 역참조가 없어 regexp2를 씁니다.
 
 ## 다른 언어가 같은 결과를 내는 방법
@@ -71,7 +71,18 @@ slopdam/ (이 저장소)
 - [x] 자동 수정을 제안하는 `go vet` 분석기 (`slopdamvet`)
 - [x] 모든 적합성 사례를 통과하는 Java 라이브러리 ([java/](java/README.ko.md)), Logback과 Log4j 2용 `%slopdam` 변환기 포함
 
-### 0.7: Rust와 편집기
+### 0.7: 데이터와 인사말 모델
+
+[log-slop](https://huggingface.co/datasets/slopdam/log-slop) 데이터셋과 [chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) 모델을 Hugging Face에 공개했습니다. 이번 단계에서는 데이터를 실제 로그에 더 가깝게 만들고, 규칙으로 할 수 있는 일은 규칙으로 옮기고, 모델을 slopdam이 도는 곳에서 쓸 수 있게 합니다.
+
+- [ ] 1. log-slop v5: 구조화된 로그와 여러 줄 로그 (JSON lines, logfmt, 스택 트레이스, 표) ([#34](https://github.com/slopdam/slopdam/issues/34))
+- [ ] 2. log-slop v5: 일본어와 중국어 메시지, 네 언어로 손으로 쓴 정답 세트 ([#35](https://github.com/slopdam/slopdam/issues/35))
+- [ ] 3. 알려진 인사말은 규칙으로: `tone.chatty` 목록을 늘리고 `strong` 단계에서 고치기, 명세와 모든 구현에 반영 ([#36](https://github.com/slopdam/slopdam/issues/36))
+- [ ] 4. `slopdam[chatter]`: Python과 `slopdam clean --chatter`에서 인사말 모델 사용, 기본은 꺼짐 ([#37](https://github.com/slopdam/slopdam/issues/37))
+- [ ] 5. 브라우저 데모에서 인사말 모델 실행 (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))
+- [ ] 6. chatter-tagger v2: v5로 학습하고, 새로 쓴 손글씨 세트에서 같은 기준을 넘을 때만 공개 ([#39](https://github.com/slopdam/slopdam/issues/39))
+
+### 0.8: Rust와 편집기
 
 - [ ] `tracing` 레이어를 갖춘 Rust 크레이트
 - [ ] `check --format json` 기반 편집기 지원 (VS Code부터)
@@ -86,7 +97,7 @@ slopdam/ (이 저장소)
 ## 범위 밖
 
 - AI가 쓴 글인지 판별하기. 믿을 만하게 할 수 없고, slopdam은 그걸 알 필요가 없습니다.
-- 언어 모델로 문장 다시 쓰기. slopdam은 결정적 규칙만 적용합니다.
+- 언어 모델로 문장 다시 쓰기. 규칙은 결정적이며, 선택 사항인 인사말 모델은 줄 맨 앞의 인사말을 지우는 일만 할 수 있습니다.
 
 ## 참여 방법
 
