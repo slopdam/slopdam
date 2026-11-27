@@ -118,13 +118,59 @@ SEPARATORS = ["==========", "----------", "──────────", "ㅡ
 CHATTY = {
     "en": ["Let's go!", "Here's the summary:", "Awesome!", "Great news!", "Alright,", "All set!", "Heads up:",
            "Just so you know,", "Quick update:", "Nice!", "Boom!", "Done and dusted:", "Perfect!", "Hooray!",
-           "Good to go:", "Sweet!"],
+           "Good to go:", "Sweet!", "Great,", "Cool,", "Phew,", "So,", "Wonderful!", "Yay!",
+           "Here is what happened:", "Great job!", "All done!", "Nice one!", "Whew!", "Huzzah!",
+           "In short,", "TL;DR:", "To sum up,", "As requested,", "Status update:", "Good catch!", "Brilliant!",
+           "Success!", "Well,", "Now,", "First things first:", "Here you go:"],
     "ko": ["살펴보겠습니다.", "해볼게요.", "좋은 소식입니다!", "자,", "알려드립니다:", "참고로", "짜잔!", "확인해 보니",
-           "정리하면", "좋습니다!", "네,", "결론적으로"],
+           "정리하면", "좋습니다!", "네,", "결론적으로", "좋아요!", "다행스럽게도", "음,", "알겠습니다.", "보시다시피",
+           "기쁜 소식입니다!", "요약하자면,", "먼저,", "그럼", "결과적으로", "참고하세요:", "잘 됐네요!", "완료했어요!",
+           "여기 있습니다:", "확인 결과", "요컨대", "멋지네요!", "드디어 해냈습니다!", "알려드리면,"],
 }
+# More training openers, built from parts so the model sees many shapes rather than one list. No
+# word here appears in CHATTY_TEST, LOOKALIKE_TEST or hf/model/handwritten2.jsonl.
+_EN_WORDS = ["Great", "Cool", "Nice", "Sweet", "Awesome", "Perfect", "Wonderful", "Brilliant", "Splendid", "Lovely",
+             "Neat", "Superb", "Yay", "Hooray", "Huzzah", "Whew", "Phew", "Boom", "Bam", "Wow", "Yes", "Alright",
+             "Well", "So", "Now", "Hmm", "Ah", "Aha", "Done", "Success", "Gotcha", "Yep", "Indeed", "Absolutely"]
+_EN_PHRASES = ["Here's the {x}:", "Here is the {x}:", "Quick {x}:", "Just a quick {x}:", "A short {x}:", "Small {x}:",
+               "The {x}:", "Some {x}:", "Big {x}:", "Latest {x}:"]
+_EN_NOUNS = ["update", "recap", "summary", "status", "rundown", "note", "result", "report", "overview"]
+_KO_STEMS = ["좋네요", "멋져요", "훌륭합니다", "해냈어요", "끝났어요", "성공입니다", "공유드립니다",
+             "전달드립니다", "확인했습니다", "시작할게요", "알아봤습니다", "결과 나왔습니다", "보시죠",
+             "요약해 드릴게요", "됐네요", "좋아요", "깔끔하네요", "역시나"]
+_KO_CONNECTIVES = ["핵심만 말하면", "간단히 말해", "결론부터 말하면", "요약하면", "돌아보면", "덧붙이자면", "알고 보니",
+                   "살펴보니", "따라서", "그래서", "그러므로", "덕분에", "결국", "한편", "이어서", "마지막으로"]
+CHATTY["en"] += [w + p for w in _EN_WORDS for p in ("!", ",", ":", ".")] + [
+    t.format(x=n) for t in _EN_PHRASES for n in _EN_NOUNS]
+CHATTY["ko"] += [w + p for w in _KO_STEMS for p in ("!", ".", ":")] + [
+    c + p for c in _KO_CONNECTIVES for p in ("", ",")]
+CHATTY = {lang: list(dict.fromkeys(v)) for lang, v in CHATTY.items()}
 CHATTY_TEST = {
-    "en": ["Voila!", "Good news:", "Fantastic!", "FYI:", "Here we go:", "Excellent!", "Okay,"],
-    "ko": ["해보겠습니다.", "완벽합니다!", "말씀드리면", "다행히", "알려 드릴게요:"],
+    "en": ["Voila!", "Good news:", "Fantastic!", "FYI:", "Here we go:", "Excellent!", "Okay,", "Hurrah!",
+           "Heads-up,", "Good stuff:", "Real quick:", "Guess what?"],
+    "ko": ["해보겠습니다.", "완벽합니다!", "말씀드리면", "다행히", "알려 드릴게요:", "정리해 보면", "와!", "좋은 결과입니다!",
+           "말하자면", "소식 전해 드려요:"],
+}
+# Lines that start with a word that only looks like an opener. They are hard negatives: nothing
+# in them may be removed. As with the openers, the *_TEST list only appears in the test split.
+LOOKALIKE = {
+    "en": ["Finally block ran in {name}", "Nice level set to {i} for {name}", "Perfect hash rebuilt for {name}",
+           "Great Lakes shard {n} is online", "Cool-down of {n}s applied to {name}", "Awesome-lib {ver} installed",
+           "Boom gate {n} reported a fault", "Sweet spot search took {ms}ms", "Alright-cli exited with code {code}",
+           "Yay-service returned {code}", "Heads-up display disabled for {name}", "Update count is {n} for {name}",
+           "Success rate for {name} is {pct}%", "Now playing queue has {n} items", "Brilliant-cut asset {n} uploaded",
+           "So-called retries disabled for {name}", "Well-known path {path} not found", "Wonderful.png uploaded to {path}"],
+    "ko": ["결론 필드가 비어 있습니다 ({name})", "자동 재시도 {n}회 실패", "참고 문서 {n}개를 색인했습니다",
+           "정리 작업 {n}건 완료", "네트워크 지연 {ms}ms", "좋은글 게시판 {n}건 백업", "음성 파일 {n}개 변환",
+           "알림 설정 {n}건 갱신", "먼저 온 요청 {n}건 처리", "확인 버튼 클릭 {n}건", "요약 리포트 {n}건 생성",
+           "완료율 {pct}%", "기쁨 스티커 {n}개 판매", "그럼블 서비스 응답 코드 {code}", "멋 쇼핑몰 주문 {n}건 동기화",
+           "다행정 구역 데이터 {n}건 갱신", "여기어때 연동 토큰 갱신", "자바 힙 사용량 {pct}%"],
+}
+LOOKALIKE_TEST = {
+    "en": ["Excellent tier quota used: {pct}%", "Fantastic4 cluster scaled to {n}", "FYI-bot posted {n} messages",
+           "Voila.png uploaded to {path}", "Good news feed refreshed for {name}", "Real-time sync lag {ms}ms"],
+    "ko": ["완벽성 검사 {n}건 통과", "와이파이 신호 약함 ({name})", "말하기 평가 {n}건 채점", "해보기 버튼 노출 {n}회",
+           "다행복 카드 발급 {n}건", "정리해고 문서 열람 권한 변경"],
 }
 # Filler adverbs. Korean ones in the rule list are removed at the strong level; the others have no rule.
 FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "깔끔하게 "], "en": ["Successfully ", "Seamlessly "]}
@@ -180,7 +226,7 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
     if roll < 0.15:  # clean message: nothing to change
         return {"lang": lang, "template_id": tid, "input": base, "kept": base, "injected": []}
     if roll < 0.25:  # hard negative: looks risky, must not change
-        text = hard_negative(rng, base)
+        text = hard_negative(rng, base) if rng.random() < 0.6 else fill(rng, rng.choice(pool["lookalike"]))
         if READER.clean(text) != text:
             text = f"{base} --dry-run {rng.choice(KVS)}"
         return {"lang": lang, "template_id": tid, "input": text, "kept": text, "injected": []}
@@ -233,7 +279,10 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
             if not kinds:
                 kinds.append("pictograph")
     if "chatty" in kinds:
-        t[0] = rng.choice(pool["chatty"]) + " " + t[0]
+        opener = rng.choice(pool["chatty"])
+        if lang == "en" and opener[-1] in ",:" and t[0][:1].isupper() and t[0][1:2].islower() and rng.random() < 0.5:
+            t[0] = t[0][0].lower() + t[0][1:]  # "Great, saved 3 rows": target capitalizes it again
+        t[0] = opener + " " + t[0]
     if "pictograph" in kinds:
         p, front = rng.choice(PICTO), rng.random() < 0.5
         both(lambda s: f"{p} {s}" if front else f"{s} {p}")
@@ -294,6 +343,7 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
         "templates": [(i, t) for i, t in enumerate(TEMPLATES[lang]) if (i % HELD_OUT == HELD_OUT - 1) == (split == "test")],
         "chatty": (CHATTY_TEST if split == "test" else CHATTY)[lang],
         "filler": (FILLER_TEST if split == "test" else FILLER)[lang],
+        "lookalike": (LOOKALIKE_TEST if split == "test" else LOOKALIKE)[lang],
     } for lang in TEMPLATES} for split in SPLITS}
     seen, splits = set(), {"train": [], "validation": [], "test": []}
     for split, count in (("test", test_rows), ("validation", validation_rows), ("train", rows)):

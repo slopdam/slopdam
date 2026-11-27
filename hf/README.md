@@ -1,14 +1,15 @@
 # Hugging Face
 
-Three repositories on the Hub, all built from this folder:
+Four repositories on the Hub, all built from this folder:
 
 | Hub repo | Type | Source |
 |---|---|---|
 | [`slopdam/log-slop`](https://huggingface.co/datasets/slopdam/log-slop) | Dataset | `dataset/generate.py` writes it, `dataset/README.md` is its card |
 | [`slopdam/slopdam`](https://huggingface.co/spaces/slopdam/slopdam) | Space (static) | `space/` as is |
+| [`slopdam/chatter-tagger`](https://huggingface.co/slopdam/chatter-tagger) | Model | `model/finetune.py` trains it, `model/card/README.md` is its card, `model/chatter.py` runs it |
 | [`slopdam/README`](https://huggingface.co/spaces/slopdam/README) | Space (static) | `org-card/README.md`, shown as the card on [huggingface.co/slopdam](https://huggingface.co/slopdam) |
 
-There is no model. slopdam's rules are deterministic, so a trained model would only approximate them, and deciding whether text was written by AI is out of scope.
+slopdam's rules are deterministic, so the only model is for what they cannot list: chatty openers such as `Great news!` or `살펴보겠습니다.`. It is optional, runs after the rules, only deletes, and every deletion passes a fixed guard. Deciding whether text was written by AI is out of scope.
 
 ## Build the dataset
 
@@ -41,6 +42,23 @@ hf upload slopdam/README hf/org-card/README.md README.md --type space --commit-m
 The card Space must hold only `README.md`: a static Space with an `index.html` shows that page as the card instead.
 
 The Space is one HTML page that loads `@slopdam/core` from jsDelivr at the version written in `space/index.html`; bump it after each npm release. It is static because Gradio and Docker Spaces under an organization need a paid plan, while static Spaces are free.
+
+## Train and upload the model
+
+Needs `torch` and `transformers`, and downloads the base model (about 540MB). On an Apple M-series GPU the release run takes about 50 minutes.
+
+```bash
+python hf/model/finetune.py --rows 100000 --epochs 3 --hand handwritten3.jsonl   # writes hf/model/out/
+```
+
+```bash
+hf repos create slopdam/chatter-tagger --type model
+hf upload slopdam/chatter-tagger hf/model/out/distilbert-tagger . --commit-message "chatter-tagger"
+hf upload slopdam/chatter-tagger hf/model/card/README.md README.md
+hf upload slopdam/chatter-tagger hf/model/chatter.py chatter.py
+```
+
+Set `id2label` in `config.json` to `KEEP`, `DELETE`, `UPPER` before uploading. A new version is released only if it meets the bar in the model card on a handwritten set written before its training run.
 
 ## Run the Space locally
 

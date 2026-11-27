@@ -18,40 +18,14 @@ import time
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-from train import DELETE, HERE, KEEP, OUT, UPPER, load, score, tags
+from chatter import DELETE, KEEP, UPPER, predict, rebuild
+from train import HERE, OUT, load, score, tags
 
 BASE = "distilbert/distilbert-base-multilingual-cased"
 
 
 def pieces(tok, text: str) -> list:
     return tok(text, return_offsets_mapping=True, add_special_tokens=False)["offset_mapping"]
-
-
-def rebuild(text: str, offsets: list, labels: list) -> str:
-    """Apply piece tags to text. A gap after a deleted piece is dropped; leading gaps are kept."""
-    out, pos, deleted = [], 0, False
-    for (s, e), t in zip(offsets, labels):
-        if not deleted or pos == 0:
-            out.append(text[pos:s])
-        if t != DELETE:
-            piece = text[s:e]
-            out.append(piece[:1].upper() + piece[1:] if t == UPPER else piece)
-        deleted, pos = t == DELETE, e
-    if not deleted:
-        out.append(text[pos:])
-    return "".join(out)
-
-
-def whole_words(offsets: list, labels: list) -> list:
-    """Let the first piece of each word decide for the whole word, so a word is never cut in half."""
-    out, first = [], KEEP
-    for i, ((s, _), t) in enumerate(zip(offsets, labels)):
-        if i == 0 or s != offsets[i - 1][1]:
-            first = t
-            out.append(t)
-        else:
-            out.append(DELETE if first == DELETE else KEEP)
-    return out
 
 
 def piece_tags(text: str, target: str, offsets: list):
@@ -82,28 +56,11 @@ def encode(tok, rows: list):
     return keep, lost
 
 
-def predict(model, tok, texts: list, device, batch: int = 64) -> list:
-    model.eval()
-    out = []
-    with torch.no_grad():
-        for i in range(0, len(texts), batch):
-            chunk = texts[i : i + batch]
-            enc = tok(chunk, return_offsets_mapping=True, add_special_tokens=False, padding=True,
-                      truncation=True, max_length=256, return_tensors="pt")
-            offsets = enc.pop("offset_mapping")
-            pred = model(**{k: v.to(device) for k, v in enc.items()}).logits.argmax(-1).cpu()
-            for k, text in enumerate(chunk):
-                n = int(enc["attention_mask"][k].sum())
-                spans = offsets[k, :n].tolist()
-                out.append(rebuild(text, spans, whole_words(spans, pred[k, :n].tolist())))
-    model.train()
-    return out
-
-
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--check", action="store_true")
-    p.add_argument("--rows", type=int, default=30000, help="train rows to use")
+    p.add_argument("--rows", type=int, default=60000, help="train rows to use")
+    p.add_argument("--hand", default="handwritten2.jsonl", help="handwritten set in hf/model/")
     p.add_argument("--epochs", type=int, default=2)
     p.add_argument("--batch", type=int, default=32)
     p.add_argument("--lr", type=float, default=5e-5)
@@ -113,7 +70,9 @@ def main(argv=None) -> int:
     random.seed(a.seed)
     torch.manual_seed(a.seed)
     tok = AutoTokenizer.from_pretrained(BASE)
-    train, val, test = (load(s) for s in ("train", "validation", "test"))
+    # The model's job is chatty openers only: filler adverbs stay with slopdam's word list, since
+    # unseen ones cannot be told from content ("Finally block ...").
+    train, val, test = ([r for r in load(s) if "filler" not in r["injected"]] for s in ("train", "validation", "test"))
     random.shuffle(train)
     examples, lost = encode(tok, train[: a.rows])
     print(f"{len(examples)} rows usable, {lost} dropped (a piece only partly deleted)", flush=True)
@@ -145,13 +104,13 @@ def main(argv=None) -> int:
             if (i // a.batch) % 200 == 0:
                 print(f"epoch {epoch + 1} step {i // a.batch}: loss {loss.item():.4f}, {time.time() - start:.0f}s", flush=True)
 
-    hand = [json.loads(line) for line in open(HERE / "handwritten.jsonl", encoding="utf-8")]
+    hand = [json.loads(line) for line in open(HERE / a.hand, encoding="utf-8")]
     hand_out = predict(model, tok, [r["reader"] for r in hand], device)
     for r, y in zip(hand, hand_out):
         if y != r["target"]:
             print(f"MISS {r['reader']!r} -> {y!r} (want {r['target']!r})")
     result = {
-        "base": BASE, "train_rows": len(examples), "epochs": a.epochs, "seconds": round(time.time() - start),
+        "base": BASE, "scope": "chatty openers (rows with filler excluded)", "hand": a.hand, "train_rows": len(examples), "epochs": a.epochs, "seconds": round(time.time() - start),
         "validation": score(val, predict(model, tok, [r["reader"] for r in val], device)),
         "test": score(test, predict(model, tok, [r["reader"] for r in test], device)),
         "handwritten": {
