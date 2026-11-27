@@ -84,7 +84,9 @@ edge = load_dataset("slopdam/log-slop", "conformance")  # the spec's cases
 | `rule_ids` | list of strings | slopdam rule IDs found in `input` (`dash.run`, `emoji.pictograph`, ...) |
 | `findings` | list of objects | One per trace, with `rule_id`, `start`, `end` (code point offsets into `input`), `text` and `fix` (`null` when the rule only reports) |
 
-18% of the rows have no trace at all. About half of those are hard negatives: text that looks risky but must stay as it is, such as `--dry-run`, `-> name`, `user_id=42`, `--since=2024-01-01`, URLs and file paths. A cleaner that touches them is wrong.
+18% of the rows have no trace at all. About half of those are hard negatives: text that looks risky but must stay as it is, such as `--dry-run`, `-> name`, `user_id=42`, `--since=2024-01-01`, URLs and file paths, and lines that start with a word that only looks like an opener (`Finally block ran in auth`, `결론 필드가 비어 있습니다`). A cleaner that touches them is wrong.
+
+English openers that end in a comma or colon are sometimes followed by a lowercase word (`Great, saved 3 rows`); `target` capitalizes it again.
 
 About 8% of the rows are multi-line summaries of two to four items under an optional title (`## Summary`, `**상태**`), the way assistants write them.
 
@@ -96,22 +98,24 @@ The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `leve
 
 | Rule (in `train`) | Rows |
 |---|---:|
-| `dash.run` | 22,511 |
-| `emoji.pictograph` | 20,278 |
-| `md.heading` | 11,917 |
-| `md.emphasis` | 11,615 |
-| `punct.arrow` | 11,096 |
-| `dash.hyphen` | 10,952 |
-| `dash.wave` | 10,937 |
-| `width.fullwidth` | 10,890 |
-| `punct.ellipsis` | 10,217 |
-| `space.invisible` | 10,208 |
-| `punct.bullet` | 9,536 |
-| `md.fence` | 7,868 |
-| `quote.single`, `quote.double` | 11,027 |
-| `tone.exclaim` | 3,848 |
-| `tone.chatty` (report only) | 2,024 |
-| `md.hr`, `dash.cjk-run`, `dash.ascii-run` | 5,072 |
+| `dash.run` | 22,900 |
+| `emoji.pictograph` | 20,339 |
+| `md.heading` | 11,954 |
+| `md.emphasis` | 11,702 |
+| `dash.hyphen` | 11,074 |
+| `dash.wave` | 10,982 |
+| `punct.arrow` | 10,982 |
+| `width.fullwidth` | 10,850 |
+| `punct.ellipsis` | 10,427 |
+| `space.invisible` | 10,247 |
+| `punct.bullet` | 9,593 |
+| `md.fence` | 7,923 |
+| `quote.single`, `quote.double` | 11,071 |
+| `tone.exclaim` | 3,637 |
+| `md.hr`, `dash.cjk-run`, `dash.ascii-run` | 5,114 |
+| `tone.chatty` (report only) | 427 |
+
+Most openers are ones no rule knows, which is why `tone.chatty` is rare here while `target` differs from `reader` on 20% of rows.
 
 ## Uses
 
@@ -125,22 +129,21 @@ The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `leve
 - The messages are synthetic and short. Real logs have more variety, longer lines and other languages.
 - "Correct" means "what slopdam outputs". Where slopdam is conservative (it keeps an English `!`, it leaves `**` around a URL, path or `key=value` alone, and a character glued to the end of a URL counts as part of the URL), the labels are too.
 - `target` only knows the chatty phrases and filler words in the generator's lists. It is a narrow, synthetic rewrite task, not general copy editing.
+- This dataset is not for detecting whether text was written by AI. None of these traces proves that, and slopdam does not try to decide it.
 
 ## Baselines
 
-Two taggers were trained on `train` to turn `reader` into `target` by deleting words (code in `hf/model/` of the slopdam repository). Neither is published, because both still delete real content on log lines written by hand.
+Taggers trained on `train` to turn `reader` into `target` by deleting words (code in `hf/model/` of the slopdam repository):
 
-| | Character tagger, from scratch (0.66M parameters) | `distilbert-base-multilingual-cased`, fine-tuned |
-|---|---:|---:|
-| `test`: unseen chatty openers removed | | 90.6% |
-| `test`: unseen filler adverbs removed | | 17% |
-| `test`: all rows where `target` differs | 54.8% | 51.9% |
-| `test`: other rows left unchanged | 96.0% | 99.8% |
-| `test`: hard negatives left unchanged | 96.8% | 100% |
-| 34 handwritten lines: content lines left unchanged | 4 of 12 | 10 of 12 |
+| | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
+|---|---:|---:|---:|
+| Job | openers and fillers | openers and fillers | openers only, with a guard |
+| `test`: unseen openers removed | | 90.6% | 94.4% |
+| `test`: other rows left unchanged | 96.0% | 99.8% | 100% |
+| `test`: hard negatives left unchanged | 96.8% | 100% | 100% |
+| Handwritten content lines left unchanged | 4 of 12 | 10 of 12 | 20 of 20 |
 
-Pretraining is what makes the difference: the small model learned the phrase lists and cut words in half on anything new, while the fine-tuned one handles unseen openers and leaves other text alone. Neither can guess unseen filler adverbs from the few examples given, and some are real content (Java's `finally` block), so slopdam handles fillers with a word list instead. Both still mistake content words for openers when they resemble them, such as `결론 필드` after training on `결론적으로`.
-- This dataset is not for detecting whether text was written by AI. None of these traces proves that, and slopdam does not try to decide it.
+The first two were scored on an earlier version of this dataset with fewer openers and no look-alike lines. Pretraining is what makes the difference: the small model learned the phrase lists and cut words in half on anything new. Filler adverbs turned out not to be learnable from a few examples, and some are real content (Java's `finally` block), so slopdam handles them with a word list and the released model only removes openers. Its card has the full evaluation.
 
 ## License and citation
 
@@ -157,4 +160,4 @@ MIT, like slopdam. The text was written for this dataset.
 
 ## 한국어 요약
 
-AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 한국어와 영어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 32개와 처음 보는 인사말, 부사로만 만들어 모델의 일반화를 잴 수 있습니다. 이 데이터로 학습한 두 모델의 결과는 Baselines에 있습니다. 사전 학습 모델은 처음 보는 인사말의 90.6%를 지웠지만, 손으로 쓴 줄에서 내용 단어를 지우는 경우가 남아 공개하지 않았습니다. 라벨은 slopdam 0.6.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
+AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 한국어와 영어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 32개와 처음 보는 인사말, 부사로만 만들어 모델의 일반화를 잴 수 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)는 처음 보는 인사말의 94.4%를 지우고, 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. 라벨은 slopdam 0.6.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.

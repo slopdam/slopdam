@@ -26,6 +26,7 @@ slopdam is an open-source logger formatter and linter. It removes the traces AI 
 |---|---|
 | [Try it](https://huggingface.co/spaces/slopdam/slopdam) | Paste a log message and see the cleaned text in your browser |
 | [log-slop](https://huggingface.co/datasets/slopdam/log-slop) | 110,000 English and Korean log messages with traces, clean outputs, rewrite targets and spans |
+| [chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) | Optional model that removes chatty openers (`Great news!`, `살펴보겠습니다.`) the rules cannot list |
 | [GitHub](https://github.com/slopdam/slopdam) | Source, rules and docs (MIT) |
 
 ```bash

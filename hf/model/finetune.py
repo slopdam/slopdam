@@ -13,91 +13,19 @@ from __future__ import annotations
 import argparse
 import json
 import random
-import re
 import time
 
 import torch
 from transformers import AutoModelForTokenClassification, AutoTokenizer
 
-from train import DELETE, HERE, KEEP, OUT, UPPER, load, score, tags
+from chatter import DELETE, KEEP, UPPER, predict, rebuild
+from train import HERE, OUT, load, score, tags
 
 BASE = "distilbert/distilbert-base-multilingual-cased"
 
 
 def pieces(tok, text: str) -> list:
     return tok(text, return_offsets_mapping=True, add_special_tokens=False)["offset_mapping"]
-
-
-def rebuild(text: str, offsets: list, labels: list) -> str:
-    """Apply piece tags to text. Spaces after a deleted piece are dropped (line breaks stay);
-    leading gaps are kept."""
-    out, pos, deleted = [], 0, False
-    for (s, e), t in zip(offsets, labels):
-        gap = text[pos:s]
-        out.append(gap if not deleted or pos == 0 else "\n" * gap.count("\n"))
-        if t != DELETE:
-            piece = text[s:e]
-            out.append(piece[:1].upper() + piece[1:] if t == UPPER else piece)
-        deleted, pos = t == DELETE, e
-    if not deleted:
-        out.append(text[pos:])
-    return "".join(out)
-
-
-def whole_words(offsets: list, labels: list) -> list:
-    """Let the first piece of each word decide for the whole word, so a word is never cut in half."""
-    out, first = [], KEEP
-    for i, ((s, _), t) in enumerate(zip(offsets, labels)):
-        if i == 0 or s != offsets[i - 1][1]:
-            first = t
-            out.append(t)
-        else:
-            out.append(DELETE if first == DELETE else KEEP)
-    return out
-
-
-LINE_START = re.compile(r"[ \t]*(?:[-*+•][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?")
-UNSAFE = re.compile(r"[0-9/\\_=@]|\.\w|\w\.\w")
-# An opener ends in punctuation, or (Korean only) in a connective ending such as -면, -로, -히.
-OPENER_END = re.compile(r"(?:[,:!?.…]|[\uac00-\ud7a3]*[면로히도피대럼과만데서])$")
-
-
-def guard(text: str, offsets: list, labels: list) -> list:
-    """The safety envelope around the model. Per line, deletions are kept only if they form one
-    run of whole pieces starting where the line's text starts (after a list or heading marker),
-    leave something behind, end in punctuation or a Korean connective ending, and contain no
-    digits, paths, file names or key=value. Upper-casing
-    is kept only on the first piece after that run. Any other line is left exactly as it was."""
-    out = list(labels)
-    line_start = 0
-    lines = []
-    for line in text.split("\n"):
-        lines.append((line_start, line_start + len(line)))
-        line_start += len(line) + 1
-    for a, b in lines:
-        idx = [i for i, (s, _) in enumerate(offsets) if a <= s < b]
-        if not idx or all(labels[i] == KEEP for i in idx):
-            continue
-        start = a + LINE_START.match(text, a, b).end() - a
-        run = [i for i in idx if labels[i] == DELETE]
-        first_kept = next((i for i in idx if labels[i] != DELETE and offsets[i][0] >= start), None)
-        ok = (
-            not run
-            or (
-                offsets[run[0]][0] == start
-                and run == list(range(run[0], run[-1] + 1))
-                and first_kept is not None
-                and first_kept == run[-1] + 1
-                and not UNSAFE.search(text[offsets[run[0]][0] : offsets[run[-1]][1]])
-                and OPENER_END.search(text[offsets[run[0]][0] : offsets[run[-1]][1]])
-            )
-        )
-        uppers = [i for i in idx if labels[i] == UPPER]
-        ok = ok and all(i == first_kept and run for i in uppers)
-        if not ok:
-            for i in idx:
-                out[i] = KEEP
-    return out
 
 
 def piece_tags(text: str, target: str, offsets: list):
@@ -126,25 +54,6 @@ def encode(tok, rows: list):
             continue
         keep.append((r["reader"], offsets, labels))
     return keep, lost
-
-
-def predict(model, tok, texts: list, device, batch: int = 64, use_guard: bool = True) -> list:
-    model.eval()
-    out = []
-    with torch.no_grad():
-        for i in range(0, len(texts), batch):
-            chunk = texts[i : i + batch]
-            enc = tok(chunk, return_offsets_mapping=True, add_special_tokens=False, padding=True,
-                      truncation=True, max_length=256, return_tensors="pt")
-            offsets = enc.pop("offset_mapping")
-            pred = model(**{k: v.to(device) for k, v in enc.items()}).logits.argmax(-1).cpu()
-            for k, text in enumerate(chunk):
-                n = int(enc["attention_mask"][k].sum())
-                spans = offsets[k, :n].tolist()
-                labels = whole_words(spans, pred[k, :n].tolist())
-                out.append(rebuild(text, spans, guard(text, spans, labels) if use_guard else labels))
-    model.train()
-    return out
 
 
 def main(argv=None) -> int:
