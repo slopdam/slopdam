@@ -137,6 +137,14 @@ def _fullwidth(m: "re.Match[str]", ctx: Context) -> str:
     return m.group(0).translate(_FULLWIDTH)
 
 
+def _quote_double(m: "re.Match[str]", ctx: Context) -> str:
+    # Inside a double-quoted string (a JSON value, a logfmt message) a plain quote would end the
+    # string, so it is escaped. "Inside" means an odd number of unescaped " earlier on the line.
+    s, i = m.string, m.start()
+    before = s[s.rfind("\n", 0, i) + 1:i]
+    return '\\"' if sum(1 for j, c in enumerate(before) if c == '"' and (j == 0 or before[j - 1] != "\\")) % 2 else '"'
+
+
 def _unwrap(m: "re.Match[str]", ctx: Context) -> str:
     return m.group(1)
 
@@ -151,7 +159,7 @@ RULES: tuple = (
     _r("space.invisible", "basic", "[​‌⁠﻿­]", _both(""), "zero-width or invisible character"),
     _r("space.nbsp", "basic", "[  　]", _both(" "), "non-breaking or ideographic space"),
     _r("width.fullwidth", "basic", "[，：；（）！？［］｛｝]", _both(_fullwidth), "full-width punctuation"),
-    _r("quote.double", "basic", "[“”„]", _both('"'), "curly double quote"),
+    _r("quote.double", "basic", "[“”„]", _both(_quote_double), "curly double quote"),
     _r("quote.single", "basic", "[‘’‚]", _both("'"), "curly single quote"),
     _r("punct.ellipsis", "basic", "[…⋯]", _both("..."), "ellipsis character"),
     _r("punct.arrow", "basic", "[↔⇔]️?", _both("<->"), "arrow symbol"),

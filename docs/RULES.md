@@ -9,7 +9,7 @@ Rules run in the order listed. `reader` is the default profile. "off" means the 
 | `space.invisible` | basic | Zero-width space, ZWNJ, word joiner, BOM, soft hyphen | Removed | Removed |
 | `space.nbsp` | basic | No-break space, narrow no-break space, ideographic space | Space | Space |
 | `width.fullwidth` | basic | `，：；（）！？［］｛｝` | Halfwidth | Halfwidth |
-| `quote.double` / `quote.single` | basic | `“ ” „` / `‘ ’ ‚` | `"` / `'` | `"` / `'` |
+| `quote.double` / `quote.single` | basic | `“ ” „` / `‘ ’ ‚` | `"` / `'` (`\"` inside a double-quoted string, so JSON and logfmt stay valid) | Same as reader |
 | `punct.ellipsis` | basic | `…` `⋯` | `...` | `...` |
 | `punct.arrow` | basic | `→ ⇒ ➜ ➡ ⟶` / `← ⇐ ⬅` / `↔ ⇔` | `->` / `<-` / `<->` | Same |
 | `punct.bullet` | basic | `• ◦ ▪ ● ▶ ►` at the start of a line | `- ` | `- ` |

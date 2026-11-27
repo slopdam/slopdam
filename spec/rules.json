@@ -102,12 +102,12 @@
       "flags": [],
       "actions": {
         "reader": {
-          "kind": "replace",
-          "value": "\""
+          "kind": "function",
+          "name": "quote_double"
         },
         "dev": {
-          "kind": "replace",
-          "value": "\""
+          "kind": "function",
+          "name": "quote_double"
         }
       }
     },
