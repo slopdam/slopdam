@@ -63,8 +63,9 @@ def test_findings_spans_point_into_the_input(text, s):
 def test_protected_spans_survive(span, prefix, s):
     out = s.clean(f"{prefix} {span} 확인")
     if s.profile == "reader" and span.startswith("`"):
-        # reader may drop the backticks of clean inline code, which then is tidied like any text.
-        assert span in out or " ".join(span.strip("`").split()) in out
+        # reader may drop the backticks of clean inline code; its content stays as written,
+        # inner spaces included, since no rule changes it (the ends of a line are still trimmed).
+        assert span in out or span.strip("`").strip() in out
     else:
         assert span in out  # byte for byte
 
