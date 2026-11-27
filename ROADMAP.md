@@ -10,7 +10,7 @@ Every implementation keeps the same four ideas:
 
 1. **One engine, two profiles.** Detection is shared; `reader` writes plain text for people, `dev` writes text that is easy to grep and parse.
 2. **Two places to stop slop.** At runtime, a formatter for the language's loggers cleans what is printed. Before merge, a linter finds traces in source code and fixes what it safely can.
-3. **Deterministic and conservative.** The same input and settings always give the same output, cleaning twice changes nothing, and dates, flags, URLs, paths, code and CJK text are left alone. No model, no network.
+3. **Deterministic and conservative.** The same input and settings always give the same output, cleaning twice changes nothing, and dates, flags, URLs, paths, code and CJK text are left alone. The rules use no model and no network; the one model ([chatter-tagger](https://huggingface.co/slopdam/chatter-tagger), for chatty openers no word list can cover) is optional, off by default, only deletes, and every deletion passes a fixed guard.
 4. **No runtime dependencies** in the core package of each language, except where the standard library cannot run the spec: Go uses regexp2, because its `regexp` has no lookbehind or back references.
 
 ## How other languages stay consistent
@@ -71,7 +71,18 @@ slopdam/ (this repository)
 - [x] `go vet` analyzer with suggested fixes (`slopdamvet`)
 - [x] Java library ([java/](java/README.md)) passing every conformance case, with `%slopdam` converters for Logback and Log4j 2
 
-### 0.7: Rust and editors
+### 0.7: data and the chatter model
+
+The [log-slop](https://huggingface.co/datasets/slopdam/log-slop) dataset and the [chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) model are on Hugging Face. This milestone makes the data closer to real logs, moves what can be a rule into the rules, and makes the model usable where slopdam runs.
+
+- [ ] 1. log-slop v5: structured and multi-line logs (JSON lines, logfmt, stack traces, tables) ([#34](https://github.com/slopdam/slopdam/issues/34))
+- [ ] 2. log-slop v5: Japanese and Chinese messages, and a handwritten gold set in four languages ([#35](https://github.com/slopdam/slopdam/issues/35))
+- [ ] 3. Known openers as a rule: a larger `tone.chatty` list with a fix at the `strong` level, in the spec and every port ([#36](https://github.com/slopdam/slopdam/issues/36))
+- [ ] 4. `slopdam[chatter]`: the chatter model from Python and `slopdam clean --chatter`, off by default ([#37](https://github.com/slopdam/slopdam/issues/37))
+- [ ] 5. The chatter model in the browser demo (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))
+- [ ] 6. chatter-tagger v2, trained on v5, released only if it meets the same bar on a new blind handwritten set ([#39](https://github.com/slopdam/slopdam/issues/39))
+
+### 0.8: Rust and editors
 
 - [ ] Rust crate with a `tracing` layer
 - [ ] Editor support on top of `check --format json` (VS Code first)
@@ -86,7 +97,7 @@ slopdam/ (this repository)
 ## Out of scope
 
 - Deciding whether a text was written by AI. That cannot be done reliably, and slopdam does not need to know.
-- Rewriting sentences with a language model. slopdam only applies deterministic rules.
+- Rewriting sentences with a language model. The rules are deterministic, and the optional chatter model can only delete an opener at the start of a line.
 
 ## How to help
 
