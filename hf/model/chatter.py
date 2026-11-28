@@ -24,9 +24,11 @@ MAX_PIECES = 256
 LINE_START = re.compile(r"[ \t]*(?:[-*+•][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?")
 UNSAFE = re.compile(r"[0-9/\\_=@]|\.\w|\w\.\w")
 # An opener ends in punctuation (full width in Japanese and Chinese), or (Korean only) in a
-# connective ending such as -면, -로, -히.
+# connective ending such as -면, -로, -히. A Japanese or Chinese span ending in "：" is not one:
+# there it is far more often a label ("状態：", "来源：") than an opener, and unseen labels
+# cannot be told from unseen openers.
 CJK_PUNCT = "、，！？：。"
-OPENER_END = re.compile(rf"(?:[,:!?.…{CJK_PUNCT}]|[가-힣]*[면로히도피대럼과만데])$")
+OPENER_END = re.compile(r"(?:[,:!?.…、，！？。]|[가-힣]*[면로히도피대럼과만데])$")
 # A log level, a diagnostic label or an exception name says what the line is: never an opener.
 LOG_LABEL = re.compile(
     r"(?i:panic|fatal|error|err|warn|warning|info|debug|trace|note|hint|caution|caused by|exception|traceback"
@@ -69,7 +71,7 @@ def whole_words(offsets: list, labels: list, text: str = "") -> list:
 def guard(text: str, offsets: list, labels: list) -> list:
     """The safety envelope around the model. Per line, deletions are kept only if they form one
     run of whole pieces starting where the line's text starts (after a list or heading marker),
-    leave something behind, end in punctuation or a Korean connective ending, and contain no
+    leave something behind, end in punctuation (not a full-width "：") or a Korean connective ending, and contain no
     digits, paths, file names, key=value or a mix of Latin with Hangul, kana or CJK ideographs, and
     do not start with a log level, a diagnostic label or an exception name ("panic:", "Warning:",
     "경고:", "エラー：", "ValueError:"). Upper-casing
