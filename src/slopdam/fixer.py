@@ -66,12 +66,36 @@ def _string_nodes(tree: ast.AST, scope: str) -> Iterable[ast.AST]:
     def is_str(n):
         return isinstance(n, ast.JoinedStr) or (isinstance(n, ast.Constant) and isinstance(n.value, str))
 
+    def message_parts(node):
+        # The strings that end up in the message: the argument itself, both sides of + and the left of %,
+        # both branches of `a if c else b`, the string before .format(), and the arguments of a plain
+        # function such as tr(...), _(...) or gettext(...). Not method calls (", ".join), subscripts or
+        # anything else that only uses a string as data.
+        if is_str(node):
+            yield node
+        elif isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Mod)):
+            yield from message_parts(node.left)
+            if isinstance(node.op, ast.Add):
+                yield from message_parts(node.right)
+        elif isinstance(node, ast.IfExp):
+            yield from message_parts(node.body)
+            yield from message_parts(node.orelse)
+        elif isinstance(node, ast.Call) and not _is_log_call(node):
+            if isinstance(node.func, ast.Name):
+                for arg in node.args:
+                    yield from message_parts(arg)
+            elif isinstance(node.func, ast.Attribute) and node.func.attr == "format":
+                yield from message_parts(node.func.value)
+
     if scope == "log-calls":
+        seen = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and _is_log_call(node):
                 for arg in [*node.args, *(k.value for k in node.keywords if k.arg is None)]:
-                    if is_str(arg):
-                        yield arg
+                    for part in message_parts(arg):
+                        if id(part) not in seen:
+                            seen.add(id(part))
+                            yield part
         return
     docs = _docstring_nodes(tree)
     for node in ast.walk(tree):
@@ -242,6 +266,8 @@ def fix_source(source: str, sanitizer: Sanitizer, scope: str = "log-calls") -> T
         new_body = _unmask(text, pieces)
         if new_body is None:
             continue  # a rule swallowed a placeholder: leave this literal alone
+        if body.strip() and not new_body.strip():
+            continue  # nothing but a symbol ("✓ " if ok else "✗ "): the symbol is the message
         # Do not leave a space at either end that the original literal did not have.
         if body == body.lstrip():
             new_body = new_body.lstrip(" \t")

@@ -15,6 +15,7 @@ import difflib
 import json
 import os
 import re
+import subprocess
 import sys
 from typing import Iterator
 
@@ -24,27 +25,54 @@ from . import __version__
 from .rules import DASH_INLINE, LEVELS, PROFILES, RULES, Sanitizer
 
 SOURCE_EXTS = {".py", ".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".java", ".kt", ".go", ".rb", ".php", ".rs", ".swift"}
-SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "__pycache__", ".tox", "target"}
+SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "dist", "build", "__pycache__", ".tox", "target",
+             # build output and caches of web frameworks and tools
+             ".next", ".nuxt", ".svelte-kit", ".turbo", ".output", ".vercel", ".cache", ".parcel-cache", "coverage",
+             ".mypy_cache", ".pytest_cache"}
+GENERATED = re.compile(r"\.min\.[cm]?js$|\.bundle\.js$|\.chunk\.js$")
+# In these languages a backtick starts a string (a template literal or a raw string), not inline code.
+BACKTICK_STRINGS = {".js", ".mjs", ".cjs", ".ts", ".tsx", ".jsx", ".go"}
 
-# Lines that look like a log/print call: logger.info(, logging.warning(, console.log(, print(, println(, slog.Info(, Log.d(
-LOG_CALL = re.compile(r"(?:\blog\w*|\bconsole|\bprint\w*|\bfmt\.(?:Print|Sprint|Fprint)\w*|\bslog)\s*[.(]", re.I)
+# Lines that look like a log/print call: logger.info(, logging.warning(, console.log(, print(, println(, slog.Info(,
+# Log.d(. Not login(, logout(, logo., or a "console.example.com" inside a string.
+LOG_CALL = re.compile(r"(?:\blog(?!in|out|os?\b)\w*|\bconsole\s*\.\s*(?:log|info|warn|error|debug|trace)\b|\bprint\w*"
+                      r"|\bfmt\.(?:Print|Sprint|Fprint)\w*|\bslog)\s*[.(]", re.I)
 # slopdam: ignore            -> skip the whole line
 # slopdam: ignore[dash,emoji] -> skip only those rule ids / prefixes
 COMMENT_PREFIXES = ("#", "//", "/*", "*", "--")  # comment-only lines are not log calls
 IGNORE = re.compile(r"slopdam:\s*ignore(?:\[([\w.,\s-]+)\])?")
 
 
+def _git_files(path: str):
+    """Files under a directory that git does not ignore, or None outside a git work tree."""
+    try:
+        out = subprocess.run(["git", "-C", path, "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+                             capture_output=True, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if out.returncode != 0:
+        return None
+    return sorted(os.path.join(path, f) for f in out.stdout.decode("utf-8", "surrogateescape").split("\0") if f)
+
+
 def iter_files(paths: list, cfg: Config) -> Iterator[str]:
+    """Explicit files as given; in a directory, source files that git does not ignore, outside build and
+    cache folders, that pass include/exclude."""
     for path in paths:
         if os.path.isfile(path):
             yield path
             continue
-        for root, dirs, files in os.walk(path):
-            dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
-            for name in sorted(files):
-                full = os.path.join(root, name)
-                if os.path.splitext(name)[1] in SOURCE_EXTS and cfg.selects(full):
-                    yield full
+        found = _git_files(path)
+        if found is None:
+            found = []
+            for root, dirs, files in os.walk(path):
+                dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
+                found += [os.path.join(root, name) for name in sorted(files)]
+        for full in found:
+            parts = os.path.normpath(full).split(os.sep)
+            if (os.path.splitext(full)[1] in SOURCE_EXTS and not SKIP_DIRS.intersection(parts[:-1])
+                    and not GENERATED.search(full) and os.path.isfile(full) and cfg.selects(full)):
+                yield full
 
 
 def _ignored(rule_id: str, ids: list) -> bool:
@@ -78,7 +106,8 @@ def _read(path: str):
         return None
 
 
-def _line_hits(text: str, sanitizer: Sanitizer, scope: str):
+def _line_hits(text: str, sanitizer: Sanitizer, scope: str, path: str = ""):
+    backtick = os.path.splitext(path)[1] in BACKTICK_STRINGS
     for lineno, line in enumerate(text.splitlines(), 1):
         if scope != "all" and (line.lstrip().startswith(COMMENT_PREFIXES) or not LOG_CALL.search(line)):
             continue
@@ -86,6 +115,9 @@ def _line_hits(text: str, sanitizer: Sanitizer, scope: str):
         if ignore and not ignore.group(1):
             continue
         ids = [i.strip() for i in ignore.group(1).split(",")] if ignore else []
+        if backtick:
+            # Otherwise the engine takes `...` for inline code and leaves it alone. Same length, so columns hold.
+            line = line.replace("`", '"')
         for f in sanitizer.findings(line):
             if not _ignored(f.rule_id, ids):
                 yield lineno, f.start + 1, f.rule_id, f.text, f.fix
@@ -98,8 +130,8 @@ def _hits(path: str, text: str, sanitizer: Sanitizer, scope: str) -> list:
             _, edits = fix_source(text, sanitizer, scope=scope)
             return sorted((e.line, e.col, e.rule_id, e.before, e.after) for e in edits)
         except SyntaxError:
-            return list(_line_hits(text, sanitizer, "log-calls"))
-    return list(_line_hits(text, sanitizer, "all" if scope == "all" else "log-calls"))
+            return list(_line_hits(text, sanitizer, "log-calls", path))
+    return list(_line_hits(text, sanitizer, "all" if scope == "all" else "log-calls", path))
 
 
 def check(args: argparse.Namespace) -> int:
