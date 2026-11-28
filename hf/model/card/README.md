@@ -54,24 +54,18 @@ slopdam's rules are deterministic and fix dashes, emoji, markdown and the like. 
 ## Use
 
 ```bash
-pip install slopdam transformers torch
+pip install "slopdam[chatter]"
+tail -f app.log | slopdam clean --chatter
 ```
 
 ```python
-from huggingface_hub import hf_hub_download
-import importlib.util, sys
-from slopdam import clean
+from slopdam.chatter import strip
 
-path = hf_hub_download("slopdam/chatter-tagger", "chatter.py")
-spec = importlib.util.spec_from_file_location("chatter", path)
-chatter = importlib.util.module_from_spec(spec); spec.loader.exec_module(chatter)
-
-tagger = chatter.ChatterTagger("slopdam/chatter-tagger")
-tagger([clean("Heads up: cache warmed for orders"), clean("Finally block ran in auth")])
-# ['Cache warmed for orders', 'Finally block ran in auth']
+strip(["Heads up: cache warmed for orders", "Finally block ran in auth", "🚀 さて、バックアップが完了しました"])
+# ['Cache warmed for orders', 'Finally block ran in auth', 'バックアップが完了しました']
 ```
 
-Run slopdam's `clean` (reader profile) first: the model was trained on its output. Calling the model without the guard is not supported.
+`strip` and `--chatter` run slopdam's rules (reader profile) first, since the model was trained on their output, then the model with its guard. They load this repository at a pinned revision. Calling the model without the guard is not supported. `chatter.py` here is the same module as `slopdam.chatter`, for use without installing slopdam: `ChatterTagger()(lines)` runs the model and guard on lines you have already cleaned.
 
 ## Evaluation
 
