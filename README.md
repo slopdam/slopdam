@@ -117,7 +117,9 @@ src/sync.py:8:18: emoji.pictograph '✅' -> ''
 src/sync.py:8:25: dash.run 'ㅡ' -> ': '
 ```
 
-Python files are read through the syntax tree, so slopdam knows exactly where each string starts and ends. `slopdam fix` changes only the literal text: quotes, prefixes, escape sequences, f-string expressions and placeholders such as `%s` stay as they are, and nothing is written unless the result compiles. Other languages are checked line by line.
+Python files are read through the syntax tree, so slopdam knows exactly where each string starts and ends. `slopdam fix` changes only the literal text: quotes, prefixes, escape sequences, f-string expressions and placeholders such as `%s` stay as they are, and nothing is written unless the result compiles. Strings inside the message count too: both sides of `+`, `%` and `.format()`, both branches of `a if c else b`, and the arguments of a translation helper such as `tr(...)` or `_(...)`. Other languages are checked line by line, template literals (`` `...${x}...` ``) included.
+
+In a directory, `check` and `fix` skip what git ignores, build and cache folders (`node_modules`, `dist`, `.next`, `coverage`, ...) and minified files.
 
 To skip a line, add `# slopdam: ignore`, or `# slopdam: ignore[emoji]` to skip one rule group.
 

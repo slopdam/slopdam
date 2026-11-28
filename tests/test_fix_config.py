@@ -207,3 +207,57 @@ def test_fix_repeats_until_stable():
     once, edits = fix_source(src, Sanitizer())
     assert once.splitlines()[2] == 'log.info("- 항목")'
     assert fix_source(once, Sanitizer())[0] == once
+
+
+# --- found on real code (AI-assisted projects) ------------------------------------------
+
+def test_fix_reaches_strings_inside_the_message():
+    source = textwrap.dedent('''\
+        log.info("✅ rows " + str(n))
+        print(tr(f"✓ written to {out}", f"✓ {out}에 저장"))
+        print(_("Saved — done"))
+        print("✅ %s rows" % n)
+        print("✅ ok" if ok else "❌ failed")
+        print("Saved — {}".format(n))
+        print(", ".join(["a — b"]), d["— key"], f(x="— kw"))
+        print(("✓ " if ok else "✗ ") + name, "✓")
+    ''')
+    new, _ = fix_source(source, READER)
+    assert new == textwrap.dedent('''\
+        log.info("rows " + str(n))
+        print(tr(f"written to {out}", f"{out}에 저장"))
+        print(_("Saved: done"))
+        print("%s rows" % n)
+        print("ok" if ok else "failed")
+        print("Saved: {}".format(n))
+        print(", ".join(["a — b"]), d["— key"], f(x="— kw"))
+        print(("✓ " if ok else "✗ ") + name, "✓")
+    ''')
+
+
+def test_check_skips_ignored_and_build_files(tmp_path, capsys):
+    import subprocess
+
+    for path in ("src/app.ts", ".next/server/app.js", "out/app.js", "web/dist/app.js", "src/vendor.min.js"):
+        (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / path).write_text('console.log("✅ done");\n', encoding="utf-8")
+    assert main(["check", "--format", "json", str(tmp_path)]) == 1
+    without_git = {h["path"] for h in json.loads(capsys.readouterr().out)}
+    assert {p.replace(str(tmp_path) + "/", "") for p in without_git} == {"src/app.ts", "out/app.js"}
+    subprocess.run(["git", "init", "-q", str(tmp_path)], check=True)
+    (tmp_path / ".gitignore").write_text("out/\n", encoding="utf-8")
+    assert main(["check", "--format", "json", str(tmp_path)]) == 1
+    with_git = {h["path"] for h in json.loads(capsys.readouterr().out)}
+    assert {p.replace(str(tmp_path) + "/", "") for p in with_git} == {"src/app.ts"}
+
+
+def test_check_sees_template_literals_but_not_urls_in_strings(tmp_path, capsys):
+    (tmp_path / "a.ts").write_text(
+        "console.log(`💀 ${unit} 전사!`);\n"
+        "const msg = `— not a log call`;\n"
+        "const link = 'console.anthropic.com → keys';\n"
+        "login(`✅ ${user}`);\n",
+        encoding="utf-8")
+    assert main(["check", "--format", "json", str(tmp_path / "a.ts")]) == 1
+    hits = json.loads(capsys.readouterr().out)
+    assert [(h["line"], h["col"], h["rule"]) for h in hits] == [(1, 14, "emoji.pictograph"), (1, 26, "tone.exclaim")]

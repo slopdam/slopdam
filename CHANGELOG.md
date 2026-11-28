@@ -4,6 +4,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Fixed
+Found by running `slopdam check` on real projects written with AI coding tools: 85% of its findings came from build output, and it missed about 4 in 10 log messages with traces.
+- In a directory, `check` and `fix` skip files git ignores (when the directory is in a git work tree), build and cache folders of common tools (`.next`, `.nuxt`, `.svelte-kit`, `.turbo`, `.output`, `.vercel`, `.cache`, `coverage`, ...) and minified or bundled files. Files named on the command line are still checked.
+- JavaScript, TypeScript and Go: a template literal or raw string (`` `...` ``) in a log call is checked. It used to be taken for markdown inline code and skipped, so `` console.log(`✅ ${n} saved`) `` went unreported.
+- Python: strings inside the message are checked and fixed, not only a string passed directly: both sides of `+`, the left of `%`, the string before `.format()`, both branches of a conditional, and the arguments of a plain function such as `tr(...)`, `_(...)` or `gettext(...)`. Method calls (`", ".join(...)`), subscripts and keyword arguments are still left alone.
+- Python: a string that is nothing but a symbol (`"✓ " if ok else "✗ "`, `print("✓", result)`) is left alone, since the symbol is the whole message and removing it would lose what it says.
+- A line is no longer taken for a log call because of `login(`, `logout(`, `logo` or a `console.` inside a string (`"console.example.com"`); `console` counts only as `console.log(`, `.info(`, `.warn(`, `.error(`, `.debug(` or `.trace(`.
+
 ### Added
 - `claude-plugin/`: a Claude Code plugin, listed by `.claude-plugin/marketplace.json` at the repository root (`/plugin marketplace add slopdam/slopdam`, then `/plugin install slopdam@slopdam`). A `PostToolUse` hook runs `slopdam check` on each source file Claude writes or edits and passes the findings to Claude as context, without blocking or changing the file; a skill, `clean-log-messages`, covers writing plain log messages and using `check`, `fix` and `clean`. It uses the project's slopdam settings and needs slopdam installed.
 
