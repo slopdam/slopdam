@@ -58,7 +58,7 @@ reader: 要するに、1591行をCSVに書き出しました
 target: 1591行をCSVに書き出しました
 ```
 
-The `reader`, `dev` and `findings` labels are produced by [slopdam](https://github.com/slopdam/slopdam) 0.8.0, a deterministic cleaner with the same output in Python, JavaScript, Go and Java. They are what slopdam does, not human judgments. `target` goes one step further: it also drops the chatty openers and filler adverbs the generator inserted, which slopdam's rules only report or do not see at all.
+The `reader`, `dev` and `findings` labels are produced by [slopdam](https://github.com/slopdam/slopdam) 0.9.0, a deterministic cleaner with the same output in Python, JavaScript, Go and Java. They are what slopdam does, not human judgments. `target` goes one step further: it also drops the chatty openers and filler adverbs the generator inserted, which slopdam's rules only report or do not see at all.
 
 ## Subsets
 
@@ -88,7 +88,7 @@ edge = load_dataset("slopdam/log-slop", "conformance")  # the spec's cases
 | `input` | string | The message as an AI assistant might write it |
 | `reader` | string | Cleaned for people: dashes become `: ` or `~`, emoji and markdown go, `!` after Hangul becomes `.` |
 | `dev` | string | Cleaned for tools: dashes become ` - `, status emoji become `[OK]`, `[FAIL]`, `[WARN]` |
-| `reader_strong` | string | `reader` at the `strong` level, which also drops Korean filler words such as `성공적으로` |
+| `reader_strong` | string | `reader` at the `strong` level, which also drops Korean filler words such as `성공적으로` and about 80 known openers at the start of a line (`Great news!`, `Heads up:`, `살펴보겠습니다.`) |
 | `target` | string | `reader`, minus the chatty openers (`Great news!`, `Heads up:`, `살펴보겠습니다.`) and filler adverbs (`Successfully`, `성공적으로`) that were inserted; equal to `reader` on the 80% of rows without them. Always `reader` with some characters deleted and at most one letter upper-cased |
 | `changed` | bool | Whether `reader` differs from `input` |
 | `injected` | list of strings | Which kinds of trace the generator inserted (`inline_dash`, `pictograph`, `bold`, `chatty`, `block`, ...); empty for clean messages and hard negatives |
@@ -151,15 +151,17 @@ Most openers are ones no rule knows, which is why `tone.chatty` is rare here whi
 
 ## Baselines
 
-Taggers trained on `train` to turn `reader` into `target` by deleting words (code in `hf/model/` of the slopdam repository):
+slopdam's own rules at the `strong` level (`reader_strong`), and taggers trained on `train` to turn `reader` into `target` by deleting words (code in `hf/model/` of the slopdam repository). Rows with filler adverbs are left out of the opener rows:
 
-| | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
-|---|---:|---:|---:|
-| Job | openers and fillers | openers and fillers | openers only, with a guard |
-| `test`: unseen openers removed | | 90.6% | 90.7% (84.3% counting openers ending in `：`) |
-| `test`: other rows left unchanged | 96.0% | 99.8% | 100% |
-| `test`: hard negatives left unchanged | 96.8% | 100% | 100% |
-| Handwritten content lines left unchanged | 4 of 12 | 10 of 12 | 20 of 20 |
+| | slopdam 0.9.0 rules, `strong` | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
+|---|---:|---:|---:|---:|
+| Job | about 80 listed openers | openers and fillers | openers and fillers | openers only, with a guard |
+| `test`: unseen openers removed | 22.1% (90 of 407) | | 90.6% | 90.7% (84.3% counting openers ending in `：`) |
+| `test`: other rows left unchanged | 100% | 96.0% | 99.8% | 100% |
+| `test`: hard negatives left unchanged | 100% | 96.8% | 100% | 100% |
+| Handwritten content lines left unchanged | | 4 of 12 | 10 of 12 | 20 of 20 |
+
+The rule list was written from this dataset's opener lists, held-out ones included (`Voila!`, `FYI:`, `Excellent!`), so its test figure is not a measure of generalization; it shows what a fixed list covers, mostly English (76 of the 90).
 
 The first two were scored on v3 (English and Korean, fewer openers, no look-alike lines), the released model (v2) on this version (v6). Its guard never deletes a Japanese or Chinese span ending in `：`, since unseen labels and unseen openers cannot be told apart, so openers like `お知らせです：` are kept; the first figure leaves them out of the count. Japanese is its weakest language (77.3% of unseen openers). Pretraining is what makes the difference: the small model learned the phrase lists and cut words in half on anything new. Filler adverbs turned out not to be learnable from a few examples, and some are real content (Java's `finally` block), so slopdam handles them with a word list and the released model only removes openers. Its card has the full evaluation.
 
@@ -178,4 +180,4 @@ MIT, like slopdam. The text was written for this dataset.
 
 ## 한국어 요약
 
-AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.8.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
+AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.9.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.

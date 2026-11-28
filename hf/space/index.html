@@ -97,7 +97,7 @@
 </main>
 
 <script type="module">
-  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.4.0/dist/esm/index.js";
+  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.5.0/dist/esm/index.js";
 
   const EXAMPLES = [
     "✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉",
@@ -127,7 +127,7 @@
     b.addEventListener("click", () => { $("input").value = text; run(); });
     $("examples").append(b);
   }
-  $("version").textContent = "spec v1 · @slopdam/core 0.4.0";
+  $("version").textContent = "spec v1 · @slopdam/core 0.5.0";
   $("input").value = EXAMPLES[0];
 
   const picked = (name) => document.querySelector(`input[name=${name}]:checked`).value;
