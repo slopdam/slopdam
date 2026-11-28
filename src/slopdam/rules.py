@@ -78,6 +78,7 @@ LINES = "─━┄-┋╌-╏═⎯⏤➖"
 # Table borders: a dash run that touches one of these is part of a table, not a separator.
 TABLE_EDGES = "+|│┃║┆┇┊┋┌┐└┘├┤┬┴┼╔╗╚╝╠╣╦╩╬╒╓╕╖╘╙╛╜╞╟╡╢╤╥╧╨╪╫╭╮╯╰"
 CHOSEONG = "ᄀ-ᅟꥠ-ꥼ"  # Hangul leading consonants (jamo and extended-A), for old-style syllables
+HAN_KANA = "぀-ヿ㐀-䶿一-鿿豈-﫿ｦ-ﾟ"  # kana and CJK ideographs
 _CHOSEONG = re.compile(f"[{CHOSEONG}]")
 # Characters next to a dash that still count as part of the words around it: brackets,
 # % and quotes, so 'A — "B"' becomes 'A: "B"' and not 'A"B"'.
@@ -133,7 +134,16 @@ def _status_tag(m: "re.Match[str]", ctx: Context) -> str:
 _FULLWIDTH = str.maketrans("，：；（）！？［］｛｝", ",:;()!?[]{}")
 
 
+_HAN_KANA = re.compile(f"[{HAN_KANA}]")
+
+
 def _fullwidth(m: "re.Match[str]", ctx: Context) -> str:
+    # Chinese and Japanese write this punctuation full width, so a line with kana or CJK
+    # ideographs keeps it; elsewhere (Korean, English) it becomes ASCII.
+    s, i = m.string, m.start()
+    end = s.find("\n", i)
+    if _HAN_KANA.search(s, s.rfind("\n", 0, i) + 1, len(s) if end < 0 else end):
+        return m.group(0)
     return m.group(0).translate(_FULLWIDTH)
 
 

@@ -35,7 +35,7 @@ A character from the private-use range U+F0000 to U+FFFFD that is already in the
 
 | Function | Behavior |
 |---|---|
-| `fullwidth` | Map full-width punctuation to its ASCII form. |
+| `fullwidth` | Map full-width punctuation to its ASCII form, unless the match's line contains a character from `charsets.han_kana` (kana or a CJK ideograph); then return the match unchanged. |
 | `unwrap` | Replace the match with its first capture group. |
 | `quote_double` | `\"` if the match is inside a double-quoted string, that is, an odd number of `"` not preceded by `\` come before it on the same line; otherwise `"`. |
 | `status_tag` | `dev` only. Replace a leading status emoji with `[OK] `, `[FAIL] ` or `[WARN] `. Return nothing when the log level is at or above `status_redundant_at` for that tag. |

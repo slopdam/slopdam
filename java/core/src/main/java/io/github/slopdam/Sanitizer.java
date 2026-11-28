@@ -48,6 +48,8 @@ public final class Sanitizer {
   private static final String WORD_AFTER = (String) SPEC.get("dash_word_after");
   private static final Pattern CHOSEONG =
       Pattern.compile("[" + map(SPEC.get("charsets")).get("hangul_choseong") + "]");
+  private static final Pattern HAN_KANA =
+      Pattern.compile("[" + map(SPEC.get("charsets")).get("han_kana") + "]");
   private static final Map<Integer, String> STATUS_OF = new HashMap<>();
   private static final Map<String, Object> REDUNDANT = map(SPEC.get("status_redundant_at"));
   private static final List<Map<String, Object>> RULE_SPECS = new ArrayList<>();
@@ -191,7 +193,13 @@ public final class Sanitizer {
   private static final Map<String, Action> FUNCTIONS = new HashMap<>();
 
   static {
+    // Chinese and Japanese write this punctuation full width, so a line with kana or CJK
+    // ideographs keeps it; elsewhere it becomes ASCII.
     FUNCTIONS.put("fullwidth", (m, s, ctx) -> {
+      int end = s.indexOf('\n', m.start());
+      if (HAN_KANA.matcher(s.substring(s.lastIndexOf('\n', m.start() - 1) + 1, end < 0 ? s.length() : end)).find()) {
+        return m.group();
+      }
       StringBuilder out = new StringBuilder();
       for (char c : m.group().toCharArray()) out.append(c >= 0xFF01 && c <= 0xFF5E ? (char) (c - 0xFEE0) : c);
       return out.toString();

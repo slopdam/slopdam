@@ -28,7 +28,8 @@
       "[FAIL]": "❌✖🔴⛔🚫❎",
       "[WARN]": "⚠🟡🚨"
     },
-    "hangul_choseong": "ᄀ-ᅟꥠ-ꥼ"
+    "hangul_choseong": "ᄀ-ᅟꥠ-ꥼ",
+    "han_kana": "぀-ヿ㐀-䶿一-鿿豈-﫿ｦ-ﾟ"
   },
   "dash_word_before": ")]}%\"'”’",
   "dash_word_after": "([{\"'“‘",

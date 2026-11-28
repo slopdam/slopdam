@@ -78,7 +78,8 @@ The [log-slop](https://huggingface.co/datasets/slopdam/log-slop) dataset and the
 - [x] 1. log-slop v5: structured and multi-line logs (JSON lines, logfmt, stack traces, tables) ([#34](https://github.com/slopdam/slopdam/issues/34))
 - [x] 1a. Structured output in the engine: aligned columns and tables kept, logfmt messages cleaned, in the spec and every port ([#40](https://github.com/slopdam/slopdam/issues/40))
 - [x] 1b. Curly quotes inside JSON and logfmt strings become `\"`, so the line stays valid ([#43](https://github.com/slopdam/slopdam/pull/43))
-- [ ] 2. log-slop v5: Japanese and Chinese messages, and a handwritten gold set in four languages ([#35](https://github.com/slopdam/slopdam/issues/35))
+- [x] 2a. Chinese and Japanese lines keep full-width punctuation (`，：！`), in the spec and every port
+- [ ] 2. log-slop v6: Japanese and Chinese messages, and a handwritten gold set in four languages ([#35](https://github.com/slopdam/slopdam/issues/35))
 - [ ] 3. Known openers as a rule: a larger `tone.chatty` list with a fix at the `strong` level, in the spec and every port ([#36](https://github.com/slopdam/slopdam/issues/36))
 - [ ] 4. `slopdam[chatter]`: the chatter model from Python and `slopdam clean --chatter`, off by default ([#37](https://github.com/slopdam/slopdam/issues/37))
 - [ ] 5. The chatter model in the browser demo (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))

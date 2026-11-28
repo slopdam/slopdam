@@ -83,6 +83,7 @@ type rulesSpec struct {
 	Charsets          struct {
 		Status         map[string]string `json:"status"`
 		HangulChoseong string            `json:"hangul_choseong"`
+		HanKana        string            `json:"han_kana"`
 	} `json:"charsets"`
 	DashWordBefore string `json:"dash_word_before"`
 	DashWordAfter  string `json:"dash_word_after"`
@@ -102,6 +103,7 @@ var (
 	multiSpace *regexp2.Regexp
 	quoteSpace *regexp2.Regexp
 	choseong   *regexp2.Regexp
+	hanKana    *regexp2.Regexp
 	statusOf   = map[rune]string{}
 	compiled   = map[int]*regexp2.Regexp{}
 )
@@ -125,6 +127,7 @@ func init() {
 	multiSpace = must(spec.Tidy.MultiSpace, nil)
 	quoteSpace = must(spec.Tidy.QuoteSpace, nil)
 	choseong = regexp2.MustCompile("^["+spec.Charsets.HangulChoseong+"]$", regexp2.None)
+	hanKana = regexp2.MustCompile("["+spec.Charsets.HanKana+"]", regexp2.None)
 	for tag, chars := range spec.Charsets.Status {
 		for _, c := range chars {
 			statusOf[c] = tag
@@ -177,7 +180,19 @@ func wordish(r rune, extra string) bool {
 }
 
 var functions = map[string]action{
-	"fullwidth": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string {
+	// Chinese and Japanese write this punctuation full width, so a line with kana or CJK
+	// ideographs keeps it; elsewhere it becomes ASCII.
+	"fullwidth": func(m *regexp2.Match, text []rune, _ *cleanCtx) string {
+		start, end := m.Index, m.Index
+		for start > 0 && text[start-1] != '\n' {
+			start--
+		}
+		for end < len(text) && text[end] != '\n' {
+			end++
+		}
+		if ok, _ := hanKana.MatchString(string(text[start:end])); ok {
+			return m.String()
+		}
 		return strings.Map(func(r rune) rune {
 			if r >= 0xFF01 && r <= 0xFF5E {
 				return r - 0xFEE0
