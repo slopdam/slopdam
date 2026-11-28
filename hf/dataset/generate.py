@@ -4,7 +4,8 @@
     python hf/dataset/generate.py                 # writes hf/dataset/out/
     python hf/dataset/generate.py --rows 200 --check   # small run, checks determinism
 
-Every row is a log or console message written for this dataset (English or Korean), with
+Every row is a log or console message written for this dataset (English, Korean, Japanese or
+Chinese), with
 AI-style traces injected on purpose: em dashes and the Hangul ㅡ, emoji, markdown, curly quotes,
 separators and so on. The labels (`reader`, `dev`, `findings`) come from the slopdam engine in
 this repository, so they are exactly what slopdam outputs, not human judgments. The same seed
@@ -88,12 +89,44 @@ KO = [
     "{name} 할당량 {pct}% 사용", "{a}-{b}년 로그 {n}개를 보관했습니다", "{a}-{b}년 보고서가 준비되었습니다",
     "{url}에서 페이지 {n}개를 가져왔습니다", "{kv} 설정으로 {name}을 시작합니다",
 ]
-TEMPLATES = {"en": EN, "ko": KO}
+JA = [
+    "{name}に{n}件保存しました", "{name}から{n}件のレコードを同期しました", "{name}を本番環境にデプロイしました",
+    "{path}のアップロードに失敗しました", "{n}秒後に{name}への接続を再試行します", "{name}のキャッシュを温めました",
+    "{m}件中{i}件目のバッチを処理しました", "ユーザー{name}がログインしました", "決済{name}を確定しました",
+    "ジョブ{name}が終了しました", "{name}のディスク使用率：{pct}%", "テーブルを{n}個移行しました",
+    "{url}へのリクエストがタイムアウトしました", "{path}から設定を読み込みました", "ドキュメントを{n}件インデックスしました",
+    "キュー{name}を空にしました", "{name}のバックアップが完了しました", "{branch}ブランチをマージしました",
+    "バージョン{ver}をリリースしました", "ポート{port}で待ち受けを開始しました", "{kv}で再実行します",
+    "{name}の応答時間は{ms}msでした", "終了コード{code}でプロセスが終了しました", "損失値：{loss}",
+    "{a}-{b}年のログを{n}件アーカイブしました", "{name}の証明書を更新しました", "{n}件のメールを送信しました",
+    "{name}のヘルスチェックに失敗しました（{n}回目）", "一時ファイルを{n}個削除しました", "{name}のレプリカを{n}台に増やしました",
+    "{path}を圧縮しました", "インデックス{name}を再構築しました", "{n}件の警告があります", "{name}のロックを解放しました",
+    "{m}個のテストのうち{i}個が失敗しました", "{url}からデータを取得しました", "スケジュール済みのタスク：{n}件",
+    "{name}の接続プールが上限に達しました", "{n}行をCSVに書き出しました", "{name}のメンテナンスを開始します",
+]
+ZH = [
+    "已将{n}条记录保存到{name}", "已从{name}同步{n}条记录", "{name}已部署到生产环境", "{path}上传失败",
+    "{n}秒后重试连接{name}", "{name}缓存预热完成", "已处理第{i}批，共{m}批", "用户{name}已登录", "支付{name}已确认",
+    "任务{name}已完成", "{name}磁盘使用率：{pct}%", "已迁移{n}张表", "请求{url}超时", "已从{path}加载配置",
+    "已索引{n}篇文档", "队列{name}已清空", "{name}备份完成", "已合并分支{branch}", "已发布版本{ver}",
+    "开始监听端口{port}", "使用{kv}重新运行", "{name}响应时间为{ms}ms", "进程退出，退出码{code}", "损失值：{loss}",
+    "已归档{a}-{b}年的日志{n}条", "{name}证书已更新", "已发送{n}封邮件", "{name}健康检查失败（第{n}次）",
+    "已删除{n}个临时文件", "{name}副本数已扩展到{n}个", "已压缩{path}", "索引{name}已重建", "共有{n}条警告",
+    "{name}的锁已释放", "{m}个测试中有{i}个失败", "已从{url}获取数据", "计划任务：{n}个", "{name}连接池已满",
+    "已导出{n}行到CSV", "{name}开始维护",
+]
+TEMPLATES = {"en": EN, "ko": KO, "ja": JA, "zh": ZH}
+LANGS = (("en", 0.3), ("ko", 0.3), ("ja", 0.2), ("zh", 0.2))  # share of rows
+COUNTER = {"en": "", "ko": "건", "ja": "件", "zh": "条"}  # after a count in parentheses
+QUOTES = {"en": "“”", "ko": "‘’", "ja": "“”", "zh": "“”"}
+CJK = {"ja", "zh"}  # full-width punctuation is correct here, and openers and fillers often run straight into the message
 SPLITS = ("train", "validation", "test")
 HELD_OUT = 5  # template i goes to the test split when i % HELD_OUT == HELD_OUT - 1
 TAILS = {
     "en": ["done", "all good", "no errors", "see details", "next step queued", "retry scheduled", "check the dashboard"],
     "ko": ["완료", "문제 없음", "오류 없음", "자세한 내용 확인", "다음 단계 대기 중", "재시도 예약됨", "대시보드 확인"],
+    "ja": ["完了", "問題なし", "エラーなし", "詳細を確認", "次のステップ待ち", "再試行を予約済み", "ダッシュボードを確認"],
+    "zh": ["完成", "一切正常", "没有错误", "查看详情", "下一步已排队", "已安排重试", "请查看仪表盘"],
 }
 NAMES = ["orders", "users-db", "billing", "api-gateway", "k8s-node-01", "search", "auth", "reports", "inventory",
          "worker-3", "payments", "cdn", "mailer", "etl", "analytics", "session-store", "jobs", "ledger", "media",
@@ -126,6 +159,13 @@ CHATTY = {
            "정리하면", "좋습니다!", "네,", "결론적으로", "좋아요!", "다행스럽게도", "음,", "알겠습니다.", "보시다시피",
            "기쁜 소식입니다!", "요약하자면,", "먼저,", "그럼", "결과적으로", "참고하세요:", "잘 됐네요!", "완료했어요!",
            "여기 있습니다:", "확인 결과", "요컨대", "멋지네요!", "드디어 해냈습니다!", "알려드리면,"],
+    "ja": ["さて、", "お知らせです：", "良いニュースです！", "まとめると、", "結論から言うと、", "ご覧の通り、", "やりました！",
+           "では、", "えーと、", "というわけで、", "念のため、", "朗報です！", "ちなみに、", "簡単に言うと、", "確認したところ、",
+           "いい感じです！", "お待たせしました！", "要するに、", "はい、", "よし、", "見てみましょう。", "やってみます。",
+           "ご報告です：", "結果発表：", "了解しました。"],
+    "zh": ["好的，", "好消息！", "总结一下：", "简单来说，", "那么，", "看起来，", "搞定！", "如你所见，", "需要注意：",
+           "顺便说一下，", "总之，", "结果是：", "让我们看看。", "我来试试。", "没问题！", "汇报一下：", "嗯，", "其实，",
+           "综上所述，", "值得一提的是，", "好了，", "来看看结果：", "收到。"],
 }
 # More training openers, built from parts so the model sees many shapes rather than one list. No
 # word here appears in CHATTY_TEST, LOOKALIKE_TEST or hf/model/handwritten2.jsonl.
@@ -140,6 +180,16 @@ _KO_STEMS = ["좋네요", "멋져요", "훌륭합니다", "해냈어요", "끝�
              "요약해 드릴게요", "됐네요", "좋아요", "깔끔하네요", "역시나"]
 _KO_CONNECTIVES = ["핵심만 말하면", "간단히 말해", "결론부터 말하면", "요약하면", "돌아보면", "덧붙이자면", "알고 보니",
                    "살펴보니", "따라서", "그래서", "그러므로", "덕분에", "결국", "한편", "이어서", "마지막으로"]
+_JA_WORDS = ["素晴らしい", "最高です", "完璧です", "いいですね", "やった", "よかった", "すごい", "なるほど", "ばっちり",
+             "上出来です", "順調です", "成功です", "できました", "わーい", "よっしゃ"]
+_JA_CONNECTIVES = ["まず", "次に", "最後に", "つまり", "したがって", "その結果", "ところで", "結局", "一方で", "続いて",
+                   "振り返ると", "改めて", "まとめて言うと", "総じて"]
+_ZH_WORDS = ["太好了", "真棒", "很好", "不错", "厉害", "漂亮", "成功了", "完成了", "搞定了", "好极了", "完美", "优秀",
+             "棒极了", "耶", "哈哈"]
+_ZH_CONNECTIVES = ["首先", "接下来", "然后", "最后", "因此", "所以", "另外", "此外", "总的来说", "换句话说", "与此同时",
+                   "回顾一下", "综合来看", "具体来说"]
+CHATTY["ja"] += [w + p for w in _JA_WORDS for p in ("！", "。", "：")] + [c + "、" for c in _JA_CONNECTIVES]
+CHATTY["zh"] += [w + p for w in _ZH_WORDS for p in ("！", "。", "：")] + [c + "，" for c in _ZH_CONNECTIVES]
 CHATTY["en"] += [w + p for w in _EN_WORDS for p in ("!", ",", ":", ".")] + [
     t.format(x=n) for t in _EN_PHRASES for n in _EN_NOUNS]
 CHATTY["ko"] += [w + p for w in _KO_STEMS for p in ("!", ".", ":")] + [
@@ -150,6 +200,10 @@ CHATTY_TEST = {
            "Heads-up,", "Good stuff:", "Real quick:", "Guess what?"],
     "ko": ["해보겠습니다.", "완벽합니다!", "말씀드리면", "다행히", "알려 드릴게요:", "정리해 보면", "와!", "좋은 결과입니다!",
            "말하자면", "소식 전해 드려요:"],
+    "ja": ["ジャーン！", "お疲れ様です！", "取り急ぎ、", "嬉しいお知らせ：", "端的に言えば、", "実は、", "なんと！",
+           "以上を踏まえると、", "ご安心ください。", "さあ、"],
+    "zh": ["哇！", "告诉你个好消息：", "长话短说，", "说实话，", "瞧！", "恭喜！", "一句话总结：", "大功告成！", "放心吧，",
+           "重点来了："],
 }
 # Lines that start with a word that only looks like an opener. They are hard negatives: nothing
 # in them may be removed. As with the openers, the *_TEST list only appears in the test split.
@@ -165,17 +219,30 @@ LOOKALIKE = {
            "알림 설정 {n}건 갱신", "먼저 온 요청 {n}건 처리", "확인 버튼 클릭 {n}건", "요약 리포트 {n}건 생성",
            "완료율 {pct}%", "기쁨 스티커 {n}개 판매", "그럼블 서비스 응답 코드 {code}", "멋 쇼핑몰 주문 {n}건 동기화",
            "다행정 구역 데이터 {n}건 갱신", "여기어때 연동 토큰 갱신", "자바 힙 사용량 {pct}%"],
+    "ja": ["まとめ記事を{n}件バックアップしました", "要約レポートを{n}件生成しました", "確認ボタンのクリック数：{n}",
+           "結果テーブルに{n}行を追加しました", "次回実行は{n}秒後です", "最終ジョブ{name}を再実行しました",
+           "結論フィールドが空です（{name}）", "はいいいえ形式の質問を{n}件集計しました", "朗読音声を{n}件変換しました",
+           "やり直しキューに{n}件あります", "完了率：{pct}%", "一方向同期を{n}件実行しました", "最後のハートビートは{ms}ms前です"],
+    "zh": ["总结报告已生成{n}份", "首次到达的请求已处理{n}个", "好友列表已同步{n}条", "确认按钮点击{n}次", "完成率：{pct}%",
+           "最后一次心跳在{ms}ms前", "结果表新增{n}行", "注意事项文档已索引{n}篇", "太平洋区域节点{n}个在线",
+           "漂亮号码池剩余{n}个", "成功率：{pct}%（{name}）", "收到的消息已处理{n}条"],
 }
 LOOKALIKE_TEST = {
     "en": ["Excellent tier quota used: {pct}%", "Fantastic4 cluster scaled to {n}", "FYI-bot posted {n} messages",
            "Voila.png uploaded to {path}", "Good news feed refreshed for {name}", "Real-time sync lag {ms}ms"],
     "ko": ["완벽성 검사 {n}건 통과", "와이파이 신호 약함 ({name})", "말하기 평가 {n}건 채점", "해보기 버튼 노출 {n}회",
            "다행복 카드 발급 {n}건", "정리해고 문서 열람 권한 변경"],
+    "ja": ["取り急ぎフラグを{n}件クリアしました", "嬉野サーバーのディスク使用率：{pct}%", "端末を{n}台再起動しました",
+           "実行時間：{ms}ms", "なんとか認証の応答コード：{code}", "お疲れ度スコアを{n}件計算しました"],
+    "zh": ["哇哈哈订单已同步{n}笔", "恭喜发财红包已发放{n}个", "说明书已上传{n}份", "长连接已断开{n}个",
+           "瞧瞧服务返回码：{code}", "放心贷申请已审核{n}笔"],
 }
 # Filler adverbs. Korean ones in the rule list are removed at the strong level; the others have no rule.
-FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "깔끔하게 "], "en": ["Successfully ", "Seamlessly "]}
-FILLER_TEST = {"ko": ["드디어 ", "순조롭게 "], "en": ["Finally "]}
-BLOCK_TITLES = {"en": ["## Summary", "### Results", "**Status**", "## Done"], "ko": ["## 요약", "### 결과", "**상태**", "## 완료"]}
+FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "깔끔하게 "], "en": ["Successfully ", "Seamlessly "],
+          "ja": ["無事に", "見事に", "スムーズに"], "zh": ["顺利地", "完美地", "轻松地"]}
+FILLER_TEST = {"ko": ["드디어 ", "순조롭게 "], "en": ["Finally "], "ja": ["きれいに", "あっさり"], "zh": ["圆满地"]}
+BLOCK_TITLES = {"en": ["## Summary", "### Results", "**Status**", "## Done"], "ko": ["## 요약", "### 결과", "**상태**", "## 완료"],
+                "ja": ["## まとめ", "### 結果", "**ステータス**", "## 完了"], "zh": ["## 总结", "### 结果", "**状态**", "## 完成"]}
 
 KINDS = ["status_emoji", "pictograph", "bold", "inline_dash", "range_dash", "separator", "heading", "bullet",
          "curly_quotes", "ellipsis", "arrow", "fullwidth", "invisible", "nbsp", "exclaim", "filler", "chatty",
@@ -215,7 +282,8 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
     templates = pool["templates"]
     tid = rng.randrange(len(templates))
     template = templates[tid][1]
-    allowed = [k for k in KINDS if not (inline and k in LINE_SHAPE) and not (plain and k in REWRITE_ONLY)]
+    allowed = [k for k in KINDS if not (inline and k in LINE_SHAPE) and not (plain and k in REWRITE_ONLY)
+               and not (k == "fullwidth" and lang in CJK)]
     kinds = rng.sample(allowed, k=rng.choice([1, 1, 2, 2, 3, 4])) if roll >= 0.25 else []
     if "heading" in kinds and "bullet" in kinds:
         kinds.remove("bullet")  # "• # text" is not something anyone writes
@@ -237,10 +305,10 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
 
     if "range_dash" in kinds and "{a}-{b}" not in template:
         a, d, b = rng.randint(1, 20), rng.choice(DASHES[:2]), rng.randint(1, 9)
-        both(lambda s: s + (f" ({a}{d}{a + b})" if lang == "en" else f" ({a}{d}{a + b}건)"))
+        both(lambda s: s + f" ({a}{d}{a + b}{COUNTER[lang]})")
     if "wave_dash" in kinds:
         a, d, b = rng.randint(1, 20), rng.choice(["〜", "～"]), rng.randint(1, 9)
-        both(lambda s: s + (f" ({a}{d}{a + b})" if lang == "en" else f" ({a}{d}{a + b}건)"))
+        both(lambda s: s + f" ({a}{d}{a + b}{COUNTER[lang]})")
     if "bold" in kinds:
         i = rng.randrange(len(t[0].split(" ")))
         both(lambda s: " ".join(f"**{w}**" if j == i else w for j, w in enumerate(s.split(" "))))
@@ -248,7 +316,7 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
         d = rng.choice(DASHES)
         both(lambda s: f"{s} {d} {tail}")
     if "curly_quotes" in kinds:
-        q = " “" + rng.choice(NAMES) + "”" if lang == "en" else " ‘" + rng.choice(NAMES) + "’"
+        q = " " + QUOTES[lang][0] + rng.choice(NAMES) + QUOTES[lang][1]
         both(lambda s: s + q)
     if "unicode_hyphen" in kinds:
         h, n = rng.choice(["−", "‐", "－"]), rng.randint(1, 99)
@@ -265,12 +333,17 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
         i, z = rng.randrange(1, len(t[0])), rng.choice(["\u200b", "\u2060", "\ufeff"])
         both(lambda s: s[:i] + z + s[i:])
     if "nbsp" in kinds:
-        both(lambda s: s.replace(" ", "\u00a0", 1))
+        if " " in t[0]:
+            both(lambda s: s.replace(" ", "\u00a0", 1))
+        else:
+            kinds.remove("nbsp")
+            if not kinds:
+                kinds.append("pictograph")
     if "exclaim" in kinds:
         both(lambda s: s + ("!" if lang == "en" else "!!"))
     if "filler" in kinds:
         f = rng.choice(pool["filler"])
-        if lang == "ko":
+        if lang != "en":
             t[0] = f + t[0]
         elif t[0][:1].isupper() and t[0][1:2].islower():
             t[0] = f + t[0][0].lower() + t[0][1:]
@@ -282,7 +355,7 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
         opener = rng.choice(pool["chatty"])
         if lang == "en" and opener[-1] in ",:" and t[0][:1].isupper() and t[0][1:2].islower() and rng.random() < 0.5:
             t[0] = t[0][0].lower() + t[0][1:]  # "Great, saved 3 rows": target capitalizes it again
-        t[0] = opener + " " + t[0]
+        t[0] = opener + ("" if lang in CJK and rng.random() < 0.7 else " ") + t[0]
     if "pictograph" in kinds:
         p, front = rng.choice(PICTO), rng.random() < 0.5
         both(lambda s: f"{p} {s}" if front else f"{s} {p}")
@@ -481,7 +554,12 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
     seen, splits = set(), {"train": [], "validation": [], "test": []}
     for split, count in (("test", test_rows), ("validation", validation_rows), ("train", rows)):
         while len(splits[split]) < count:
-            lang = "ko" if rng.random() < 0.5 else "en"
+            roll, lang = rng.random(), LANGS[-1][0]
+            for code, share in LANGS:
+                if roll < share:
+                    lang = code
+                    break
+                roll -= share
             row = make(rng, lang, pools[split][lang], split)
             if row["input"] in seen:
                 continue  # no input appears twice, within or across splits
@@ -520,7 +598,7 @@ def write(data: dict, out: Path) -> dict:
         "templates": {split: len({r["template_id"] for r in data[split]}) for split in SPLITS},
         "changed_share": round(sum(r["changed"] for r in train) / len(train), 3),
         "target_differs_share": round(sum(r["target"] != r["reader"] for r in train) / len(train), 3),
-        "lang": {l: sum(r["lang"] == l for r in train) for l in ("en", "ko")},
+        "lang": {l: sum(r["lang"] == l for r in train) for l in TEMPLATES},
         "injected": dict(sorted(((k, sum(k in r["injected"] for r in train)) for k in
                                  {x for r in train for x in r["injected"]}), key=lambda x: -x[1])),
         "rules": dict(sorted(((rid, sum(rid in r["rule_ids"] for r in train)) for rid in
