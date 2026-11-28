@@ -4,6 +4,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Added
+- `pip install "slopdam[chatter]"` adds the optional chatter model ([slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)) for the openers no rule lists: `slopdam.chatter.strip(lines)` and `slopdam clean --chatter` run the rules, then the model with its guard. The model is downloaded on first use at a pinned revision and is off by default; without the extra, `--chatter` exits 2 with the install command. The core package still has no runtime dependencies (#37).
+
 ### Output changes
 - At the `strong` level, `tone.chatty` removes a known opener at the start of a line when more text follows: about 80 phrases in English, Korean, Japanese and Chinese (`Great news!`, `Heads up:`, `Here's the summary:`, `살펴보겠습니다.`, `좋은 소식입니다!`, `さて、`, `好消息！`). The next word is capitalized when it is a plain lowercase word with a vowel, so `Heads up: cache warmed` becomes `Cache warmed` while `npm` and `k8s-node-01` keep their case. A line start may have indentation, a list marker, a heading marker or dev's `[OK]` tag. `basic` output does not change; the existing report-only `tone.chatty` rule still flags chatty phrases anywhere. The spec gains the `opener` function and a conformance group, `chatty`, with look-alike lines that must not change (`Great Lakes shard`, `Finally block ran`, `FYI-bot`, `결론 필드가`, `状態：OK`). On 20,000 random inputs at `strong`, JavaScript, Go and Java match Python exactly (#36).
 

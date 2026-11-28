@@ -3,7 +3,7 @@
 
     slopdam check [PATH ...]   report rule hits, exit 1 if any (- reads stdin)
     slopdam fix [PATH ...]     rewrite string literals in Python files (--diff to preview)
-    slopdam clean              read stdin, write cleaned text to stdout
+    slopdam clean              read stdin, write cleaned text to stdout (--chatter: also the opener model)
 
 Settings come from slopdam.toml or [tool.slopdam] in pyproject.toml (see config.py);
 command line options win over the file. Exit codes: 0 clean, 1 findings, 2 usage or config error.
@@ -217,10 +217,23 @@ def fix(args: argparse.Namespace) -> int:
 
 def clean(args: argparse.Namespace) -> int:
     sanitizer = _sanitizer(_resolve(args))
+    tagger = None
+    if args.chatter:
+        try:
+            from .chatter import tagger as load_tagger
+
+            tagger = load_tagger()
+        except ImportError as e:
+            print(f"slopdam: {e}", file=sys.stderr)
+            return 2
     for line in sys.stdin:
         cleaned = sanitizer.clean(line)
+        if cleaned and tagger is not None:
+            cleaned = tagger([cleaned])[0]  # one line at a time, so `tail -f | slopdam clean` keeps streaming
         if cleaned:
             sys.stdout.write(cleaned + "\n")
+            if tagger is not None:
+                sys.stdout.flush()
     return 0
 
 
@@ -249,6 +262,8 @@ def main(argv: list = None) -> int:
     p_fix.set_defaults(func=fix)
 
     p_clean = sub.add_parser("clean", help="clean stdin to stdout")
+    p_clean.add_argument("--chatter", action="store_true",
+                         help='also remove chatty openers with the slopdam/chatter-tagger model (pip install "slopdam[chatter]")')
     p_clean.set_defaults(func=clean)
 
     args = parser.parse_args(argv)
