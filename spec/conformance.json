@@ -1033,6 +1033,87 @@
           "dev": "好消息"
         }
       ]
+    },
+    {
+      "id": "dash-meaning",
+      "title": "Identifier ranges and empty cells",
+      "cases": [
+        {
+          "input": "MA-PMO hypothesis validation (H1–H5) — five-axis KPI",
+          "reader": "MA-PMO hypothesis validation (H1~H5): five-axis KPI",
+          "dev": "MA-PMO hypothesis validation (H1-H5) - five-axis KPI"
+        },
+        {
+          "input": "v1–v3 supported",
+          "reader": "v1~v3 supported",
+          "dev": "v1-v3 supported"
+        },
+        {
+          "input": "Q1–Q4 report",
+          "reader": "Q1~Q4 report",
+          "dev": "Q1-Q4 report"
+        },
+        {
+          "input": "Step 1–Step 2",
+          "reader": "Step 1: Step 2",
+          "dev": "Step 1 - Step 2"
+        },
+        {
+          "input": "page 3–Chapter 4",
+          "reader": "page 3: Chapter 4",
+          "dev": "page 3 - Chapter 4"
+        },
+        {
+          "input": "H1 – H5",
+          "reader": "H1~H5",
+          "dev": "H1-H5"
+        },
+        {
+          "input": "{name:<15} –",
+          "reader": "{name:<15} -",
+          "dev": "{name:<15} -"
+        },
+        {
+          "input": "  {name:<15}  –",
+          "reader": "{name:<15} -",
+          "dev": "{name:<15} -"
+        },
+        {
+          "input": "| a | – |",
+          "reader": "| a | - |",
+          "dev": "| a | - |"
+        },
+        {
+          "input": "| a | — | b |",
+          "reader": "| a | - | b |",
+          "dev": "| a | - | b |"
+        },
+        {
+          "input": "name\t–\tok",
+          "reader": "name: ok",
+          "dev": "name - ok"
+        },
+        {
+          "input": "totals:  –",
+          "reader": "totals: -",
+          "dev": "totals: -"
+        },
+        {
+          "input": "완료 ㅡ",
+          "reader": "완료",
+          "dev": "완료"
+        },
+        {
+          "input": "Done —",
+          "reader": "Done",
+          "dev": "Done"
+        },
+        {
+          "input": "count 3 —",
+          "reader": "count 3",
+          "dev": "count 3"
+        }
+      ]
     }
   ]
 }

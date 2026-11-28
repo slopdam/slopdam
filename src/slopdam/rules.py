@@ -83,6 +83,9 @@ _CHOSEONG = re.compile(f"[{CHOSEONG}]")
 # Characters next to a dash that still count as part of the words around it: brackets,
 # % and quotes, so 'A — "B"' becomes 'A: "B"' and not 'A"B"'.
 _OPENERS, _CLOSERS = "([{\"'“‘", ")]}%\"'”’"
+# After a digit, a short identifier with a number ("H5", "v3", "Q4") ends a range just as a digit does.
+DASH_RANGE_AFTER = "[A-Za-z]{1,3}[0-9]"
+_ID_AFTER = re.compile(DASH_RANGE_AFTER)
 
 
 def _wordish(c: str, extra: str) -> bool:
@@ -99,13 +102,19 @@ def _dash_run(m: "re.Match[str]", ctx: Context) -> str:
     inner = _wordish(prev, _CLOSERS) and _wordish(nxt, _OPENERS)
     if len(run) >= 2:  # separator or emoticon: ㅡㅡ, ──, ——
         return " " if inner else ""
-    if prev.isdigit() and nxt.isdigit():
+    if prev.isdigit() and (nxt.isdigit() or _ID_AFTER.match(s, end)):  # 1–2, H1–H5, v1–v3
         return "~" if ctx.profile == "reader" else "-"
     head = s[s.rfind("\n", 0, start) + 1 : start]
     if not head.strip() and m.group(3):  # list marker at line start
         return lead + "- "
     if inner:
         return ctx.dash_inline if ctx.profile == "reader" else " - "
+    # An empty cell: after column padding (two spaces or a tab), a table bar or a format placeholder,
+    # and before the end of the line, a bar or a tab ("{name:<15} –", "| – |"). It means "no value",
+    # so it stays, in ASCII. A dash hanging off a sentence ("완료 ㅡ") still goes.
+    cell = len(lead) >= 2 or "\t" in lead or prev in "|}"
+    if lead and cell and head.strip() and (nxt in "\n|" or "\t" in m.group(3)):
+        return lead + "-" + m.group(3)
     return ""
 
 

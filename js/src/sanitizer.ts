@@ -81,6 +81,7 @@ const STATUS_OF: Record<string, string> = {};
 for (const [tag, chars] of Object.entries(SPEC.charsets.status)) {
   for (const c of chars) STATUS_OF[c] = tag;
 }
+const RANGE_AFTER = new RegExp(SPEC.dash_range_after, "y");
 const CHOSEONG = new RegExp(`^[${SPEC.charsets.hangul_choseong}]$`, "u");
 const HAN_KANA = new RegExp(`[${SPEC.charsets.han_kana}]`, "u");
 const wordish = (c: string, extra: string): boolean => isAlnum(c) || extra.includes(c) || PUA_RE.test(c);
@@ -131,10 +132,14 @@ const FUNCTIONS: Record<string, Fn> = {
     const next = end < s.length ? charAt(s, end) : "\n";
     const inner = wordish(prev, SPEC.dash_word_before) && wordish(next, SPEC.dash_word_after);
     if ([...run].length >= 2) return inner ? " " : ""; // separator or emoticon: ㅡㅡ, ──
-    if (isDigit(prev) && isDigit(next)) return ctx.profile === "reader" ? "~" : "-";
+    RANGE_AFTER.lastIndex = end;
+    if (isDigit(prev) && (isDigit(next) || RANGE_AFTER.test(s))) return ctx.profile === "reader" ? "~" : "-"; // 1–2, H1–H5
     const head = s.slice(start === 0 ? 0 : s.lastIndexOf("\n", start - 1) + 1, start);
     if (!pyStrip(head) && m[3]) return lead + "- "; // list marker at line start
     if (inner) return ctx.profile === "reader" ? ctx.dashInline : " - ";
+    // An empty cell after column padding, a table bar or a format placeholder: keep it, in ASCII.
+    const cell = lead.length >= 2 || lead.includes("\t") || prev === "|" || prev === "}";
+    if (lead && cell && pyStrip(head) && (next === "\n" || next === "|" || m[3]!.includes("\t"))) return lead + "-" + m[3]!;
     return "";
   },
 };

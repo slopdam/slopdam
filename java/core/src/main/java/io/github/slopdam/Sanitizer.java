@@ -46,6 +46,7 @@ public final class Sanitizer {
   private static final int MAX_PASSES = ((Double) map(SPEC.get("tidy")).get("max_passes")).intValue();
   private static final String WORD_BEFORE = (String) SPEC.get("dash_word_before");
   private static final String WORD_AFTER = (String) SPEC.get("dash_word_after");
+  private static final Pattern RANGE_AFTER = Pattern.compile((String) SPEC.get("dash_range_after"));
   private static final Pattern CHOSEONG =
       Pattern.compile("[" + map(SPEC.get("charsets")).get("hangul_choseong") + "]");
   private static final Pattern HAN_KANA =
@@ -235,10 +236,15 @@ public final class Sanitizer {
       int next = end < s.length() ? s.codePointAt(end) : '\n';
       boolean inner = wordish(prev, WORD_BEFORE) && wordish(next, WORD_AFTER);
       if (run.codePointCount(0, run.length()) >= 2) return inner ? " " : ""; // separator: ㅡㅡ, ──
-      if (PyRegex.isDigit(prev) && PyRegex.isDigit(next)) return ctx.profile.equals("reader") ? "~" : "-";
+      boolean rangeAfter = end < s.length() && RANGE_AFTER.matcher(s).region(end, s.length()).lookingAt();
+      if (PyRegex.isDigit(prev) && (PyRegex.isDigit(next) || rangeAfter)) return ctx.profile.equals("reader") ? "~" : "-";
       int lineStart = start == 0 ? 0 : s.lastIndexOf('\n', start - 1) + 1;
       if (PyRegex.strip(s.substring(lineStart, start)).isEmpty() && !trail.isEmpty()) return lead + "- ";
       if (inner) return ctx.profile.equals("reader") ? ctx.dashInline : " - ";
+      // An empty cell after column padding, a table bar or a format placeholder: keep it, in ASCII.
+      boolean cell = lead.length() >= 2 || lead.contains("\t") || prev == '|' || prev == '}';
+      if (!lead.isEmpty() && cell && !PyRegex.strip(s.substring(lineStart, start)).isEmpty()
+          && (next == '\n' || next == '|' || trail.contains("\t"))) return lead + "-" + trail;
       return "";
     });
   }

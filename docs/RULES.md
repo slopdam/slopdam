@@ -38,9 +38,10 @@ A run of dash-like characters is judged by what is next to it.
 | Context | Example | `reader` | `dev` |
 |---|---|---|---|
 | Two or more in a row | `ㅡㅡ`, `──`, `——` | Removed | Removed |
-| Between digits | `3ㅡ5`, `2024–2025` | `~` | `-` |
+| Between digits, or a digit and a short identifier with a number | `3ㅡ5`, `2024–2025`, `H1–H5`, `v1–v3` | `~` | `-` |
 | Start of a line, followed by a space | `ㅡ item` | `- ` | `- ` |
 | Between words, with or without spaces | `done ㅡ next`, `done—next` | `: ` (change with `--dash-inline`) | ` - ` |
+| An empty cell: after column padding (two spaces or a tab), a `|` or a `}`, and before the end of the line, a `|` or a tab | `{name:<15} –`, `| – |`, `total:  –` | `-` | `-` |
 | Anything else (end of line, next to punctuation) | `done ㅡ`, `done ㅡ, next` | Removed | Removed |
 
 A conjoining `ᅳ` (U+1173) right after a leading consonant is part of a syllable and is left alone. In Python string literals, placeholders such as `%s`, `{0}` and f-string expressions count as words.
