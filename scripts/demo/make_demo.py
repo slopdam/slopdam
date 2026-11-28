@@ -66,6 +66,13 @@ FILES = {
             logging.info("==========")
             logging.error("❌ Upload failed — see https://example.com/runs/42")
             ''',
+        "run.log": '''\
+            {"level":"info","msg":"✅ Synced 3 records from “cdn” — done"}
+            level=warn msg="⚠️ Retrying… db-01 is slow" attempt=2
+            NAME          READY   STATUS
+            api-7d9f      1/1     Running
+            worker-c41a   0/1     Pending
+            ''',
     },
     "ko": {
         "src/sync.py": '''\
@@ -98,6 +105,13 @@ FILES = {
             logging.info("ㅡㅡㅡㅡㅡㅡㅡㅡ")
             logging.error("❌ 업로드 실패 — https://example.com/runs/42 참고")
             ''',
+        "run.log": '''\
+            {"level":"info","msg":"✅ “cdn”에서 3건 동기화 ㅡ 완료"}
+            level=warn msg="⚠️ 재시도 중… db-01 응답이 느립니다" attempt=2
+            NAME          READY   STATUS
+            api-7d9f      1/1     Running
+            worker-c41a   0/1     Pending
+            ''',
     },
 }
 
@@ -113,6 +127,8 @@ SCENES = {
         ("pipe", "Clean any program's output through a pipe",
          ["echo '✅ **Deployed** v2 — all checks passed! 🚀' | slopdam clean",
           "echo '✅ **Deployed** v2 — all checks passed! 🚀' | slopdam --profile dev clean"]),
+        ("structured", "JSON lines, logfmt and tables keep their shape",
+         ["cat run.log", "slopdam clean < run.log"]),
     ],
     "ko": [
         ("logging", "로그 출력 정리: 화면은 reader, 파일은 dev",
@@ -124,6 +140,8 @@ SCENES = {
         ("pipe", "파이프로 어떤 프로그램의 출력이든 정리",
          ["echo '✅ **배포 완료** ㅡ v2 모든 검사 통과! 🚀' | slopdam clean",
           "echo '✅ **배포 완료** ㅡ v2 모든 검사 통과! 🚀' | slopdam --profile dev clean"]),
+        ("structured", "JSON lines, logfmt, 표는 모양을 그대로 유지",
+         ["cat run.log", "slopdam clean < run.log"]),
     ],
 }
 
