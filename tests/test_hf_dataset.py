@@ -85,3 +85,14 @@ def test_japanese_and_chinese_keep_full_width_punctuation():
     for r in rows:
         for c in "，：（）":
             assert r["reader"].count(c) == r["input"].count(c), r["input"]
+
+
+def test_japanese_and_chinese_labels_are_kept_and_held_out():
+    for lang in gen.CJK:
+        assert not set(gen.LABELS[lang]) & set(gen.LABELS_TEST[lang])
+    data = gen.build(1500, 50, 300, 29)
+    labeled = [r for r in data["test"] if r["lang"] in gen.CJK and "：" in r["target"].split("\n")[0][:6]]
+    assert labeled
+    for r in data["test"]:
+        head = r["target"].split("：")[0]
+        assert head not in sum((gen.LABELS[l] for l in gen.CJK), []), r["input"]

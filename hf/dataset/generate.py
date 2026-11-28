@@ -237,6 +237,17 @@ LOOKALIKE_TEST = {
     "zh": ["哇哈哈订单已同步{n}笔", "恭喜发财红包已发放{n}个", "说明书已上传{n}份", "长连接已断开{n}个",
            "瞧瞧服务返回码：{code}", "放心贷申请已审核{n}笔"],
 }
+# Japanese and Chinese logs often lead with a label ("状態：", "耗时："). It ends in "：" like many
+# openers, but it is content and must stay. Test labels again only appear in the test split.
+LABELS = {
+    "ja": ["状態", "所要時間", "件数", "対象", "理由", "原因", "接続先", "残り", "平均", "合計", "最大", "結果", "詳細",
+           "種別", "期限", "担当"],
+    "zh": ["状态", "耗时", "数量", "对象", "原因", "目标", "剩余", "平均", "合计", "总计", "最大", "结果", "详情", "类型",
+           "期限", "负责人"],
+}
+LABELS_TEST = {"ja": ["送信元", "経過時間", "優先度", "宛先"], "zh": ["来源", "经过时间", "优先级", "接收方"]}
+LABEL_VALUES = ["{n}", "{ms}ms", "{name}", "{pct}%", "{code}", "{ver}", "OK", "NG"]
+
 # Filler adverbs. Korean ones in the rule list are removed at the strong level; the others have no rule.
 FILLER = {"ko": ["성공적으로 ", "완벽하게 ", "무사히 ", "깔끔하게 "], "en": ["Successfully ", "Seamlessly "],
           "ja": ["無事に", "見事に", "スムーズに"], "zh": ["顺利地", "完美地", "轻松地"]}
@@ -289,12 +300,16 @@ def line(rng: random.Random, lang: str, pool: dict, roll: float, inline: bool = 
         kinds.remove("bullet")  # "• # text" is not something anyone writes
     # A range like 2024-2025 gets an en or em dash only when that trace is injected.
     base = fill(rng, template, rng.choice(["–", "—", "ㅡ"]) if "range_dash" in kinds else "-")
+    if lang in CJK and rng.random() < 0.15:
+        base = f"{rng.choice(pool['labels'])}：{base}"  # an opener may come before a label
     tail = rng.choice(TAILS[lang])
     tid = f"{lang}-{templates[tid][0]:03d}"
     if roll < 0.15:  # clean message: nothing to change
         return {"lang": lang, "template_id": tid, "input": base, "kept": base, "injected": []}
     if roll < 0.25:  # hard negative: looks risky, must not change
         text = hard_negative(rng, base) if rng.random() < 0.6 else fill(rng, rng.choice(pool["lookalike"]))
+        if lang in CJK and rng.random() < 0.4:
+            text = f"{rng.choice(pool['labels'])}：" + fill(rng, rng.choice(LABEL_VALUES))
         if READER.clean(text) != text:
             text = f"{base} --dry-run {rng.choice(KVS)}"
         return {"lang": lang, "template_id": tid, "input": text, "kept": text, "injected": []}
@@ -550,6 +565,7 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
         "chatty": (CHATTY_TEST if split == "test" else CHATTY)[lang],
         "filler": (FILLER_TEST if split == "test" else FILLER)[lang],
         "lookalike": (LOOKALIKE_TEST if split == "test" else LOOKALIKE)[lang],
+        "labels": (LABELS_TEST if split == "test" else LABELS).get(lang, []),
     } for lang in TEMPLATES} for split in SPLITS}
     seen, splits = set(), {"train": [], "validation": [], "test": []}
     for split, count in (("test", test_rows), ("validation", validation_rows), ("train", rows)):
