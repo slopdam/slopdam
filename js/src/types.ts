@@ -33,6 +33,7 @@ export interface RulesSpec {
     emoji: string;
     status: Record<string, string>;
     hangul_choseong: string;
+    han_kana: string;
   };
   dash_word_before: string;
   dash_word_after: string;

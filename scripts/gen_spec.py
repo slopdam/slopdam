@@ -50,6 +50,7 @@ def rules_json() -> dict:
             "emoji": rules._EMOJI_CLASS,
             "status": rules._STATUS,
             "hangul_choseong": rules.CHOSEONG,
+            "han_kana": rules.HAN_KANA,
         },
         # dash_run: a neighbor counts as part of a word when it is a letter or digit, a protected
         # span, or one of these (before the dash: closers, after it: openers).

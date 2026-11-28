@@ -82,10 +82,18 @@ for (const [tag, chars] of Object.entries(SPEC.charsets.status)) {
   for (const c of chars) STATUS_OF[c] = tag;
 }
 const CHOSEONG = new RegExp(`^[${SPEC.charsets.hangul_choseong}]$`, "u");
+const HAN_KANA = new RegExp(`[${SPEC.charsets.han_kana}]`, "u");
 const wordish = (c: string, extra: string): boolean => isAlnum(c) || extra.includes(c) || PUA_RE.test(c);
 
 const FUNCTIONS: Record<string, Fn> = {
-  fullwidth: (m) => m[0].replace(/[！-～]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)),
+  fullwidth: (m) => {
+    // Chinese and Japanese write this punctuation full width, so a line with kana or CJK
+    // ideographs keeps it; elsewhere it becomes ASCII.
+    const end = m.input.indexOf("\n", m.index);
+    const line = m.input.slice(m.input.lastIndexOf("\n", m.index - 1) + 1, end < 0 ? undefined : end);
+    if (HAN_KANA.test(line)) return m[0];
+    return m[0].replace(/[！-～]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0));
+  },
 
   unwrap: (m) => m[1] ?? "",
 
