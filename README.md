@@ -192,7 +192,7 @@ strip(["Woohoo, the cache is warm again", "Finally block ran in auth"])
 # ['The cache is warm again', 'Finally block ran in auth']
 ```
 
-The model card has its evaluation and limits.
+The model card has its evaluation and limits. You can also try it in the browser: turn on the model in the [demo](https://huggingface.co/spaces/slopdam/slopdam) (an int8 export, 129 MB, downloaded once).
 
 ## Performance
 

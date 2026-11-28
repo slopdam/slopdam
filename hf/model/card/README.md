@@ -67,6 +67,10 @@ strip(["Heads up: cache warmed for orders", "Finally block ran in auth", "🚀 �
 
 `strip` and `--chatter` run slopdam's rules (reader profile) first, since the model was trained on their output, then the model with its guard. They load this repository at a pinned revision. Calling the model without the guard is not supported. `chatter.py` here is the same module as `slopdam.chatter`, for use without installing slopdam: `ChatterTagger()(lines)` runs the model and guard on lines you have already cleaned.
 
+### In the browser
+
+`onnx/model_int8.onnx` (129 MB) is an int8 export for [onnxruntime-web](https://www.npmjs.com/package/onnxruntime-web). The [slopdam Space](https://huggingface.co/spaces/slopdam/slopdam) runs it in the page, with `chatter.js` there as the tokenizer, guard and rebuild; nothing is sent to a server. On log-slop `test` it gives the same output as the PyTorch model on 4,551 of 4,552 lines and the same handwritten-set scores; see the table below. `hf/model/export_onnx.py` makes it, and `hf/model/js_parity.py` checks that `chatter.js` turns the same labels into the same text as `chatter.py` (5,337 lines, all equal).
+
 ## Evaluation
 
 Scored on log-slop v6, which adds Japanese and Chinese (20% of rows each) to v5. v6 is generated from slopdam's main branch, which keeps full-width punctuation on Chinese and Japanese lines; it goes on the Hub with the next slopdam release. The `test` split uses message templates, openers, labels, look-alike lines and log shapes that never appear in training. Rows with filler adverbs are excluded, since fillers are not this model's job. The handwritten sets are 44 lines each, written by hand with words that are in none of the generator's lists; sets 3 and 4 are English and Korean, sets 5 to 7 Japanese and Chinese. Set 7 is the gate for this release.
@@ -84,6 +88,9 @@ Scored on log-slop v6, which adds Japanese and Chinese (20% of rows each) to v5.
 | Handwritten set 5 (ja, zh): content / openers | 20 of 20 / 18 of 24 | |
 | Handwritten set 4 (en, ko): content / openers | 20 of 20 / 21 of 24 | |
 | Handwritten set 3 (en, ko): content / openers | 20 of 20 / 23 of 24 | |
+| int8 ONNX: `test` unseen openers, `：` left out / all | 90.5% (342 of 378) / 84.0% | 90% |
+| int8 ONNX: other rows / hard negatives / set 7 | 100% / 100% / 20 of 20, 21 of 24 | |
+| int8 ONNX: per line on CPU (onnxruntime), median / p99 | 2.5 ms / 7.3 ms | |
 
 The three openers set 7 misses all end in `：` (`報告いたします：`, `郑重通知：`, `划重点：`), which the guard keeps by design.
 
@@ -101,6 +108,7 @@ How the bar was met, in full. This is the second training round on v6. The first
 - Base: [distilbert-base-multilingual-cased](https://huggingface.co/distilbert/distilbert-base-multilingual-cased) (Apache-2.0, pretrained on Wikipedia in 104 languages).
 - Data: 90,268 rows of log-slop v6 `train` without filler rows, labels derived from `reader` and `target`; 3 epochs, AdamW, learning rate 5e-5 with a one-cycle schedule, batch 32, on an Apple M-series GPU (61 minutes).
 - Code: `hf/model/finetune.py` and `hf/model/chatter.py` in the slopdam repository.
+- int8 ONNX: dynamic quantization with one scale per output channel. One scale per tensor was tried first and scored 89.9% of unseen openers on `test`, under the bar; per channel was picked after seeing that.
 
 ## License
 
@@ -108,4 +116,4 @@ Apache-2.0, the license of the base model. The training data and the slopdam cod
 
 ## 한국어 요약
 
-AI 도구가 로그 맨 앞에 붙이는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)을 영어, 한국어, 일본어, 중국어에서 지우는 모델입니다. slopdam 규칙으로 먼저 정리한 텍스트에 씁니다. 글자를 새로 쓰지 않고 단어를 지우거나 첫 글자를 대문자로 바꾸기만 하며, 줄 맨 앞의 한 덩어리이고 문장 부호나 연결 어미로 끝나고 숫자, 경로, 파일 이름이 없을 때만 지웁니다. 조건이 맞지 않으면 그 줄은 원문 그대로 둡니다. `panic:`, `경고:`, `エラー：` 같은 로그 레벨과 라벨은 지우지 않고, 일본어와 중국어에서 `：`로 끝나는 구간은 라벨일 때가 많아 지우지 않습니다. log-slop v6 test에서 학습에 없던 인사말의 90.7%를 지웠고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 일본어가 가장 약합니다(77.3%). 기준을 맞추기까지의 과정(평가 세트를 새로 쓴 이유, 가드 규칙을 더한 시점)은 위 Evaluation에 모두 적었습니다.
+AI 도구가 로그 맨 앞에 붙이는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)을 영어, 한국어, 일본어, 중국어에서 지우는 모델입니다. slopdam 규칙으로 먼저 정리한 텍스트에 씁니다. 글자를 새로 쓰지 않고 단어를 지우거나 첫 글자를 대문자로 바꾸기만 하며, 줄 맨 앞의 한 덩어리이고 문장 부호나 연결 어미로 끝나고 숫자, 경로, 파일 이름이 없을 때만 지웁니다. 조건이 맞지 않으면 그 줄은 원문 그대로 둡니다. `panic:`, `경고:`, `エラー：` 같은 로그 레벨과 라벨은 지우지 않고, 일본어와 중국어에서 `：`로 끝나는 구간은 라벨일 때가 많아 지우지 않습니다. log-slop v6 test에서 학습에 없던 인사말의 90.7%를 지웠고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 일본어가 가장 약합니다(77.3%). 브라우저용 int8 ONNX(`onnx/model_int8.onnx`, 129 MB)도 있으며, test 4,552줄 중 4,551줄에서 PyTorch 모델과 같은 결과를 냅니다. [데모](https://huggingface.co/spaces/slopdam/slopdam)에서 써 볼 수 있습니다. 기준을 맞추기까지의 과정(평가 세트를 새로 쓴 이유, 가드 규칙을 더한 시점)은 위 Evaluation에 모두 적었습니다.

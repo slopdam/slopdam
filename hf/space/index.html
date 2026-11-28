@@ -62,7 +62,7 @@
     <h1>slopdam <span class="version" id="version"></span></h1>
   </header>
   <p class="lead">Removes the traces AI coding tools leave in log messages: em dashes and the Korean <code>ㅡ</code>,
-    emoji, markdown, curly quotes, separators. Deterministic rules, no model. It runs in your browser; the text is not sent anywhere.
+    emoji, markdown, curly quotes, separators. Deterministic rules, plus an optional model for chatty openers. Both run in your browser; the text is not sent anywhere.
     <a href="https://github.com/slopdam/slopdam">GitHub</a> ·
     <a href="https://huggingface.co/datasets/slopdam/log-slop">Dataset</a></p>
 
@@ -81,6 +81,9 @@
       <output id="reader" for="input"></output>
       <label class="title" for="dev">dev <span class="hint">for log files and tools</span></label>
       <output id="dev" for="input"></output>
+      <label class="title"><input type="checkbox" id="chatter"> reader + chatter model
+        <span class="hint">removes openers no rule lists; downloads 129 MB once</span></label>
+      <output id="chattered" for="input" hidden></output>
     </div>
   </div>
 
@@ -98,10 +101,27 @@
 
 <script type="module">
   import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.5.0/dist/esm/index.js";
+  import { loadVocab, stripOpener } from "./chatter.js";
+
+  // slopdam/chatter-tagger v2, int8 ONNX, at a fixed revision
+  const MODEL = "https://huggingface.co/slopdam/chatter-tagger/resolve/dfb1875915980b39342f0ed63e7f171907e9cb1a";
+  const ORT = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.31.1/dist/ort.wasm.min.mjs";
+  let model = null;
+  function loadModel() {
+    model ??= (async () => {
+      const ort = await import(ORT);
+      ort.env.wasm.numThreads = 1; // no cross-origin isolation on Spaces, so no worker threads
+      const [session, vocab] = await Promise.all([
+        ort.InferenceSession.create(`${MODEL}/onnx/model_int8.onnx`), loadVocab(`${MODEL}/tokenizer.json`)]);
+      return { ort, session, vocab };
+    })();
+    return model;
+  }
 
   const EXAMPLES = [
     "✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉",
     "✅ **Saved** 3 rows — done! 🎉",
+    "Woohoo, the cache is warm again 🎉\n좋은 소식이에요, 백업이 끝났습니다\nさて、移行が完了しました",
     "🚀 Server started — listening on https://localhost:8080 (see `--port`)",
     "⚠️ 재시도 중… “db-01” 응답이 느립니다\n──────────\n• 다음 단계: 캐시 확인",
     "Let's go! Here's the summary: user_id=42 region=ap-northeast-2",
@@ -160,6 +180,25 @@
       rows.push(tr);
     }
     $("findings").replaceChildren(...rows);
+    runChatter(reader.clean(text));
+  }
+
+  let pending = 0;
+  async function runChatter(cleaned) {
+    const out = $("chattered");
+    out.hidden = !$("chatter").checked;
+    if (out.hidden) return;
+    const mine = ++pending;
+    if (!model) out.textContent = "Loading the model (129 MB, once)...";
+    try {
+      const m = await loadModel();
+      const lines = [];
+      for (const line of cleaned.split("\n")) lines.push(await stripOpener(m.ort, m.session, m.vocab, line));
+      if (mine === pending) out.textContent = lines.join("\n");
+    } catch (e) {
+      model = null;
+      if (mine === pending) out.textContent = `Could not load the model: ${e.message}`;
+    }
   }
   document.addEventListener("input", run);
   run();

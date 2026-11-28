@@ -82,7 +82,7 @@ The [log-slop](https://huggingface.co/datasets/slopdam/log-slop) dataset and the
 - [x] 2. log-slop v6: Japanese and Chinese messages, and a handwritten gold set in four languages ([#35](https://github.com/slopdam/slopdam/issues/35))
 - [x] 3. Known openers as a rule: a larger `tone.chatty` list with a fix at the `strong` level, in the spec and every port ([#36](https://github.com/slopdam/slopdam/issues/36))
 - [x] 4. `slopdam[chatter]`: the chatter model from Python and `slopdam clean --chatter`, off by default ([#37](https://github.com/slopdam/slopdam/issues/37))
-- [ ] 5. The chatter model in the browser demo (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))
+- [x] 5. The chatter model in the browser demo (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))
 - [x] 6. chatter-tagger v2, trained on v6 (v5 plus Japanese and Chinese), released after meeting the bar on a new blind handwritten set (set 7) ([#39](https://github.com/slopdam/slopdam/issues/39))
 
 ### 0.8: Rust and editors
