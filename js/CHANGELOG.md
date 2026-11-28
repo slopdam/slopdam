@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [0.3.0] - 2026-11-28
+
+### Output changes
+- From the spec (#40, #43): lines no rule changed keep their spacing, so aligned columns and tables are no longer squeezed; dash runs touching a table edge (`+------+`, `┌─────┐`) stay; the message of a logfmt line (`msg=`, `message=`, `error=`) is cleaned; a curly quote inside a double-quoted string becomes `\"`, so JSON lines stay valid; no space is left before a closing quote.
+
 ## [0.2.1] - 2026-11-25
 
 ### Fixed

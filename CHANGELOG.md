@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.7.0] - 2026-11-28
 
 ### Output changes
 - A curly double quote inside a double-quoted string becomes `\"`, so JSON lines and logfmt messages stay valid: `{"msg":"from “analytics”"}` becomes `{"msg":"from \"analytics\""}` instead of breaking the JSON. Outside a string it still becomes `"`. Found while building structured log data for log-slop (#34).
