@@ -58,7 +58,7 @@ dev   : [OK] Saved - 3 rows processed
 
 ## Install
 
-slopdam needs Python 3.9 or later and has no runtime dependencies.
+slopdam needs Python 3.9 or later and has no runtime dependencies. The optional chatter model is a separate extra (see [Chatty openers](#chatty-openers)).
 
 ```bash
 pip install slopdam
@@ -163,6 +163,23 @@ Exit codes: `0` clean, `1` traces found (or `fix --diff` has changes), `2` usage
 ```bash
 tail -f app.log | slopdam clean
 ```
+
+## Chatty openers
+
+At the `strong` level the rules remove about 80 known openers (`Great news!`, `Heads up:`, `살펴보겠습니다.`, `さて、`). For the ones no list can hold, there is an optional model, [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger), for English, Korean, Japanese and Chinese. It runs after the rules, only deletes an opener at the start of a line, and every deletion passes a fixed guard, so a line it is unsure about comes back unchanged. It is off unless you ask for it, and it is a separate install (transformers and torch, about 540 MB for the model on first use).
+
+```bash
+pip install "slopdam[chatter]"
+tail -f app.log | slopdam clean --chatter
+```
+
+```python
+from slopdam.chatter import strip
+strip(["Woohoo, the cache is warm again", "Finally block ran in auth"])
+# ['The cache is warm again', 'Finally block ran in auth']
+```
+
+The model card has its evaluation and limits.
 
 ## Other languages
 

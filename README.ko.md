@@ -58,7 +58,7 @@ dev   : [OK] 저장 완료 - 2024-2025년 데이터 3건 처리했습니다!
 
 ## 설치
 
-Python 3.9 이상에서 동작하고, 실행에 필요한 의존성은 없습니다.
+Python 3.9 이상에서 동작하고, 실행에 필요한 의존성은 없습니다. 선택 사항인 인사말 모델은 따로 설치합니다([인사말](#인사말) 참고).
 
 ```bash
 pip install slopdam
@@ -163,6 +163,23 @@ GitHub Actions에서는 발견한 흔적을 PR에 주석(annotation)으로 표�
 ```bash
 tail -f app.log | slopdam clean
 ```
+
+## 인사말
+
+`strong` 단계에서는 규칙이 알려진 인사말 약 80개(`Great news!`, `Heads up:`, `살펴보겠습니다.`, `さて、`)를 지웁니다. 목록에 담을 수 없는 인사말은 선택 사항인 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)가 맡습니다. 영어, 한국어, 일본어, 중국어를 지원합니다. 규칙 다음에 돌고, 줄 맨 앞의 인사말을 지우기만 하며, 지울 때마다 정해진 가드를 통과해야 하므로 확실하지 않은 줄은 그대로 돌아옵니다. 요청할 때만 켜지고 따로 설치합니다(transformers와 torch, 처음 쓸 때 모델 약 540 MB).
+
+```bash
+pip install "slopdam[chatter]"
+tail -f app.log | slopdam clean --chatter
+```
+
+```python
+from slopdam.chatter import strip
+strip(["좋은 소식이에요, 캐시가 다시 채워졌습니다", "Finally block ran in auth"])
+# ['캐시가 다시 채워졌습니다', 'Finally block ran in auth']
+```
+
+평가 결과와 한계는 모델 카드에 있습니다.
 
 ## 다른 언어
 

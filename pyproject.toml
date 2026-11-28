@@ -35,6 +35,8 @@ keywords = ["logging", "formatter", "linter", "korean", "ai", "slop", "llm", "em
 [project.optional-dependencies]
 # What the test suite needs; the integration and property tests are skipped without them.
 test = ["pytest", "hypothesis", "structlog", "loguru"]
+# The optional chatter model (slopdam.chatter, `slopdam clean --chatter`); the core needs none of it.
+chatter = ["transformers>=4.40", "torch>=2.1"]
 
 [project.urls]
 Homepage = "https://github.com/slopdam/slopdam"

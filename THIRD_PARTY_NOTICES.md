@@ -7,6 +7,14 @@ External components that slopdam includes or uses, and their licenses. The polic
 - **Runtime dependencies: none.** slopdam uses only the Python standard library.
 - **Bundled third-party code or data: none.**
 
+## Optional extra `slopdam[chatter]` (not installed by default)
+
+| Component | Used for | License (SPDX) |
+|---|---|---|
+| [transformers](https://pypi.org/project/transformers/) | Loading and running the chatter model | `Apache-2.0` |
+| [PyTorch](https://pypi.org/project/torch/) | Running the chatter model | `BSD-3-Clause` |
+| [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) | Model weights, downloaded from the Hugging Face Hub on first use, fine-tuned from [distilbert-base-multilingual-cased](https://huggingface.co/distilbert/distilbert-base-multilingual-cased) | `Apache-2.0` |
+
 ## Development dependencies (not shipped)
 
 | Component | Used for | License (SPDX) |
