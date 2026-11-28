@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [0.6.0] - 2026-11-28
+
+### Output changes
+- From the spec (#65): a dash between a digit and a short identifier with a number is a range (`H1–H5` becomes `H1~H5`, `dev`: `H1-H5`); a single dash used as an empty cell (`{name:<15} –`, `| – |`) becomes an ASCII `-` instead of disappearing.
+
 ## [0.5.0] - 2026-11-28
 
 ### Output changes
