@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Changed
+- `go/vet` requires the core module at go/v0.4.0, so its findings match slopdam 0.9.0, including the known openers `tone.chatty` removes at the `strong` level (#36). Released as go/vet/v0.3.0.
+
 ## [0.9.0] - 2026-11-28
 
 ### Added
