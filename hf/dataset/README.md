@@ -146,12 +146,12 @@ Taggers trained on `train` to turn `reader` into `target` by deleting words (cod
 | | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
 |---|---:|---:|---:|
 | Job | openers and fillers | openers and fillers | openers only, with a guard |
-| `test`: unseen openers removed | | 90.6% | 94.4% |
+| `test`: unseen openers removed | | 90.6% | 95.3% |
 | `test`: other rows left unchanged | 96.0% | 99.8% | 100% |
 | `test`: hard negatives left unchanged | 96.8% | 100% | 100% |
 | Handwritten content lines left unchanged | 4 of 12 | 10 of 12 | 20 of 20 |
 
-All three were scored on earlier versions of this dataset: the first two on v3 (fewer openers, no look-alike lines), the released model on v4 (no structured rows). Pretraining is what makes the difference: the small model learned the phrase lists and cut words in half on anything new. Filler adverbs turned out not to be learnable from a few examples, and some are real content (Java's `finally` block), so slopdam handles them with a word list and the released model only removes openers. Its card has the full evaluation.
+The first two were scored on v3 (fewer openers, no look-alike lines), the released model on this version (v5). Retraining it on v5 did not help (93.5% of unseen openers), so the released weights are still the ones trained on v4. Pretraining is what makes the difference: the small model learned the phrase lists and cut words in half on anything new. Filler adverbs turned out not to be learnable from a few examples, and some are real content (Java's `finally` block), so slopdam handles them with a word list and the released model only removes openers. Its card has the full evaluation.
 
 ## License and citation
 
@@ -168,4 +168,4 @@ MIT, like slopdam. The text was written for this dataset.
 
 ## 한국어 요약
 
-AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 한국어와 영어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 32개와 처음 보는 인사말, 부사로만 만들어 모델의 일반화를 잴 수 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)는 처음 보는 인사말의 94.4%를 지우고, 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.7.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
+AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 한국어와 영어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 32개와 처음 보는 인사말, 부사로만 만들어 모델의 일반화를 잴 수 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)는 처음 보는 인사말의 95.3%를 지우고, 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.7.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.

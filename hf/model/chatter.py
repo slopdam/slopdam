@@ -24,6 +24,11 @@ LINE_START = re.compile(r"[ \t]*(?:[-*+•][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?")
 UNSAFE = re.compile(r"[0-9/\\_=@]|\.\w|\w\.\w")
 # An opener ends in punctuation, or (Korean only) in a connective ending such as -면, -로, -히.
 OPENER_END = re.compile(r"(?:[,:!?.…]|[가-힣]*[면로히도피대럼과만데])$")
+# A log level, a diagnostic label or an exception name says what the line is: never an opener.
+LOG_LABEL = re.compile(
+    r"(?i:panic|fatal|error|err|warn|warning|info|debug|trace|note|hint|caution|caused by|exception|traceback"
+    r"|경고|오류|에러|참고|주의|치명적 오류|알림)(?![\w-])|\w*(?:Error|Exception|Warning)(?![\w-])"
+)
 MIXED = re.compile(r"[A-Za-z].*[가-힣]|[가-힣].*[A-Za-z]", re.S)  # "orders에서" is content
 
 
@@ -59,7 +64,8 @@ def guard(text: str, offsets: list, labels: list) -> list:
     """The safety envelope around the model. Per line, deletions are kept only if they form one
     run of whole pieces starting where the line's text starts (after a list or heading marker),
     leave something behind, end in punctuation or a Korean connective ending, and contain no
-    digits, paths, file names, key=value or a mix of Latin and Hangul. Upper-casing
+    digits, paths, file names, key=value or a mix of Latin and Hangul, and do not start with a log
+    level, a diagnostic label or an exception name ("panic:", "Warning:", "경고:", "ValueError:"). Upper-casing
     is kept only on the first piece after that run. Any other line is left exactly as it was."""
     out = list(labels)
     line_start = 0
@@ -83,6 +89,7 @@ def guard(text: str, offsets: list, labels: list) -> list:
             and not UNSAFE.search(span)
             and OPENER_END.search(span)
             and not MIXED.search(span)
+            and not LOG_LABEL.match(span)
         )
         uppers = [i for i in idx if labels[i] == UPPER]
         ok = ok and all(i == first_kept and run for i in uppers)
