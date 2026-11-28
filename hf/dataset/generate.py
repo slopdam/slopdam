@@ -588,7 +588,20 @@ def build(rows: int, validation_rows: int, test_rows: int, seed: int) -> dict:
         for i, c in enumerate(group["cases"]):
             conformance.append({"id": f"{group['id']}-{i:02d}", "group": group["id"], "input": c["input"],
                                 "options": json.dumps(c.get("options", {})), "reader": c["reader"], "dev": c["dev"]})
-    return {**splits, "conformance": conformance}
+    real = []
+    for line in open(Path(__file__).resolve().parent / "real" / "messages.jsonl", encoding="utf-8"):
+        r = json.loads(line)
+        real.append({**r, "reader": literal(READER, r["input"]), "dev": literal(DEV, r["input"])})
+    return {**splits, "conformance": conformance, "real": real}
+
+
+def literal(sanitizer: Sanitizer, text: str) -> str:
+    """What `slopdam fix` makes of a string literal: cleaned, with the whitespace at either end kept,
+    and left alone when nothing but a symbol would remain."""
+    out = sanitizer.clean(text)
+    if not out.strip():
+        return text
+    return text[: len(text) - len(text.lstrip())] + out + text[len(text.rstrip()):]
 
 
 FIELDS = ["id", "lang", "template_id", "input", "reader", "dev", "reader_strong", "target", "changed", "injected",
@@ -598,12 +611,14 @@ FIELDS = ["id", "lang", "template_id", "input", "reader", "dev", "reader_strong"
 def write(data: dict, out: Path) -> dict:
     (out / "data").mkdir(parents=True, exist_ok=True)
     (out / "conformance").mkdir(parents=True, exist_ok=True)
+    (out / "real").mkdir(parents=True, exist_ok=True)
     paths = {name: out / "data" / f"{name}.jsonl" for name in SPLITS}
     paths["conformance"] = out / "conformance" / "test.jsonl"
+    paths["real"] = out / "real" / "test.jsonl"
     digests = {}
     for name, path in paths.items():
         rows = data[name]
-        lines = [json.dumps({k: r[k] for k in (FIELDS if name != "conformance" else r)}, ensure_ascii=False) for r in rows]
+        lines = [json.dumps({k: r[k] for k in (FIELDS if name in SPLITS else r)}, ensure_ascii=False) for r in rows]
         body = "\n".join(lines) + "\n"
         path.write_text(body, encoding="utf-8")
         digests[name] = hashlib.sha256(body.encode()).hexdigest()[:16]

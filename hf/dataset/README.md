@@ -35,6 +35,10 @@ configs:
     data_files:
       - split: test
         path: conformance/test.jsonl
+  - config_name: real
+    data_files:
+      - split: test
+        path: real/test.jsonl
 ---
 
 # log-slop
@@ -67,7 +71,8 @@ The `reader`, `dev` and `findings` labels are produced by [slopdam](https://gith
 | `default` | train | 100,000 | Generated messages, 30% English, 30% Korean, 20% Japanese, 20% Chinese, from 192 templates |
 | `default` | validation | 5,000 | Same templates as train |
 | `default` | test | 5,000 | 48 held-out templates, and chatty openers, filler words and labels, that never appear in train or validation |
-| `conformance` | test | 133 | slopdam's language-neutral conformance cases, hand-written edge cases |
+| `conformance` | test | 168 | slopdam's language-neutral conformance cases, hand-written edge cases |
+| `real` | test | 104 | Log messages from a real project written with AI coding tools, labeled by hand (see below) |
 
 No input appears twice, within or across splits. Because the test templates, openers (`FYI:`, `Excellent!`, `완벽합니다!`, `実は、`, `说实话，`), fillers (`Finally`, `순조롭게`) and labels (`宛先：`, `来源：`) are held out, a model scored on `test` has to generalize to phrases it has not seen, not recall them.
 
@@ -109,6 +114,23 @@ About 8% of the rows are multi-line summaries of two to four items under an opti
 
 The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `level`, `dash_inline`, `log_level`), `reader` and `dev`.
 
+## Real messages (`real`)
+
+104 string literals from the log and print calls of [ma-pmo-ext](https://github.com/ma-pmo/ma-pmo-ext), an open-source project written with AI coding tools, taken as they appear in the source (escape sequences such as `\n` are not expanded). 41 of them carry a trace (`✓`, `✗`, `—`, `→`, `…`, `🎉`); the others are there to catch changes that should not happen.
+
+| Field | Meaning |
+|---|---|
+| `id`, `source` | `real-0000`; a link to the line on GitHub at a fixed commit |
+| `source_lang` | `py`, `ts`, `tsx`, `js` or `mjs` |
+| `input` | The literal's text |
+| `expected` | What it should become, judged by hand by the slopdam maintainers |
+| `note` | Why `expected` differs from slopdam's output, when it does |
+| `reader`, `dev` | slopdam's engine on `input`, keeping whitespace at either end and leaving a literal alone when nothing but a symbol would remain, the way `slopdam fix` treats a Python string. f-string and template expressions are not masked here, unlike in `fix`. |
+
+slopdam 0.9.0 (`reader`) fixes all 41 traces and leaves 61 of the other 63 alone. The two it gets wrong: an en dash used as an empty table cell (`{name:<15} –`), and check marks inside an f-string expression (`{'✓' if r.ok else '✗'}`), which `slopdam fix` does not touch but the engine on the whole text does.
+
+The same review covered `slopdam check` on five such projects (614 log messages; only this public one is published). It led to the fixes in slopdam's next release: `check` had spent 85% of its findings on build output, and missed template literals in JavaScript and TypeScript and strings nested in Python calls (`print(tr("✓ ..."))`). After them it reports 124 of the 126 messages with a trace (the other two are rightly left alone), and 169 of 171 findings in developer logs are correct.
+
 ## How it was made
 
 `hf/dataset/generate.py` in the slopdam repository writes every file from a fixed seed (`20261125`): it fills 80 English, 80 Korean, 40 Japanese and 40 Chinese message templates (deployments, databases, CI, model training, payments, queues, containers) with names, numbers, versions, branches, paths, URLs and `key=value` pairs, injects one to four of 20 kinds of trace at random, sometimes wraps the message in a log format, and labels the result with slopdam. It builds each message twice, with and without the chatty and filler insertions, and the second copy cleaned by slopdam is `target`. Running it again gives byte-identical files; `stats.json` records the SHA-256 of each one. No text was collected from people, websites or code repositories.
@@ -143,7 +165,7 @@ Most openers are ones no rule knows, which is why `tone.chatty` is rare here whi
 
 ## Limits
 
-- The messages are synthetic and short. Real logs have more variety, longer lines and other languages. Japanese and Chinese have half as many templates as English and Korean.
+- Apart from `real`, the messages are synthetic and short. Real logs have more variety, longer lines and other languages. Japanese and Chinese have half as many templates as English and Korean.
 - slopdam drops empty lines, so multi-line output with blank lines (a Go panic, a paragraph break) is not in the hard negatives.
 - "Correct" means "what slopdam outputs". Where slopdam is conservative (it keeps an English `!`, it leaves `**` around a URL, path or `key=value` alone, and a character glued to the end of a URL counts as part of the URL), the labels are too.
 - `target` only knows the chatty phrases and filler words in the generator's lists. It is a narrow, synthetic rewrite task, not general copy editing.
@@ -167,7 +189,7 @@ The first two were scored on v3 (English and Korean, fewer openers, no look-alik
 
 ## License and citation
 
-MIT, like slopdam. The text was written for this dataset.
+MIT, like slopdam. The text was written for this dataset, except `real`: those messages come from ma-pmo-ext (AGPL-3.0, or a commercial license), and its authors, who also maintain slopdam, include them here under MIT.
 
 ```bibtex
 @misc{slopdam_log_slop_2026,
@@ -180,4 +202,4 @@ MIT, like slopdam. The text was written for this dataset.
 
 ## 한국어 요약
 
-AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.9.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
+AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.9.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. `real` 설정에는 AI 코딩 도구로 만든 실제 오픈소스 프로젝트의 로그 문구 104개와 사람이 판정한 정답이 있어, 실제 코드에서 놓치거나 잘못 고치는 것을 잴 수 있습니다. 그 외 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.

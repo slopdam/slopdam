@@ -96,3 +96,15 @@ def test_japanese_and_chinese_labels_are_kept_and_held_out():
     for r in data["test"]:
         head = r["target"].split("：")[0]
         assert head not in sum((gen.LABELS[l] for l in gen.CJK), []), r["input"]
+
+
+def test_real_messages():
+    data = gen.build(200, 20, 20, 31)
+    rows = data["real"]
+    assert len(rows) >= 100 and len({r["id"] for r in rows}) == len(rows)
+    assert all(r["source"].startswith("https://github.com/ma-pmo/ma-pmo-ext/blob/") for r in rows)
+    traced = [r for r in rows if r["expected"] != r["input"]]
+    assert traced and all(r["reader"] == r["expected"] for r in traced)  # every real trace is fixed
+    wrong = [r for r in rows if r["reader"] != r["expected"]]
+    assert all(r["expected"] == r["input"] for r in wrong)  # what slopdam gets wrong, it changes when it should not
+    assert all(r["note"] for r in wrong)
