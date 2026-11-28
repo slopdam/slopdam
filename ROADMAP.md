@@ -71,7 +71,7 @@ slopdam/ (this repository)
 - [x] `go vet` analyzer with suggested fixes (`slopdamvet`)
 - [x] Java library ([java/](java/README.md)) passing every conformance case, with `%slopdam` converters for Logback and Log4j 2
 
-### 0.7: data and the chatter model (in progress; slopdam 0.7.0 and @slopdam/core 0.3.0 ship steps 1a and 1b, slopdam 0.8.0 and @slopdam/core 0.4.0 step 2a, slopdam 0.9.0 and @slopdam/core 0.5.0 steps 3 and 4)
+### 0.7: data and the chatter model (done; slopdam 0.7.0 and @slopdam/core 0.3.0 ship steps 1a and 1b, slopdam 0.8.0 and @slopdam/core 0.4.0 step 2a, slopdam 0.9.0 and @slopdam/core 0.5.0 steps 3 and 4)
 
 The [log-slop](https://huggingface.co/datasets/slopdam/log-slop) dataset and the [chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) model are on Hugging Face. This milestone makes the data closer to real logs, moves what can be a rule into the rules, and makes the model usable where slopdam runs.
 

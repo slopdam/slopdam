@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.9.1] - 2026-11-28
 
 ### Fixed
 Found by running `slopdam check` on real projects written with AI coding tools: 85% of its findings came from build output, and it missed about 4 in 10 log messages with traces.
