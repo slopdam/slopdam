@@ -11,7 +11,8 @@
 Run slopdam first: the model was trained on slopdam's `reader` output. It only deletes; it never
 writes new text. Every deletion also has to pass `guard`, a fixed set of rules (one run of whole
 words at the start of a line, ending in punctuation or a Korean connective, no digits, paths, file
-names or key=value), so a line the model is unsure about comes back unchanged.
+names or key=value), so a line the model is unsure about comes back unchanged. Japanese and
+Chinese openers are cut at full-width punctuation ("さて、", "好的，").
 """
 from __future__ import annotations
 
@@ -22,14 +23,20 @@ MAX_PIECES = 256
 
 LINE_START = re.compile(r"[ \t]*(?:[-*+•][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?")
 UNSAFE = re.compile(r"[0-9/\\_=@]|\.\w|\w\.\w")
-# An opener ends in punctuation, or (Korean only) in a connective ending such as -면, -로, -히.
-OPENER_END = re.compile(r"(?:[,:!?.…]|[가-힣]*[면로히도피대럼과만데])$")
+# An opener ends in punctuation (full width in Japanese and Chinese), or (Korean only) in a
+# connective ending such as -면, -로, -히. A Japanese or Chinese span ending in "：" is not one:
+# there it is far more often a label ("状態：", "来源：") than an opener, and unseen labels
+# cannot be told from unseen openers.
+CJK_PUNCT = "、，！？：。"
+OPENER_END = re.compile(r"(?:[,:!?.…、，！？。]|[가-힣]*[면로히도피대럼과만데])$")
 # A log level, a diagnostic label or an exception name says what the line is: never an opener.
 LOG_LABEL = re.compile(
     r"(?i:panic|fatal|error|err|warn|warning|info|debug|trace|note|hint|caution|caused by|exception|traceback"
-    r"|경고|오류|에러|참고|주의|치명적 오류|알림)(?![\w-])|\w*(?:Error|Exception|Warning)(?![\w-])"
+    r"|경고|오류|에러|참고|주의|치명적 오류|알림|警告|エラー|注意|情報|致命的エラー|错误|提示|信息|严重|致命错误)(?![\w-])"
+    r"|\w*(?:Error|Exception|Warning)(?![\w-])"
 )
-MIXED = re.compile(r"[A-Za-z].*[가-힣]|[가-힣].*[A-Za-z]", re.S)  # "orders에서" is content
+_CJK = "가-힣\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff"
+MIXED = re.compile(rf"[A-Za-z].*[{_CJK}]|[{_CJK}].*[A-Za-z]", re.S)  # "orders에서", "payments磁盘" are content
 
 
 def rebuild(text: str, offsets: list, labels: list) -> str:
@@ -48,11 +55,12 @@ def rebuild(text: str, offsets: list, labels: list) -> str:
     return "".join(out)
 
 
-def whole_words(offsets: list, labels: list) -> list:
-    """Let the first piece of each word decide for the whole word, so a word is never cut in half."""
+def whole_words(offsets: list, labels: list, text: str = "") -> list:
+    """Let the first piece of each word decide for the whole word, so a word is never cut in half.
+    Japanese and Chinese have no spaces, so full-width punctuation also ends a word there."""
     out, first = [], KEEP
     for i, ((s, _), t) in enumerate(zip(offsets, labels)):
-        if i == 0 or s != offsets[i - 1][1]:
+        if i == 0 or s != offsets[i - 1][1] or (s > 0 and text[s - 1] in CJK_PUNCT):
             first = t
             out.append(t)
         else:
@@ -63,9 +71,10 @@ def whole_words(offsets: list, labels: list) -> list:
 def guard(text: str, offsets: list, labels: list) -> list:
     """The safety envelope around the model. Per line, deletions are kept only if they form one
     run of whole pieces starting where the line's text starts (after a list or heading marker),
-    leave something behind, end in punctuation or a Korean connective ending, and contain no
-    digits, paths, file names, key=value or a mix of Latin and Hangul, and do not start with a log
-    level, a diagnostic label or an exception name ("panic:", "Warning:", "경고:", "ValueError:"). Upper-casing
+    leave something behind, end in punctuation (not a full-width "：") or a Korean connective ending, and contain no
+    digits, paths, file names, key=value or a mix of Latin with Hangul, kana or CJK ideographs, and
+    do not start with a log level, a diagnostic label or an exception name ("panic:", "Warning:",
+    "경고:", "エラー：", "ValueError:"). Upper-casing
     is kept only on the first piece after that run. Any other line is left exactly as it was."""
     out = list(labels)
     line_start = 0
@@ -114,7 +123,7 @@ def predict(model, tok, texts: list, device, batch: int = 64, use_guard: bool = 
             for k, text in enumerate(chunk):
                 n = int(enc["attention_mask"][k].sum())
                 spans = offsets[k, :n].tolist()
-                labels = whole_words(spans, pred[k, :n].tolist())
+                labels = whole_words(spans, pred[k, :n].tolist(), text)
                 out.append(rebuild(text, spans, guard(text, spans, labels) if use_guard else labels))
     return out
 

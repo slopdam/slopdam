@@ -92,9 +92,10 @@ def score(rows: list, outputs: list) -> dict:
             groups["hard_negative"].append(ok)
     res = {k: round(sum(v) / len(v), 4) for k, v in groups.items() if v}
     res["rows"] = {k: len(v) for k, v in groups.items()}
-    for lang in ("en", "ko"):
+    for lang in sorted({r["lang"] for r in rows}):
         sub = [(r, y) for r, y in zip(rows, outputs) if r["lang"] == lang and r["target"] != r["reader"]]
-        res[f"rewrite_{lang}"] = round(sum(y == r["target"] for r, y in sub) / len(sub), 4)
+        if sub:
+            res[f"rewrite_{lang}"] = round(sum(y == r["target"] for r, y in sub) / len(sub), 4)
     return res
 
 

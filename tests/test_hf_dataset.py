@@ -32,7 +32,7 @@ def test_labels_match_slopdam_and_negatives_stay():
             assert r["target"] == r["reader"]  # target only goes beyond the rules for filler and chatter
         else:
             assert r["target"] != r["reader"]
-    assert {r["lang"] for r in data["train"]} == {"en", "ko"}
+    assert {r["lang"] for r in data["train"]} == {"en", "ko", "ja", "zh"}
     assert len(data["conformance"]) >= 100
 
 
@@ -44,8 +44,8 @@ def test_test_split_uses_held_out_templates():
 
 def test_test_split_uses_held_out_openers():
     data = gen.build(600, 60, 300, 17)
-    held = tuple(p for lang in ("en", "ko") for p in gen.CHATTY_TEST[lang] + gen.FILLER_TEST[lang])
-    trained = tuple(p for lang in ("en", "ko") for p in gen.CHATTY[lang] + gen.FILLER[lang])
+    held = tuple(p for lang in gen.TEMPLATES for p in gen.CHATTY_TEST[lang] + gen.FILLER_TEST[lang])
+    trained = tuple(p for lang in gen.TEMPLATES for p in gen.CHATTY[lang] + gen.FILLER[lang])
     assert not set(held) & set(trained)
     rewrites = [r for r in data["test"] if r["target"] != r["reader"]]
     assert rewrites and all(not r["input"].startswith(trained) for r in rewrites if "block" not in r["injected"]
@@ -53,11 +53,11 @@ def test_test_split_uses_held_out_openers():
 
 
 def test_lookalikes_are_untouched_and_held_out():
-    for lang in ("en", "ko"):
+    for lang in gen.TEMPLATES:
         assert not set(gen.LOOKALIKE[lang]) & set(gen.LOOKALIKE_TEST[lang])
     reader = Sanitizer("reader")
     rng = gen.random.Random(3)
-    for lang in ("en", "ko"):
+    for lang in gen.TEMPLATES:
         for t in gen.LOOKALIKE[lang] + gen.LOOKALIKE_TEST[lang]:
             text = gen.fill(rng, t)
             assert reader.clean(text) == text, text
@@ -76,3 +76,23 @@ def test_structured_rows_keep_their_structure():
     train = {r["template_id"] for r in data["train"] if r["template_id"].startswith("shape-")}
     test = {r["template_id"] for r in data["test"] if r["template_id"].startswith("shape-")}
     assert train and test and train.isdisjoint(test)
+
+
+def test_japanese_and_chinese_keep_full_width_punctuation():
+    data = gen.build(1500, 50, 50, 23)
+    rows = [r for r in data["train"] if r["lang"] in gen.CJK]
+    assert rows and "fullwidth" not in {k for r in rows for k in r["injected"]}
+    for r in rows:
+        for c in "，：（）":
+            assert r["reader"].count(c) == r["input"].count(c), r["input"]
+
+
+def test_japanese_and_chinese_labels_are_kept_and_held_out():
+    for lang in gen.CJK:
+        assert not set(gen.LABELS[lang]) & set(gen.LABELS_TEST[lang])
+    data = gen.build(1500, 50, 300, 29)
+    labeled = [r for r in data["test"] if r["lang"] in gen.CJK and "：" in r["target"].split("\n")[0][:6]]
+    assert labeled
+    for r in data["test"]:
+        head = r["target"].split("：")[0]
+        assert head not in sum((gen.LABELS[l] for l in gen.CJK), []), r["input"]
