@@ -1,0 +1,44 @@
+{"id": "hand4-00", "input": "Rad! The cache is warm again", "reader": "Rad! The cache is warm again", "target": "The cache is warm again", "chatter": true}
+{"id": "hand4-01", "input": "Sweet as, the backup finished in 4m", "reader": "Sweet as, the backup finished in 4m", "target": "The backup finished in 4m", "chatter": true}
+{"id": "hand4-02", "input": "Okey-dokey: rotated 3 keys", "reader": "Okey-dokey: rotated 3 keys", "target": "Rotated 3 keys", "chatter": true}
+{"id": "hand4-03", "input": "Huge win! p99 latency is down to 120ms", "reader": "Huge win! p99 latency is down to 120ms", "target": "P99 latency is down to 120ms", "chatter": true}
+{"id": "hand4-04", "input": "Bad news first: 2 shards are offline", "reader": "Bad news first: 2 shards are offline", "target": "2 shards are offline", "chatter": true}
+{"id": "hand4-05", "input": "Bonus: the old index was removed", "reader": "Bonus: the old index was removed", "target": "The old index was removed", "chatter": true}
+{"id": "hand4-06", "input": "Phew! Nothing was lost during the failover", "reader": "Phew! Nothing was lost during the failover", "target": "Nothing was lost during the failover", "chatter": true}
+{"id": "hand4-07", "input": "Moving on, the worker pool is resized to 8", "reader": "Moving on, the worker pool is resized to 8", "target": "The worker pool is resized to 8", "chatter": true}
+{"id": "hand4-08", "input": "Time for a recap: 41 jobs ran, 2 failed", "reader": "Time for a recap: 41 jobs ran, 2 failed", "target": "41 jobs ran, 2 failed", "chatter": true}
+{"id": "hand4-09", "input": "Yippee, coverage reached 88%", "reader": "Yippee, coverage reached 88%", "target": "Coverage reached 88%", "chatter": true}
+{"id": "hand4-10", "input": "Cheers! The export is in the bucket", "reader": "Cheers! The export is in the bucket", "target": "The export is in the bucket", "chatter": true}
+{"id": "hand4-11", "input": "Alrighty then, deploy number 412 is out", "reader": "Alrighty then, deploy number 412 is out", "target": "Deploy number 412 is out", "chatter": true}
+{"id": "hand4-12", "input": "짜릿하네요! 캐시가 다시 채워졌습니다", "reader": "짜릿하네요. 캐시가 다시 채워졌습니다", "target": "캐시가 다시 채워졌습니다", "chatter": true}
+{"id": "hand4-13", "input": "오늘도 수고 많으셨습니다. 백업 완료", "reader": "오늘도 수고 많으셨습니다. 백업 완료", "target": "백업 완료", "chatter": true}
+{"id": "hand4-14", "input": "드디어 해결! 메모리 누수가 사라졌습니다", "reader": "드디어 해결. 메모리 누수가 사라졌습니다", "target": "메모리 누수가 사라졌습니다", "chatter": true}
+{"id": "hand4-15", "input": "핵심부터 짚자면, 결제 2건이 실패했습니다", "reader": "핵심부터 짚자면, 결제 2건이 실패했습니다", "target": "결제 2건이 실패했습니다", "chatter": true}
+{"id": "hand4-16", "input": "반가워요! 새 노드 3대가 붙었습니다", "reader": "반가워요. 새 노드 3대가 붙었습니다", "target": "새 노드 3대가 붙었습니다", "chatter": true}
+{"id": "hand4-17", "input": "한 줄 요약: 인덱스 재구성 완료", "reader": "한 줄 요약: 인덱스 재구성 완료", "target": "인덱스 재구성 완료", "chatter": true}
+{"id": "hand4-18", "input": "걱정 마세요, 데이터는 안전합니다", "reader": "걱정 마세요, 데이터는 안전합니다", "target": "데이터는 안전합니다", "chatter": true}
+{"id": "hand4-19", "input": "정리해 드릴게요: 테스트 98개 통과", "reader": "정리해 드릴게요: 테스트 98개 통과", "target": "테스트 98개 통과", "chatter": true}
+{"id": "hand4-20", "input": "짝짝짝! 배포가 끝났습니다", "reader": "짝짝짝. 배포가 끝났습니다", "target": "배포가 끝났습니다", "chatter": true}
+{"id": "hand4-21", "input": "아 참, 캐시 만료 시간을 10분으로 줄였습니다", "reader": "아 참, 캐시 만료 시간을 10분으로 줄였습니다", "target": "캐시 만료 시간을 10분으로 줄였습니다", "chatter": true}
+{"id": "hand4-22", "input": "기쁜 마음으로 알려드려요: 장애가 복구되었습니다", "reader": "기쁜 마음으로 알려드려요: 장애가 복구되었습니다", "target": "장애가 복구되었습니다", "chatter": true}
+{"id": "hand4-23", "input": "다 됐어요! 리포트 7개 생성", "reader": "다 됐어요. 리포트 7개 생성", "target": "리포트 7개 생성", "chatter": true}
+{"id": "hand4-24", "input": "Warning: disk usage is at 91%", "reader": "Warning: disk usage is at 91%", "target": "Warning: disk usage is at 91%", "chatter": false}
+{"id": "hand4-25", "input": "Error: connection refused by db-01", "reader": "Error: connection refused by db-01", "target": "Error: connection refused by db-01", "chatter": false}
+{"id": "hand4-26", "input": "panic: assignment to entry in nil map", "reader": "panic: assignment to entry in nil map", "target": "panic: assignment to entry in nil map", "chatter": false}
+{"id": "hand4-27", "input": "fatal: not a git repository", "reader": "fatal: not a git repository", "target": "fatal: not a git repository", "chatter": false}
+{"id": "hand4-28", "input": "Caused by: java.net.SocketTimeoutException: Read timed out", "reader": "Caused by: java.net.SocketTimeoutException: Read timed out", "target": "Caused by: java.net.SocketTimeoutException: Read timed out", "chatter": false}
+{"id": "hand4-29", "input": "TypeError: Cannot read properties of undefined", "reader": "TypeError: Cannot read properties of undefined", "target": "TypeError: Cannot read properties of undefined", "chatter": false}
+{"id": "hand4-30", "input": "Note: this endpoint is deprecated", "reader": "Note: this endpoint is deprecated", "target": "Note: this endpoint is deprecated", "chatter": false}
+{"id": "hand4-31", "input": "Hint: run with --verbose for details", "reader": "Hint: run with --verbose for details", "target": "Hint: run with --verbose for details", "chatter": false}
+{"id": "hand4-32", "input": "{\"level\":\"info\",\"msg\":\"Great news! Synced 3 records\"}", "reader": "{\"level\":\"info\",\"msg\":\"Great news! Synced 3 records\"}", "target": "{\"level\":\"info\",\"msg\":\"Great news! Synced 3 records\"}", "chatter": false}
+{"id": "hand4-33", "input": "level=info msg=\"Nice, cache warmed\" shard=2", "reader": "level=info msg=\"Nice, cache warmed\" shard=2", "target": "level=info msg=\"Nice, cache warmed\" shard=2", "chatter": false}
+{"id": "hand4-34", "input": "Rad-tools 2.1 installed", "reader": "Rad-tools 2.1 installed", "target": "Rad-tools 2.1 installed", "chatter": false}
+{"id": "hand4-35", "input": "Bonus points recalculated for 52 users", "reader": "Bonus points recalculated for 52 users", "target": "Bonus points recalculated for 52 users", "chatter": false}
+{"id": "hand4-36", "input": "경고: 디스크 사용량 91%", "reader": "경고: 디스크 사용량 91%", "target": "경고: 디스크 사용량 91%", "chatter": false}
+{"id": "hand4-37", "input": "오류: db-01 연결이 거부되었습니다", "reader": "오류: db-01 연결이 거부되었습니다", "target": "오류: db-01 연결이 거부되었습니다", "chatter": false}
+{"id": "hand4-38", "input": "참고: 이 API는 곧 사라집니다", "reader": "참고: 이 API는 곧 사라집니다", "target": "참고: 이 API는 곧 사라집니다", "chatter": false}
+{"id": "hand4-39", "input": "치명적 오류: 설정 파일이 없습니다", "reader": "치명적 오류: 설정 파일이 없습니다", "target": "치명적 오류: 설정 파일이 없습니다", "chatter": false}
+{"id": "hand4-40", "input": "반가움 지수 계산 완료", "reader": "반가움 지수 계산 완료", "target": "반가움 지수 계산 완료", "chatter": false}
+{"id": "hand4-41", "input": "핵심 지표 12개 갱신", "reader": "핵심 지표 12개 갱신", "target": "핵심 지표 12개 갱신", "chatter": false}
+{"id": "hand4-42", "input": "요약 리포트 3건 생성", "reader": "요약 리포트 3건 생성", "target": "요약 리포트 3건 생성", "chatter": false}
+{"id": "hand4-43", "input": "드디어 서비스 응답 코드 200", "reader": "드디어 서비스 응답 코드 200", "target": "드디어 서비스 응답 코드 200", "chatter": false}
