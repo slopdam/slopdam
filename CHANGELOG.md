@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.8.0] - 2026-11-28
 
 ### Output changes
 - Chinese and Japanese lines keep their full-width punctuation. `width.fullwidth` used to turn `处理完成，共 42 条记录。` into `处理完成,共 42 条记录。` and `注意：` into `注意:`, mixing the two widths on one line. A line with kana or CJK ideographs is now left as written; Korean and English lines still get ASCII. The spec gains `charsets.han_kana` and a conformance group, `cjk`. On 20,000 random inputs, JavaScript, Go and Java match Python exactly. Found while adding Japanese and Chinese to log-slop (#35).
