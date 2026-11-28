@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "slopdam"
-version = "0.9.1"
+version = "0.10.0"
 description = "Logger formatter and linter that strips AI-generated patterns (em dashes, emoji, separators, markdown) from log output"
 readme = "README.md"
 license = "MIT"
