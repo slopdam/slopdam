@@ -29,7 +29,7 @@ dev   : [OK] Saved - 3 rows processed
 - `reader` (default): plain text for people, such as CLI messages, alerts and reports.
 - `dev`: grep-friendly text for log files and collectors. Status emoji become `[OK]`, `[FAIL]` and `[WARN]` instead of disappearing.
 
-![slopdam demo: a Python app logging reader text to the console and dev text to a file, slopdam check finding traces in Python and JavaScript log calls, slopdam fix previewing a diff, and slopdam clean in a pipe](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/demo.gif)
+![slopdam demo: a Python app logging reader text to the console and dev text to a file, slopdam check finding traces in Python and JavaScript log calls, slopdam fix previewing a diff, slopdam clean in a pipe, and a log of JSON lines, logfmt and a table cleaned with its structure intact](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/demo.gif)
 
 <sub>Recorded from real runs on a sample project with <code>scripts/demo/make_demo.py</code>; every line of output is what slopdam printed.</sub>
 
@@ -37,10 +37,11 @@ dev   : [OK] Saved - 3 rows processed
 
 - One engine, two profiles. Detection is shared; `reader` writes plain sentences for people and `dev` keeps information for tools. A logger can send `reader` text to the console and `dev` text to a file at the same time.
 - Cleans logs as they are written. A `logging` formatter and filter, a structlog processor and a loguru patcher. Each handler gets its own result, tracebacks are never touched, and records that were only a separator line are dropped.
+- Keeps structure. In JSON lines and logfmt only the message is cleaned and the line stays valid (a curly quote inside a string becomes `\"`). Tables, aligned columns, stack traces and diffs come out as they went in.
 - Finds traces before they are committed. `slopdam check` reads Python through the syntax tree and JavaScript, TypeScript, Java, Kotlin, Go, Rust, Ruby, PHP and Swift line by line, looking only at log and print calls.
 - Fixes Python safely. `slopdam fix` rewrites only the text inside string literals. Quotes, prefixes, escapes, f-string expressions and `%s` placeholders stay, and nothing is written unless the file still compiles.
 - Korean-aware. The Hangul `ㅡ` in all three of its code points, `!` after Hangul, number ranges written with `~` as in Korean in `reader`, and Hangul, Hanja and kana text left alone.
-- Conservative by design. URLs, inline code, `key=value` values and file paths are protected; dates, command line flags and `__name__` are not mistaken for traces. Rules are deterministic, and property-based tests check that cleaning twice changes nothing.
+- Conservative by design. URLs, inline code, `key=value` values (except the message of a logfmt line) and file paths are protected; dates, command line flags and `__name__` are not mistaken for traces. Rules are deterministic, and property-based tests check that cleaning twice changes nothing.
 - Fits into CI. pre-commit hook, GitHub Action with pull request annotations, SARIF for code scanning, JSON output and stdin for editors. Every finding has a rule ID you can disable or ignore per line.
 - Ready for other languages. The behavior is written down as a language-neutral [spec](https://github.com/slopdam/slopdam/blob/main/spec/README.md) with conformance cases. The JavaScript and TypeScript package [@slopdam/core](https://github.com/slopdam/slopdam/blob/main/js/README.md), the [Go module](https://github.com/slopdam/slopdam/blob/main/go/README.md) and the [Java library](https://github.com/slopdam/slopdam/blob/main/java/README.md) already pass all of them; Rust follows ([roadmap](https://github.com/slopdam/slopdam/blob/main/ROADMAP.md)).
 - No runtime dependencies. Python 3.9 to 3.13, typed.
@@ -52,6 +53,8 @@ dev   : [OK] Saved - 3 rows processed
 | ![python app.py prints reader text, and app.log holds the dev text with an [OK] tag; the separator line is dropped](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/logging-en.png) | ![slopdam check lists each trace with file, line, column, rule ID and the suggested fix](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/check-en.png) |
 | **Preview fixes to Python string literals** | **Clean any program's output in a pipe** |
 | ![slopdam fix --diff shows the log calls rewritten, with the %d placeholders kept](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/fix-en.png) | ![echo piped into slopdam clean, then into slopdam --profile dev clean](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/pipe-en.png) |
+| **Keep JSON lines, logfmt and tables intact** | **Try it in the browser** |
+| ![a log with a JSON line, a logfmt line and a kubectl table; slopdam clean changes only the messages, escapes the quotes inside the JSON string and keeps the table's columns](https://raw.githubusercontent.com/slopdam/slopdam/main/docs/assets/structured-en.png) | [huggingface.co/spaces/slopdam/slopdam](https://huggingface.co/spaces/slopdam/slopdam): paste a log message and see the `reader` and `dev` output and every trace, with nothing sent to a server |
 
 ## Install
 
