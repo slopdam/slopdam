@@ -4,6 +4,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Output changes
+- At the `strong` level, `tone.chatty` removes a known opener at the start of a line when more text follows: about 80 phrases in English, Korean, Japanese and Chinese (`Great news!`, `Heads up:`, `Here's the summary:`, `살펴보겠습니다.`, `좋은 소식입니다!`, `さて、`, `好消息！`). The next word is capitalized when it is a plain lowercase word with a vowel, so `Heads up: cache warmed` becomes `Cache warmed` while `npm` and `k8s-node-01` keep their case. A line start may have indentation, a list marker, a heading marker or dev's `[OK]` tag. `basic` output does not change; the existing report-only `tone.chatty` rule still flags chatty phrases anywhere. The spec gains the `opener` function and a conformance group, `chatty`, with look-alike lines that must not change (`Great Lakes shard`, `Finally block ran`, `FYI-bot`, `결론 필드가`, `状態：OK`). On 20,000 random inputs at `strong`, JavaScript, Go and Java match Python exactly (#36).
+
 ### Changed
 - `go/vet` requires the core module at go/v0.3.0 instead of v0.1.0, so its findings and suggested fixes match slopdam 0.8.0: the structured-output fixes (#40), the quote fix (#43) and full-width punctuation kept on Chinese and Japanese lines (#49). Released as go/vet/v0.2.0.
 

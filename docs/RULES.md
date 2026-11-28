@@ -27,6 +27,7 @@ Rules run in the order listed. `reader` is the default profile. "off" means the 
 | `dash.ascii-run` | basic | Five or more of the same `= - * # ~ _ +`, not touching `+` or `\|` (a table border such as `+-----+` stays) | Removed | Removed |
 | `tone.exclaim` | basic | `!` right after Hangul | `.` | off |
 | `tone.filler` | strong | Korean filler words such as `성공적으로` | Removed | report |
+| `tone.chatty` | strong | A known opener at the start of a line, before more text: `Great news!`, `Heads up:`, `살펴보겠습니다.`, `さて、`, `好消息！` (about 80 in four languages) | Removed, next word capitalized | Removed, next word capitalized |
 | `tone.chatty` | basic | Chatty phrases such as `Let's` and `Here's` | report | report |
 | `symbol.non-ascii` | strict | Any symbol that is not a letter, digit, space or ASCII | report | report |
 

@@ -201,6 +201,14 @@ var functions = map[string]action{
 		}, m.String())
 	},
 	"unwrap": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string { return group(m, 1) },
+	// Keep the line start, drop the opener, capitalize the next word when the pattern captured it.
+	"opener": func(m *regexp2.Match, _ []rune, _ *cleanCtx) string {
+		word := group(m, 2) // ASCII letters only, so slicing by byte is safe
+		if word != "" {
+			word = strings.ToUpper(word[:1]) + word[1:]
+		}
+		return group(m, 1) + word
+	},
 	// Inside a double-quoted string a plain quote would end it, so it is escaped.
 	"quote_double": func(m *regexp2.Match, text []rune, _ *cleanCtx) string {
 		start := m.Index
