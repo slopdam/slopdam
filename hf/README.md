@@ -6,7 +6,7 @@ Four repositories on the Hub, all built from this folder:
 |---|---|---|
 | [`slopdam/log-slop`](https://huggingface.co/datasets/slopdam/log-slop) | Dataset | `dataset/generate.py` writes it, `dataset/README.md` is its card |
 | [`slopdam/slopdam`](https://huggingface.co/spaces/slopdam/slopdam) | Space (static) | `space/` as is |
-| [`slopdam/chatter-tagger`](https://huggingface.co/slopdam/chatter-tagger) | Model | `model/finetune.py` trains it, `model/card/README.md` is its card, `model/chatter.py` runs it |
+| [`slopdam/chatter-tagger`](https://huggingface.co/slopdam/chatter-tagger) | Model | `model/finetune.py` trains it, `model/card/README.md` is its card, `src/slopdam/chatter.py` runs it (uploaded as `chatter.py`); `model/export_onnx.py` makes `onnx/model_int8.onnx`, which `space/chatter.js` runs in the browser |
 | [`slopdam/README`](https://huggingface.co/spaces/slopdam/README) | Space (static) | `org-card/README.md`, shown as the card on [huggingface.co/slopdam](https://huggingface.co/slopdam) |
 
 slopdam's rules are deterministic, so the only model is for what they cannot list: chatty openers such as `Great news!` or `살펴보겠습니다.`. It is optional, runs after the rules, only deletes, and every deletion passes a fixed guard. Deciding whether text was written by AI is out of scope.

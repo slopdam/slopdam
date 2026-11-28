@@ -192,7 +192,7 @@ strip(["좋은 소식이에요, 캐시가 다시 채워졌습니다", "Finally b
 # ['캐시가 다시 채워졌습니다', 'Finally block ran in auth']
 ```
 
-평가 결과와 한계는 모델 카드에 있습니다.
+평가 결과와 한계는 모델 카드에 있습니다. 브라우저에서도 써 볼 수 있습니다. [데모](https://huggingface.co/spaces/slopdam/slopdam)에서 모델을 켜면 int8 버전(129 MB)을 한 번 내려받아 돌립니다.
 
 ## 성능
 

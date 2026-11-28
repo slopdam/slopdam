@@ -13,6 +13,7 @@ Found by running `slopdam check` on real projects written with AI coding tools: 
 - A line is no longer taken for a log call because of `login(`, `logout(`, `logo` or a `console.` inside a string (`"console.example.com"`); `console` counts only as `console.log(`, `.info(`, `.warn(`, `.error(`, `.debug(` or `.trace(`.
 
 ### Added
+- The chatter model runs in the browser demo: `onnx/model_int8.onnx` on the Hub (129 MB, int8) with `hf/space/chatter.js` as tokenizer, guard and rebuild, off until you turn it on. `hf/model/export_onnx.py` makes the file and `hf/model/js_parity.py` checks the JavaScript against `slopdam.chatter`. On log-slop test the int8 model matches the PyTorch one on 4,551 of 4,552 lines (#38).
 - `scripts/bench_lines.py` times each of log-slop's 5,000 test lines in Python, JavaScript and Go (median, p95, p99, lines per second), and the chatter model with `--chatter`; the README has the numbers from an Apple M5.
 - `claude-plugin/`: a Claude Code plugin, listed by `.claude-plugin/marketplace.json` at the repository root (`/plugin marketplace add slopdam/slopdam`, then `/plugin install slopdam@slopdam`). A `PostToolUse` hook runs `slopdam check` on each source file Claude writes or edits and passes the findings to Claude as context, without blocking or changing the file; a skill, `clean-log-messages`, covers writing plain log messages and using `check`, `fix` and `clean`. It uses the project's slopdam settings and needs slopdam installed.
 
