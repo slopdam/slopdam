@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [0.4.0] - 2026-11-28
+
+### Output changes
+- From the spec (#49): a line with kana or CJK ideographs keeps its full-width punctuation (`处理完成，共 42 条记录。` stays as written); Korean and English lines still get ASCII.
+
 ## [0.3.0] - 2026-11-28
 
 ### Output changes

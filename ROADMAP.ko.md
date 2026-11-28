@@ -71,7 +71,7 @@ slopdam/ (이 저장소)
 - [x] 자동 수정을 제안하는 `go vet` 분석기 (`slopdamvet`)
 - [x] 모든 적합성 사례를 통과하는 Java 라이브러리 ([java/](java/README.ko.md)), Logback과 Log4j 2용 `%slopdam` 변환기 포함
 
-### 0.7: 데이터와 인사말 모델 (진행 중, slopdam 0.7.0과 @slopdam/core 0.3.0에 1a, 1b 반영)
+### 0.7: 데이터와 인사말 모델 (진행 중, slopdam 0.7.0과 @slopdam/core 0.3.0에 1a, 1b, slopdam 0.8.0과 @slopdam/core 0.4.0에 2a 반영)
 
 [log-slop](https://huggingface.co/datasets/slopdam/log-slop) 데이터셋과 [chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) 모델을 Hugging Face에 공개했습니다. 이번 단계에서는 데이터를 실제 로그에 더 가깝게 만들고, 규칙으로 할 수 있는 일은 규칙으로 옮기고, 모델을 slopdam이 도는 곳에서 쓸 수 있게 합니다.
 
