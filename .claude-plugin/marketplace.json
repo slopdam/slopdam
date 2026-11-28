@@ -1,0 +1,14 @@
+{
+  "name": "slopdam",
+  "description": "slopdam for Claude Code: keep AI-style traces out of log messages",
+  "owner": { "name": "The slopdam Authors", "url": "https://github.com/slopdam" },
+  "plugins": [
+    {
+      "name": "slopdam",
+      "source": "./claude-plugin",
+      "description": "After each file write or edit, checks the file's log messages for em dashes, emoji, markdown and chatty openers, and tells Claude what to fix",
+      "category": "code-quality",
+      "tags": ["logging", "linter", "korean"]
+    }
+  ]
+}
