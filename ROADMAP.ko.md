@@ -88,6 +88,7 @@ slopdam/ (이 저장소)
 ### 0.8: Rust와 편집기
 
 - [ ] `tracing` 레이어를 갖춘 Rust 크레이트
+- [x] Claude Code 플러그인: Claude가 쓰거나 고친 파일을 검사하는 훅과 스킬 (`claude-plugin/`)
 - [ ] `check --format json` 기반 편집기 지원 (VS Code부터)
 
 ### 1.0: 안정판

@@ -88,6 +88,7 @@ The [log-slop](https://huggingface.co/datasets/slopdam/log-slop) dataset and the
 ### 0.8: Rust and editors
 
 - [ ] Rust crate with a `tracing` layer
+- [x] Claude Code plugin: a hook that checks every file Claude writes or edits, and a skill (`claude-plugin/`)
 - [ ] Editor support on top of `check --format json` (VS Code first)
 
 ### 1.0: stable

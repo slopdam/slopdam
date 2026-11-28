@@ -1,0 +1,13 @@
+{
+  "description": "Check the log messages in a file Claude just wrote or edited",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/check.py\"", "timeout": 60 }
+        ]
+      }
+    ]
+  }
+}

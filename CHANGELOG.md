@@ -4,6 +4,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Added
+- `claude-plugin/`: a Claude Code plugin, listed by `.claude-plugin/marketplace.json` at the repository root (`/plugin marketplace add slopdam/slopdam`, then `/plugin install slopdam@slopdam`). A `PostToolUse` hook runs `slopdam check` on each source file Claude writes or edits and passes the findings to Claude as context, without blocking or changing the file; a skill, `clean-log-messages`, covers writing plain log messages and using `check`, `fix` and `clean`. It uses the project's slopdam settings and needs slopdam installed.
+
 ### Changed
 - `go/vet` requires the core module at go/v0.4.0, so its findings match slopdam 0.9.0, including the known openers `tone.chatty` removes at the `strong` level (#36). Released as go/vet/v0.3.0.
 

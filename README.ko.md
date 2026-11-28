@@ -158,6 +158,17 @@ GitHub Actions에서는 발견한 흔적을 PR에 주석(annotation)으로 표�
 
 종료 코드: `0` 깨끗함, `1` 흔적 발견(`fix --diff`에서는 바뀔 내용 있음), `2` 옵션이나 설정 오류.
 
+## Claude Code
+
+플러그인이 Claude가 쓰거나 고친 파일마다 로그 메시지를 검사하고, 고칠 내용을 Claude에게 알려 줍니다. 프로젝트의 slopdam 설정을 따릅니다. 평이한 로그 메시지를 쓰는 법을 담은 스킬도 함께 들어 있습니다. slopdam이 설치돼 있어야 합니다(`pip install slopdam`).
+
+```
+/plugin marketplace add slopdam/slopdam
+/plugin install slopdam@slopdam
+```
+
+자세한 내용은 [claude-plugin/README.ko.md](claude-plugin/README.ko.md)에 있습니다.
+
 ## 파이프
 
 ```bash

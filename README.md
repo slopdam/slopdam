@@ -158,6 +158,17 @@ GitHub Actions, with findings shown as annotations on the pull request:
 
 Exit codes: `0` clean, `1` traces found (or `fix --diff` has changes), `2` usage or configuration error.
 
+## Claude Code
+
+A plugin checks the log messages in every file Claude writes or edits and tells Claude what to fix, using your project's slopdam settings. It also adds a skill on writing plain log messages. It needs slopdam installed (`pip install slopdam`).
+
+```
+/plugin marketplace add slopdam/slopdam
+/plugin install slopdam@slopdam
+```
+
+Details are in [claude-plugin/README.md](claude-plugin/README.md).
+
 ## Pipe
 
 ```bash
