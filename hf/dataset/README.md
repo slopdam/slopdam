@@ -62,7 +62,7 @@ reader: 要するに、1591行をCSVに書き出しました
 target: 1591行をCSVに書き出しました
 ```
 
-The `reader`, `dev` and `findings` labels are produced by [slopdam](https://github.com/slopdam/slopdam) 0.9.0, a deterministic cleaner with the same output in Python, JavaScript, Go and Java. They are what slopdam does, not human judgments. `target` goes one step further: it also drops the chatty openers and filler adverbs the generator inserted, which slopdam's rules only report or do not see at all.
+The `reader`, `dev` and `findings` labels are produced by [slopdam](https://github.com/slopdam/slopdam) 0.10.0, a deterministic cleaner with the same output in Python, JavaScript, Go and Java. They are what slopdam does, not human judgments. `target` goes one step further: it also drops the chatty openers and filler adverbs the generator inserted, which slopdam's rules only report or do not see at all.
 
 ## Subsets
 
@@ -71,7 +71,7 @@ The `reader`, `dev` and `findings` labels are produced by [slopdam](https://gith
 | `default` | train | 100,000 | Generated messages, 30% English, 30% Korean, 20% Japanese, 20% Chinese, from 192 templates |
 | `default` | validation | 5,000 | Same templates as train |
 | `default` | test | 5,000 | 48 held-out templates, and chatty openers, filler words and labels, that never appear in train or validation |
-| `conformance` | test | 168 | slopdam's language-neutral conformance cases, hand-written edge cases |
+| `conformance` | test | 183 | slopdam's language-neutral conformance cases, hand-written edge cases |
 | `real` | test | 104 | Log messages from a real project written with AI coding tools, labeled by hand (see below) |
 
 No input appears twice, within or across splits. Because the test templates, openers (`FYI:`, `Excellent!`, `완벽합니다!`, `実は、`, `说实话，`), fillers (`Finally`, `순조롭게`) and labels (`宛先：`, `来源：`) are held out, a model scored on `test` has to generalize to phrases it has not seen, not recall them.
@@ -127,7 +127,7 @@ The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `leve
 | `note` | Why `expected` differs from slopdam's output, when it does |
 | `reader`, `dev` | slopdam's engine on `input`, keeping whitespace at either end and leaving a literal alone when nothing but a symbol would remain, the way `slopdam fix` treats a Python string. f-string and template expressions are not masked here, unlike in `fix`. |
 
-slopdam (`reader`) fixes all 42 traces and leaves 61 of the other 62 alone. One of the traces is an en dash used as an empty table cell (`{name:<15} –`), which should stay as an ASCII `-`; slopdam 0.9 removed it, and the next release keeps it. The one it still gets wrong is check marks inside an f-string expression (`{'✓' if r.ok else '✗'}`), which `slopdam fix` does not touch but the engine on the whole text does.
+slopdam (`reader`) fixes all 42 traces and leaves 61 of the other 62 alone. One of the traces is an en dash used as an empty table cell (`{name:<15} –`), which should stay as an ASCII `-`; slopdam 0.9 removed it, 0.10 keeps it. The one it still gets wrong is check marks inside an f-string expression (`{'✓' if r.ok else '✗'}`), which `slopdam fix` does not touch but the engine on the whole text does.
 
 The same review covered `slopdam check` on five such projects (614 log messages; only this public one is published). It led to the fixes in slopdam's next release: `check` had spent 85% of its findings on build output, and missed template literals in JavaScript and TypeScript and strings nested in Python calls (`print(tr("✓ ..."))`). After them it reports 124 of the 126 messages with a trace (the other two are rightly left alone), and 169 of 171 findings in developer logs are correct.
 
@@ -175,7 +175,7 @@ Most openers are ones no rule knows, which is why `tone.chatty` is rare here whi
 
 slopdam's own rules at the `strong` level (`reader_strong`), and taggers trained on `train` to turn `reader` into `target` by deleting words (code in `hf/model/` of the slopdam repository). Rows with filler adverbs are left out of the opener rows:
 
-| | slopdam 0.9.0 rules, `strong` | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
+| | slopdam 0.10.0 rules, `strong` | Character tagger, from scratch | DistilBERT, first try | [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) |
 |---|---:|---:|---:|---:|
 | Job | about 80 listed openers | openers and fillers | openers and fillers | openers only, with a guard |
 | `test`: unseen openers removed | 22.1% (90 of 407) | | 90.6% | 90.7% (84.3% counting openers ending in `：`) |
@@ -202,4 +202,4 @@ MIT, like slopdam. The text was written for this dataset, except `real`: those m
 
 ## 한국어 요약
 
-AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.9.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. `real` 설정에는 AI 코딩 도구로 만든 실제 오픈소스 프로젝트의 로그 문구 104개와 사람이 판정한 정답이 있어, 실제 코드에서 놓치거나 잘못 고치는 것을 잴 수 있습니다. 그 외 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
+AI 코딩 도구가 로그 메시지에 남기는 흔적(긴 대시와 한글 `ㅡ`, 이모지, 마크다운, 둥근 따옴표, 구분선, 보이지 않는 문자, 전각 문장 부호, 군더더기 인사말)이 들어간 영어, 한국어, 일본어, 중국어 메시지 110,000개입니다. 메시지마다 사람용(`reader`)과 도구용(`dev`)으로 정리한 결과, 흔적마다의 위치와 규칙 ID가 함께 있습니다. `target`은 규칙이 고치지 못하는 인사말(`좋은 소식입니다!`, `Heads up:`, `さて、`, `好的，`)과 부사(`성공적으로`, `Successfully`)까지 뺀 결과이고, test 분할은 학습에 쓰지 않은 템플릿 48개와 처음 보는 인사말, 부사, 라벨로만 만들어 모델의 일반화를 잴 수 있습니다. 일본어와 중국어는 전각 문장 부호를 그대로 두며, `状態：OK`처럼 `：`로 끝나는 라벨은 지우면 안 되는 내용으로 들어 있습니다. 이 데이터로 학습한 인사말 제거 모델 [slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger) v2는 처음 보는 인사말의 90.7%를 지우고(`：`로 끝나는 인사말 제외, 전부 세면 84.3%), 그대로 둬야 할 줄은 하나도 바꾸지 않았습니다. 자세한 결과는 Baselines와 모델 카드에 있습니다. JSON lines, logfmt, 시각이 붙은 로그 줄 안의 메시지도 있어 구조는 그대로 두고 메시지만 정리하는지 볼 수 있습니다. 라벨은 slopdam 0.10.0이 만든 결정적 결과이고, 바뀌면 안 되는 문장(옵션, URL, 경로, `key=value`, 스택 트레이스, 표, diff)도 섞여 있어 잘못 고치는지도 확인할 수 있습니다. `real` 설정에는 AI 코딩 도구로 만든 실제 오픈소스 프로젝트의 로그 문구 104개와 사람이 판정한 정답이 있어, 실제 코드에서 놓치거나 잘못 고치는 것을 잴 수 있습니다. 그 외 문장은 모두 이 데이터셋을 위해 생성했으며, AI가 쓴 글인지 판별하는 용도는 아닙니다.
