@@ -159,6 +159,59 @@ def _unwrap(m: "re.Match[str]", ctx: Context) -> str:
     return m.group(1)
 
 
+def _opener(m: "re.Match[str]", ctx: Context) -> str:
+    # Keep the line start (indent, dev's status tag, list marker) and drop the opener. The next
+    # word, when it is a plain lowercase word with a vowel, starts the sentence now, so it gets a
+    # capital letter ("npm", "k8s-node-01" and "api.example.com" stay as they are).
+    word = m.group(2) or ""
+    return m.group(1) + word[:1].upper() + word[1:]
+
+
+def _literal(phrase: str) -> str:
+    """A phrase as a pattern that every port's regex engine reads the same way."""
+    return re.sub(r"([.^$*+?()\[\]{}|\\])", r"\\\1", phrase)
+
+
+# Openers that carry no information and are safe to drop at the start of a line (step 3 of
+# roadmap 0.7). Each needs its punctuation, or a following space when it has none, so
+# "Great Lakes shard", "Boom gate" and "결론 필드" never match. The Korean `!` is already a `.`
+# in reader by the time this runs; Japanese and Chinese accept full-width or ASCII punctuation.
+OPENERS = {
+    "en": ["Great news!", "Great news:", "Good news!", "Good news:", "Heads up:", "Heads up,", "Heads-up:",
+           "Just so you know,", "Just a heads up:", "Quick update:", "Status update:", "Here's the summary:",
+           "Here's a summary:", "Here is the summary:", "Here's a quick summary:", "Here's what happened:",
+           "Here is what happened:", "Here you go:", "Here we go:", "Let's go!", "Let's see:", "Voila!",
+           "Voilà!", "TL;DR:", "TL;DR,", "FYI:", "FYI,", "Hooray!", "Yay!", "Woohoo!", "Huzzah!", "Whew!",
+           "Phew!", "Phew,", "Great job!", "Nice one!", "Awesome!", "Fantastic!", "Excellent!", "Wonderful!",
+           "Brilliant!", "Good catch!", "Guess what?", "Ta-da!"],
+    "ko": ["살펴보겠습니다.", "해볼게요.", "해보겠습니다.", "좋은 소식입니다!", "기쁜 소식입니다!", "좋은 소식이 있습니다!",
+           "알려드립니다:", "알려 드립니다:", "짜잔!", "잘 됐네요!", "잘됐네요!", "멋지네요!", "요약하자면,", "정리하자면,",
+           "다행스럽게도", "보시다시피", "확인해 보니", "확인해보니"],
+    "ja": ["さて、", "お知らせです：", "良いニュースです！", "朗報です！", "まとめると、", "結論から言うと、", "ご覧の通り、",
+           "というわけで、", "簡単に言うと、", "お待たせしました！"],
+    "zh": ["好消息！", "总结一下：", "简单来说，", "如你所见，", "顺便说一下，", "综上所述，", "汇报一下：", "让我们看看。",
+           "我来试试。"],
+}
+_ENDS = {"!": "[!.]+", "！": "[！!]", "：": "[：:]", "，": "[，,]"}
+
+
+def _opener_pattern() -> str:
+    alts = []
+    for lang, phrases in OPENERS.items():
+        for p in phrases:
+            end = p[-1]
+            if lang == "ko" and end == "!":
+                alts.append(_literal(p[:-1]) + "[!.]+")  # tone.exclaim already made it "." in reader
+            elif lang in ("ja", "zh") and end in _ENDS:
+                alts.append(_literal(p[:-1]) + _ENDS[end])
+            elif end.isalnum():
+                alts.append(_literal(p) + "(?=[ \t])")
+            else:
+                alts.append(_literal(p))
+    return (r"^([ \t]*(?:\[(?:OK|FAIL|WARN)\][ \t]+)?(?:[-*+][ \t]+|#{1,6}[ \t]+|\d+[.)][ \t]+)?)(?:"
+            + "|".join(alts) + r")[ \t]*(?=\S)((?=[a-z]*[aeiouy])[a-z]+(?![\w.\-/:@]))?")
+
+
 def _r(id: str, level: str, pattern: str, actions: Dict[str, Action], description: str,
        flags: int = 0, ascii: bool = False) -> Rule:
     return Rule(id, level, re.compile(pattern, flags), actions, description, ascii)
@@ -197,6 +250,9 @@ RULES: tuple = (
     _r("dash.ascii-run", "basic", r"(?<![=\-*#~_+|])([=\-*#~_+])\1{4,}(?![=\-*#~_+|])", _both(""), "ASCII separator", ascii=True),
     _r("tone.exclaim", "basic", "(?<=[가-힣])!+", {"reader": "."}, "exclamation after Korean text"),
     _r("tone.filler", "strong", r"(?:성공적으로|완벽하게|무사히|드디어)[ \t]*", {"reader": "", "dev": None}, "filler phrase"),
+    # At strong, a known opener at the start of a line is dropped; the report-only rule after it
+    # still flags chatty phrases anywhere, at every level.
+    _r("tone.chatty", "strong", _opener_pattern(), _both(_opener), "chatty opener", re.M, ascii=True),
     _r("tone.chatty", "basic", r"\b(?:Let's|Here's|Voila|Awesome)\b|해볼게요|해보겠습니다|살펴보겠습니다", _both(None), "chatty phrase", ascii=True),
     _r("symbol.non-ascii", "strict", "[^\\w\\s\x00-\x7f\U000F0000-\U000FFFFD]", _both(None), "non-ASCII symbol"),
 )

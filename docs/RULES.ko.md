@@ -27,6 +27,7 @@
 | `dash.ascii-run` | basic | 같은 `= - * # ~ _ +`가 다섯 개 이상 이어짐, 단 `+`나 `\|`에 붙은 것은 제외(`+-----+` 같은 표 테두리는 유지) | 삭제 | 삭제 |
 | `tone.exclaim` | basic | 한글 바로 뒤의 `!` | `.` | 꺼짐 |
 | `tone.filler` | strong | `성공적으로` 같은 군더더기 표현 | 삭제 | 보고 |
+| `tone.chatty` | strong | 줄 맨 앞에 오고 뒤에 내용이 이어지는 알려진 인사말: `Great news!`, `Heads up:`, `살펴보겠습니다.`, `さて、`, `好消息！` (4개 언어 약 80개) | 삭제, 다음 단어 첫 글자 대문자 | 삭제, 다음 단어 첫 글자 대문자 |
 | `tone.chatty` | basic | `Let's`, `Here's`, `살펴보겠습니다` 같은 대화체 표현 | 보고 | 보고 |
 | `symbol.non-ascii` | strict | 글자, 숫자, 공백, ASCII 이외의 모든 기호 | 보고 | 보고 |
 

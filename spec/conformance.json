@@ -750,6 +750,289 @@
           "dev": "`retry：3` 回目で成功しました"
         }
       ]
+    },
+    {
+      "id": "chatty",
+      "title": "Known chatty openers at the start of a line, removed at strong",
+      "cases": [
+        {
+          "input": "Great news! Deployed api: 3 pods",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Deployed api: 3 pods",
+          "dev": "Deployed api: 3 pods"
+        },
+        {
+          "input": "Great news! Deployed api: 3 pods",
+          "reader": "Great news! Deployed api: 3 pods",
+          "dev": "Great news! Deployed api: 3 pods"
+        },
+        {
+          "input": "Heads up: cache warmed for orders",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Cache warmed for orders",
+          "dev": "Cache warmed for orders"
+        },
+        {
+          "input": "Heads up: npm install failed",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "npm install failed",
+          "dev": "npm install failed"
+        },
+        {
+          "input": "Heads up: k8s-node-01 is down",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "k8s-node-01 is down",
+          "dev": "k8s-node-01 is down"
+        },
+        {
+          "input": "- FYI: saved 3 rows\n- TL;DR: nothing broke",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "- Saved 3 rows\n- Nothing broke",
+          "dev": "- Saved 3 rows\n- Nothing broke"
+        },
+        {
+          "input": "1. Here's the summary: 2 jobs failed",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "1. 2 jobs failed",
+          "dev": "1. 2 jobs failed"
+        },
+        {
+          "input": "✅ Great news! **Deployed** api — 3 pods 🎉",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Deployed api: 3 pods",
+          "dev": "[OK] Deployed api - 3 pods"
+        },
+        {
+          "input": "## Here we go: retrying in 3s",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Retrying in 3s",
+          "dev": "Retrying in 3s"
+        },
+        {
+          "input": "Let's go! `make test` passed",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "make test passed",
+          "dev": "`make test` passed"
+        },
+        {
+          "input": "Here’s what happened: the cache expired",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "The cache expired",
+          "dev": "The cache expired"
+        },
+        {
+          "input": "Great news!",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Great news!",
+          "dev": "Great news!"
+        },
+        {
+          "input": "Great news! ",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Great news!",
+          "dev": "Great news!"
+        },
+        {
+          "input": "Great Lakes shard 3 is online",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Great Lakes shard 3 is online",
+          "dev": "Great Lakes shard 3 is online"
+        },
+        {
+          "input": "Boom gate 3 reported a fault",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Boom gate 3 reported a fault",
+          "dev": "Boom gate 3 reported a fault"
+        },
+        {
+          "input": "Finally block ran in auth",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Finally block ran in auth",
+          "dev": "Finally block ran in auth"
+        },
+        {
+          "input": "Voila.png uploaded to /tmp/x",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Voila.png uploaded to /tmp/x",
+          "dev": "Voila.png uploaded to /tmp/x"
+        },
+        {
+          "input": "FYI-bot posted 3 messages",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "FYI-bot posted 3 messages",
+          "dev": "FYI-bot posted 3 messages"
+        },
+        {
+          "input": "Note: this endpoint is deprecated",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Note: this endpoint is deprecated",
+          "dev": "Note: this endpoint is deprecated"
+        },
+        {
+          "input": "INFO Great news! saved 3 rows",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "INFO Great news! saved 3 rows",
+          "dev": "INFO Great news! saved 3 rows"
+        },
+        {
+          "input": "{\"msg\":\"Great news! saved 3 rows\"}",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "{\"msg\":\"Great news! saved 3 rows\"}",
+          "dev": "{\"msg\":\"Great news! saved 3 rows\"}"
+        },
+        {
+          "input": "Saved 3 rows. Great news!",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "Saved 3 rows. Great news!",
+          "dev": "Saved 3 rows. Great news!"
+        },
+        {
+          "input": "좋은 소식입니다! 배포 완료",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "배포 완료",
+          "dev": "배포 완료"
+        },
+        {
+          "input": "좋은 소식입니다! 성공적으로 배포했습니다",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "배포했습니다",
+          "dev": "성공적으로 배포했습니다"
+        },
+        {
+          "input": "살펴보겠습니다. 로그 3건 확인",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "로그 3건 확인",
+          "dev": "로그 3건 확인"
+        },
+        {
+          "input": "다행스럽게도 데이터는 안전합니다",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "데이터는 안전합니다",
+          "dev": "데이터는 안전합니다"
+        },
+        {
+          "input": "다행스럽게도",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "다행스럽게도",
+          "dev": "다행스럽게도"
+        },
+        {
+          "input": "결론 필드가 비어 있습니다",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "결론 필드가 비어 있습니다",
+          "dev": "결론 필드가 비어 있습니다"
+        },
+        {
+          "input": "보시다시피요 이건 내용",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "보시다시피요 이건 내용",
+          "dev": "보시다시피요 이건 내용"
+        },
+        {
+          "input": "さて、バックアップが完了しました",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "バックアップが完了しました",
+          "dev": "バックアップが完了しました"
+        },
+        {
+          "input": "お知らせです：メンテナンスは22時から",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "メンテナンスは22時から",
+          "dev": "メンテナンスは22時から"
+        },
+        {
+          "input": "好消息！已索引42篇文档",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "已索引42篇文档",
+          "dev": "已索引42篇文档"
+        },
+        {
+          "input": "总结一下：3个任务失败",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "3个任务失败",
+          "dev": "3个任务失败"
+        },
+        {
+          "input": "状態：OK",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "状態：OK",
+          "dev": "状態：OK"
+        },
+        {
+          "input": "好消息",
+          "options": {
+            "level": "strong"
+          },
+          "reader": "好消息",
+          "dev": "好消息"
+        }
+      ]
     }
   ]
 }

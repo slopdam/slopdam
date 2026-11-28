@@ -97,6 +97,12 @@ const FUNCTIONS: Record<string, Fn> = {
 
   unwrap: (m) => m[1] ?? "",
 
+  // Keep the line start, drop the opener, capitalize the next word when the pattern captured it.
+  opener: (m) => {
+    const word = m[2] ?? "";
+    return (m[1] ?? "") + word.slice(0, 1).toUpperCase() + word.slice(1);
+  },
+
   quote_double: (m) => {
     // Inside a double-quoted string a plain quote would end it, so it is escaped.
     const before = m.input.slice(m.input.lastIndexOf("\n", m.index - 1) + 1, m.index);

@@ -205,6 +205,11 @@ public final class Sanitizer {
       return out.toString();
     });
     FUNCTIONS.put("unwrap", (m, s, ctx) -> m.group(1) == null ? "" : m.group(1));
+    // Keep the line start, drop the opener, capitalize the next word when the pattern captured it.
+    FUNCTIONS.put("opener", (m, s, ctx) -> {
+      String lead = m.group(1) == null ? "" : m.group(1), word = m.group(2) == null ? "" : m.group(2);
+      return lead + (word.isEmpty() ? "" : word.substring(0, 1).toUpperCase() + word.substring(1));
+    });
     // Inside a double-quoted string a plain quote would end it, so it is escaped.
     FUNCTIONS.put("quote_double", (m, s, ctx) -> {
       int start = s.lastIndexOf('\n', m.start() - 1) + 1, n = 0;
