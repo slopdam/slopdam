@@ -194,6 +194,19 @@ strip(["좋은 소식이에요, 캐시가 다시 채워졌습니다", "Finally b
 
 평가 결과와 한계는 모델 카드에 있습니다.
 
+## 성능
+
+[log-slop](https://huggingface.co/datasets/slopdam/log-slop) test 5,000줄을 한 줄씩 처리한 결과입니다. `reader` 프로필, `basic` 단계, Apple M5 기준입니다.
+
+| | 중앙값 | p99 | 초당 줄 수 |
+|---|---:|---:|---:|
+| Python 3.11 | 16 µs | 67 µs | 53,000 |
+| JavaScript (Node 24) | 5 µs | 22 µs | 169,000 |
+| Go 1.27 | 24 µs | 122 µs | 32,000 |
+| 인사말 모델(선택), CPU | 6.2 ms | 15.8 ms | 144 |
+
+`dev`도 같고, `strong`은 10% 정도 더 걸립니다. 직접 재려면 `python scripts/bench_lines.py`를, 모델까지 재려면 `--chatter`를 붙입니다.
+
 ## 다른 언어
 
 slopdam은 어느 언어에서나 같은 방식으로 동작하도록 만들고 있습니다.

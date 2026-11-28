@@ -194,6 +194,19 @@ strip(["Woohoo, the cache is warm again", "Finally block ran in auth"])
 
 The model card has its evaluation and limits.
 
+## Performance
+
+Per line, on the 5,000 test lines of [log-slop](https://huggingface.co/datasets/slopdam/log-slop), `reader` profile at the `basic` level, on an Apple M5:
+
+| | Median | p99 | Lines per second |
+|---|---:|---:|---:|
+| Python 3.11 | 16 µs | 67 µs | 53,000 |
+| JavaScript (Node 24) | 5 µs | 22 µs | 169,000 |
+| Go 1.27 | 24 µs | 122 µs | 32,000 |
+| Chatter model (optional), CPU | 6.2 ms | 15.8 ms | 144 |
+
+`dev` costs the same and `strong` about 10% more. To measure on your machine: `python scripts/bench_lines.py`, with `--chatter` for the model.
+
 ## Other languages
 
 slopdam is built to work the same way in every language.
