@@ -100,7 +100,7 @@
 </main>
 
 <script type="module">
-  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.5.0/dist/esm/index.js";
+  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.6.0/dist/esm/index.js";
   import { loadVocab, stripOpener } from "./chatter.js";
 
   // slopdam/chatter-tagger v2, int8 ONNX, at a fixed revision
@@ -147,7 +147,7 @@
     b.addEventListener("click", () => { $("input").value = text; run(); });
     $("examples").append(b);
   }
-  $("version").textContent = "spec v1 · @slopdam/core 0.5.0";
+  $("version").textContent = "spec v1 · @slopdam/core 0.6.0";
   $("input").value = EXAMPLES[0];
 
   const picked = (name) => document.querySelector(`input[name=${name}]:checked`).value;
