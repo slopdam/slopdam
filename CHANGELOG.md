@@ -2,7 +2,7 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
-## [Unreleased]
+## [0.9.0] - 2026-11-28
 
 ### Added
 - `pip install "slopdam[chatter]"` adds the optional chatter model ([slopdam/chatter-tagger](https://huggingface.co/slopdam/chatter-tagger)) for the openers no rule lists: `slopdam.chatter.strip(lines)` and `slopdam clean --chatter` run the rules, then the model with its guard. The model is downloaded on first use at a pinned revision and is off by default; without the extra, `--chatter` exits 2 with the install command. The core package still has no runtime dependencies (#37).

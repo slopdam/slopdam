@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Output follows slopdam's spec; see its [GOVERNANCE.md](https://github.com/slopdam/slopdam/blob/main/GOVERNANCE.md) for the output stability policy.
 
+## [0.5.0] - 2026-11-28
+
+### Output changes
+- From the spec (#36): at the `strong` level, `tone.chatty` removes about 80 known openers at the start of a line when more text follows (`Great news!`, `Heads up:`, `살펴보겠습니다.`, `さて、`), and capitalizes the next word when it is a plain lowercase word with a vowel. `basic` output does not change.
+
 ## [0.4.0] - 2026-11-28
 
 ### Output changes

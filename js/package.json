@@ -1,6 +1,6 @@
 {
   "name": "@slopdam/core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Strip AI-generated traces (em dashes, emoji, separators, markdown) from log messages, with pino, winston and ESLint integrations. JavaScript port of slopdam, conformance-tested against its spec.",
   "license": "MIT",
   "author": "The slopdam Authors",

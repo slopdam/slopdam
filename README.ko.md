@@ -140,7 +140,7 @@ exclude = ["tests/**"]
 ```yaml
 repos:
   - repo: https://github.com/slopdam/slopdam
-    rev: v0.8.0
+    rev: v0.9.0
     hooks:
       - id: slopdam
 ```
@@ -149,7 +149,7 @@ GitHub Actions에서는 발견한 흔적을 PR에 주석(annotation)으로 표�
 
 ```yaml
 - uses: actions/checkout@v7
-- uses: slopdam/slopdam@v0.8.0
+- uses: slopdam/slopdam@v0.9.0
   with:
     paths: src/
 ```
