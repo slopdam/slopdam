@@ -3,7 +3,7 @@ module github.com/slopdam/slopdam/go/vet
 go 1.26.0
 
 require (
-	github.com/slopdam/slopdam/go v0.1.0
+	github.com/slopdam/slopdam/go v0.3.0
 	golang.org/x/tools v0.52.0
 )
 

@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Changed
+- `go/vet` requires the core module at go/v0.3.0 instead of v0.1.0, so its findings and suggested fixes match slopdam 0.8.0: the structured-output fixes (#40), the quote fix (#43) and full-width punctuation kept on Chinese and Japanese lines (#49). Released as go/vet/v0.2.0.
+
 ## [0.8.0] - 2026-11-28
 
 ### Output changes
