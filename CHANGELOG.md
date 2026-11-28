@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Changed
+- `go/vet` requires the core module at go/v0.5.0, so its findings match slopdam 0.10.0 (identifier ranges and empty cells, #65). Released as go/vet/v0.4.0.
+
 ## [0.10.0] - 2026-11-28
 
 ### Output changes
