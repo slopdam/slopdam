@@ -68,6 +68,6 @@ python3 -m http.server 7860 -d hf/space   # http://localhost:7860
 
 ## 한국어
 
-- `slopdam/log-slop` 데이터셋과 `slopdam/slopdam` Space(브라우저에서 도는 정적 데모)를 올립니다. 규칙이 결정적이라 학습 모델은 만들지 않습니다.
+- `slopdam/log-slop` 데이터셋, `slopdam/slopdam` Space(브라우저에서 도는 정적 데모), `slopdam/chatter-tagger` 모델, 조직 카드 `slopdam/README`를 올립니다. 규칙이 결정적이라 모델은 규칙으로 나열할 수 없는 인사말(`Great news!`, `살펴보겠습니다.`) 하나만 다루며, 선택 사항이고 규칙 뒤에 돌며 지우기만 합니다.
 - 데이터셋은 `python hf/dataset/generate.py`로 매번 같은 바이트로 생성됩니다. 카드(`dataset/README.md`)를 `out/`에 복사한 뒤 `hf upload`로 올립니다.
 - 업로드에는 `slopdam` 조직의 쓰기 토큰이 필요합니다(`hf auth login`).

@@ -97,7 +97,7 @@
 </main>
 
 <script type="module">
-  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.3.0/dist/esm/index.js";
+  import { Sanitizer, LEVELS } from "https://cdn.jsdelivr.net/npm/@slopdam/core@0.4.0/dist/esm/index.js";
 
   const EXAMPLES = [
     "✅ **저장 완료** ㅡ 2024–2025년 데이터 3건 처리했습니다! 🎉",
@@ -106,6 +106,7 @@
     "⚠️ 재시도 중… “db-01” 응답이 느립니다\n──────────\n• 다음 단계: 캐시 확인",
     "Let's go! Here's the summary: user_id=42 region=ap-northeast-2",
     '{"level":"info","msg":"✅ Synced 3 records from “cdn” — done"}\nlevel=warn msg="⚠️ Retrying… db-01 is slow" attempt=2',
+    "✅ **バックアップ完了** — 所要時間：12秒（3件）🎉\n🚀 部署成功——共处理 42 条记录，耗时 3 秒！",
     "NAME          READY   STATUS\napi-7d9f      1/1     Running\n┌──────┬───────┐\n│ api  │ 3     │\n└──────┴───────┘",
   ];
   const DASHES = ["colon", "comma", "hyphen", "space"];
@@ -126,7 +127,7 @@
     b.addEventListener("click", () => { $("input").value = text; run(); });
     $("examples").append(b);
   }
-  $("version").textContent = "spec v1 · @slopdam/core 0.3.0";
+  $("version").textContent = "spec v1 · @slopdam/core 0.4.0";
   $("input").value = EXAMPLES[0];
 
   const picked = (name) => document.querySelector(`input[name=${name}]:checked`).value;

@@ -79,7 +79,7 @@ slopdam/ (이 저장소)
 - [x] 1a. 엔진의 구조화 출력 처리: 정렬된 열과 표는 유지하고 logfmt 메시지는 정리, 명세와 모든 구현에 반영 ([#40](https://github.com/slopdam/slopdam/issues/40))
 - [x] 1b. JSON과 logfmt 문자열 안의 둥근 따옴표는 `\"`로 바꿔 줄이 깨지지 않게 함 ([#43](https://github.com/slopdam/slopdam/pull/43))
 - [x] 2a. 중국어와 일본어 줄은 전각 문장 부호(`，：！`)를 그대로 둠, 명세와 모든 구현에 반영
-- [ ] 2. log-slop v6: 일본어와 중국어 메시지, 네 언어로 손으로 쓴 정답 세트 ([#35](https://github.com/slopdam/slopdam/issues/35))
+- [x] 2. log-slop v6: 일본어와 중국어 메시지, 네 언어로 손으로 쓴 정답 세트 ([#35](https://github.com/slopdam/slopdam/issues/35))
 - [ ] 3. 알려진 인사말은 규칙으로: `tone.chatty` 목록을 늘리고 `strong` 단계에서 고치기, 명세와 모든 구현에 반영 ([#36](https://github.com/slopdam/slopdam/issues/36))
 - [ ] 4. `slopdam[chatter]`: Python과 `slopdam clean --chatter`에서 인사말 모델 사용, 기본은 꺼짐 ([#37](https://github.com/slopdam/slopdam/issues/37))
 - [ ] 5. 브라우저 데모에서 인사말 모델 실행 (ONNX) ([#38](https://github.com/slopdam/slopdam/issues/38))
