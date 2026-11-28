@@ -2,6 +2,11 @@
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows the output stability policy in [GOVERNANCE.md](GOVERNANCE.md).
 
+## [Unreleased]
+
+### Output changes
+- `dash.run`, two cases found on real projects. A dash between a digit and a short identifier with a number is a range: `H1–H5` becomes `H1~H5` (`dev`: `H1-H5`), not `H1: H5`; so do `v1–v3` and `Q1–Q4`. A single dash used as an empty cell, after column padding (two spaces or a tab), a `|` or a format placeholder `}` and before the end of the line, a `|` or a tab, becomes an ASCII `-` instead of disappearing: `{name:<15} –` becomes `{name:<15} -`, `| – |` becomes `| - |`. A dash hanging off a sentence (`완료 ㅡ`, `Done —`) is still removed. The spec gains `dash_range_after` and a conformance group, `dash-meaning`; no existing expected output changes. JavaScript, Go and Java match Python on 40,000 random inputs.
+
 ## [0.9.1] - 2026-11-28
 
 ### Fixed

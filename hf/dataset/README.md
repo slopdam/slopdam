@@ -116,7 +116,7 @@ The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `leve
 
 ## Real messages (`real`)
 
-104 string literals from the log and print calls of [ma-pmo-ext](https://github.com/ma-pmo/ma-pmo-ext), an open-source project written with AI coding tools, taken as they appear in the source (escape sequences such as `\n` are not expanded). 41 of them carry a trace (`✓`, `✗`, `—`, `→`, `…`, `🎉`); the others are there to catch changes that should not happen.
+104 string literals from the log and print calls of [ma-pmo-ext](https://github.com/ma-pmo/ma-pmo-ext), an open-source project written with AI coding tools, taken as they appear in the source (escape sequences such as `\n` are not expanded). 42 of them carry a trace (`✓`, `✗`, `—`, `–`, `→`, `…`, `🎉`); the others are there to catch changes that should not happen.
 
 | Field | Meaning |
 |---|---|
@@ -127,7 +127,7 @@ The `conformance` subset has `id`, `group`, `input`, `options` (JSON text: `leve
 | `note` | Why `expected` differs from slopdam's output, when it does |
 | `reader`, `dev` | slopdam's engine on `input`, keeping whitespace at either end and leaving a literal alone when nothing but a symbol would remain, the way `slopdam fix` treats a Python string. f-string and template expressions are not masked here, unlike in `fix`. |
 
-slopdam 0.9.0 (`reader`) fixes all 41 traces and leaves 61 of the other 63 alone. The two it gets wrong: an en dash used as an empty table cell (`{name:<15} –`), and check marks inside an f-string expression (`{'✓' if r.ok else '✗'}`), which `slopdam fix` does not touch but the engine on the whole text does.
+slopdam (`reader`) fixes all 42 traces and leaves 61 of the other 62 alone. One of the traces is an en dash used as an empty table cell (`{name:<15} –`), which should stay as an ASCII `-`; slopdam 0.9 removed it, and the next release keeps it. The one it still gets wrong is check marks inside an f-string expression (`{'✓' if r.ok else '✗'}`), which `slopdam fix` does not touch but the engine on the whole text does.
 
 The same review covered `slopdam check` on five such projects (614 log messages; only this public one is published). It led to the fixes in slopdam's next release: `check` had spent 85% of its findings on build output, and missed template literals in JavaScript and TypeScript and strings nested in Python calls (`print(tr("✓ ..."))`). After them it reports 124 of the 126 messages with a trace (the other two are rightly left alone), and 169 of 171 findings in developer logs are correct.
 

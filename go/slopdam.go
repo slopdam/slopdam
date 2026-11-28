@@ -87,6 +87,7 @@ type rulesSpec struct {
 	} `json:"charsets"`
 	DashWordBefore string `json:"dash_word_before"`
 	DashWordAfter  string `json:"dash_word_after"`
+	DashRangeAfter string `json:"dash_range_after"`
 	Tidy           struct {
 		Scope      string `json:"scope"`
 		MultiSpace string `json:"multi_space"`
@@ -103,6 +104,7 @@ var (
 	multiSpace *regexp2.Regexp
 	quoteSpace *regexp2.Regexp
 	choseong   *regexp2.Regexp
+	idAfter    *regexp2.Regexp
 	hanKana    *regexp2.Regexp
 	statusOf   = map[rune]string{}
 	compiled   = map[int]*regexp2.Regexp{}
@@ -127,6 +129,7 @@ func init() {
 	multiSpace = must(spec.Tidy.MultiSpace, nil)
 	quoteSpace = must(spec.Tidy.QuoteSpace, nil)
 	choseong = regexp2.MustCompile("^["+spec.Charsets.HangulChoseong+"]$", regexp2.None)
+	idAfter = regexp2.MustCompile("^"+spec.DashRangeAfter, regexp2.None)
 	hanKana = regexp2.MustCompile("["+spec.Charsets.HanKana+"]", regexp2.None)
 	for tag, chars := range spec.Charsets.Status {
 		for _, c := range chars {
@@ -257,7 +260,11 @@ var functions = map[string]action{
 			}
 			return ""
 		}
-		if isDigit(prev) && isDigit(next) {
+		rangeAfter := false
+		if end < len(s) {
+			rangeAfter, _ = idAfter.MatchString(string(s[end:min(end+4, len(s))]))
+		}
+		if isDigit(prev) && (isDigit(next) || rangeAfter) { // 1–2, H1–H5
 			if ctx.profile == "reader" {
 				return "~"
 			}
@@ -278,6 +285,11 @@ var functions = map[string]action{
 				return ctx.dashInline
 			}
 			return " - "
+		}
+		// An empty cell after column padding, a table bar or a format placeholder: keep it, in ASCII.
+		cell := len(lead) >= 2 || strings.Contains(lead, "\t") || prev == '|' || prev == '}'
+		if lead != "" && cell && len(pyStrip(s[lineStart:start])) > 0 && (next == '\n' || next == '|' || strings.Contains(trail, "\t")) {
+			return lead + "-" + trail
 		}
 		return ""
 	},
