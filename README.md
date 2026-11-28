@@ -137,7 +137,7 @@ exclude = ["tests/**"]
 ```yaml
 repos:
   - repo: https://github.com/slopdam/slopdam
-    rev: v0.6.0
+    rev: v0.7.0
     hooks:
       - id: slopdam
 ```
@@ -146,7 +146,7 @@ GitHub Actions, with findings shown as annotations on the pull request:
 
 ```yaml
 - uses: actions/checkout@v7
-- uses: slopdam/slopdam@v0.6.0
+- uses: slopdam/slopdam@v0.7.0
   with:
     paths: src/
 ```

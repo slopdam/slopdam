@@ -27,12 +27,12 @@ Needs `pip install -U huggingface_hub` and a write token for the `slopdam` organ
 ```bash
 hf repos create slopdam/log-slop --type dataset
 cp hf/dataset/README.md hf/dataset/out/README.md
-hf upload slopdam/log-slop hf/dataset/out . --type dataset --commit-message "log-slop from slopdam 0.6.0"
+hf upload slopdam/log-slop hf/dataset/out . --type dataset --commit-message "log-slop from slopdam 0.7.0"
 ```
 
 ```bash
 hf repos create slopdam/slopdam --type space --sdk static
-hf upload slopdam/slopdam hf/space . --type space --commit-message "slopdam 0.6.0"
+hf upload slopdam/slopdam hf/space . --type space --commit-message "slopdam 0.7.0"
 ```
 
 ```bash
